@@ -1,5 +1,5 @@
 {
-  "name": "fuxa-server",
+  "name": "scadacraft-server",
   "version": "1.3.5-2937",
   "description": "Web-based Process Visualization (SCADA/HMI/Dashboard) software",
   "main": "main.js",

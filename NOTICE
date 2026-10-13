@@ -1,0 +1,10 @@
+ScadaCraft
+Copyright (c) 2026 Andrea Allegretta
+
+This product is a derivative of FUXA (https://github.com/frangoteam/FUXA),
+Copyright (c) 2019-2025 frangoteam, licensed under the MIT License.
+The full MIT license text is in the LICENSE file and applies to the
+FUXA-derived portions of this software.
+
+Third-party libraries bundled with this software are subject to their
+own licenses, listed in their respective package metadata.

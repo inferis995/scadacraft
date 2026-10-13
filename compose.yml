@@ -1,6 +1,7 @@
 services:
-  fuxa:
-    image: frangoteam/fuxa:latest
+  scadacraft:
+    image: scadacraft:latest
+    build: .
     restart: unless-stopped
     volumes:
       - './appdata:/usr/src/app/FUXA/server/_appdata'

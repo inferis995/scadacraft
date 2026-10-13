@@ -45,8 +45,8 @@ nopt.invalidHandler = function (k, v, t) {
 var parsedArgs = nopt(knownOpts, shortHands, process.argv, 2);
 
 if (parsedArgs.help) {
-    console.log("FUXA v" + FUXA.version());
-    console.log("Usage: fuxa [-?] [--port PORT] [--userDir DIR]");
+    console.log("ScadaCraft v" + FUXA.version());
+    console.log("Usage: scadacraft [-?] [--port PORT] [--userDir DIR]");
     console.log("");
     console.log("Options:");
     console.log("  -p, --port     PORT  port to listen on");
@@ -227,9 +227,9 @@ if (!fs.existsSync(settings.logDir)) {
 logger.init(settings);
 const version = FUXA.version();
 if (version.indexOf('beta') > 0) {
-    logger.warn('FUXA V.' + version);
+    logger.warn('ScadaCraft V.' + version);
 } else {
-    logger.info('FUXA V.' + version);
+    logger.info('ScadaCraft V.' + version);
 }
 
 // Check storage Database dir
@@ -339,7 +339,7 @@ settings.uiHost = settings.uiHost || "0.0.0.0";
 
 // Wait ending initialization
 events.once('init-runtime-ok', function () {
-    logger.info('FUXA init in  ' + utils.endTime(startTime) + 'ms.');
+    logger.info('ScadaCraft init in  ' + utils.endTime(startTime) + 'ms.');
     startFuxa();
     initWebcamSnapshotCleanup();
 });
@@ -352,7 +352,7 @@ try {
         logger.error('Unsupported version of node.js:', process.version);
         logger.error('FUXA requires node.js v6 or later');
     } else if (err.code == 'not_built') {
-        logger.error('FUXA has not been built. See README.md for details');
+        logger.error('ScadaCraft has not been built. See README.md for details');
     } else {
         logger.error('Failed to start server:');
         if (err.stack) {
@@ -598,7 +598,7 @@ function startFuxa() {
 
             server.listen(settings.uiPort, settings.uiHost, function () {
                 settings.serverPort = server.address().port;
-                process.title = 'FUXA';
+                process.title = 'ScadaCraft';
                 logger.info('WebServer is running ' + getListenPath());
             });
         } else {
@@ -678,6 +678,6 @@ process.on('SIGINT', function () {
     FUXA.stop().then(function () {
         process.exit();
     });
-    logger.info('FUXA end!');
+    logger.info('ScadaCraft end!');
     process.exit();
 });
