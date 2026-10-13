@@ -1,0 +1,8 @@
+OpenBridge Web Components
+Copyright (c) OpenBridge Components AS
+https://github.com/Ocean-Industries-Concept-Lab/openbridge-webcomponents
+
+This directory contains a subset (automation components) of
+@oicl/openbridge-webcomponents, version listed in VERSION, used under the
+Apache License, Version 2.0 (see LICENSE-APACHE). Rebuild with
+tools/openbridge/build-bundle.sh.
