@@ -88,7 +88,9 @@ server/_appdata
 #server/package-lock.json
 #client/package-lock.json
 
-server/_widgets
+server/_widgets/*
+!server/_widgets/README.md
+!server/_widgets/openbridge/
 
 .agents/
 AGENTS.md

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="52" viewBox="0 0 120 52">
+  <desc>OpenBridge Readout (OpenBridge obc-automation-readout, Apache-2.0).
+Bindable properties:
+  _pn_value (default 0): Process value
+  _ps_unit (default 'm3/h'): Engineering unit
+  _pn_digits (default 3): Number of digits</desc>
+  <rect id="ob_bg" x="0" y="0" width="120" height="52" fill="none" />
+  <foreignObject id="ob_fo" x="0" y="0" width="120" height="52">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;width:100%;height:100%;overflow:visible;">
+      <obc-automation-readout id="ob_el" style="position:absolute;left:41px;top:2px;"></obc-automation-readout>
+    </div>
+  </foreignObject>
+  <script type="text/javascript"><![CDATA[
+//!export-start
+let _pn_value = 0;
+let _ps_unit = 'm3/h';
+let _pn_digits = 3;
+//!export-end
+
+function toBool(v) {
+    if (v === true || v === 1) return true;
+    var s = String(v).toLowerCase();
+    return s === 'true' || s === '1' || s === 'on';
+}
+
+function toNum(v) {
+    var n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+}
+
+function apply() {
+    var el = document.getElementById('ob_el');
+    if (!el) return;
+    el.value = toNum(_pn_value);
+    el.unit = String(_ps_unit);
+    el.numberOfDigits = toNum(_pn_digits);
+}
+
+function putValue(id, value) {
+    if (id === '_pn_value') { _pn_value = toNum(value); }
+    if (id === '_ps_unit') { _ps_unit = String(value); }
+    if (id === '_pn_digits') { _pn_digits = toNum(value); }
+    apply();
+}
+
+function postValue(id, value) {
+    // replaced at runtime: writes value to the tag bound to "id"
+}
+
+apply();
+]]></script>
+</svg>

@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="184" height="224" viewBox="0 0 184 224">
+  <desc>OpenBridge Tank (OpenBridge obc-automation-tank, Apache-2.0).
+Bindable properties:
+  _pn_level (default 50): Level (same unit as max)
+  _pn_max (default 100): Maximum level
+  _ps_trend (default 'stable'): fast-rising | rising | stable | falling | fast-falling
+  _ps_medium (default 'water'): water | air | normal | empty
+  _ps_tag (default 'T-101'): Tank tag label</desc>
+  <rect id="ob_bg" x="0" y="0" width="184" height="224" fill="none" />
+  <foreignObject id="ob_fo" x="0" y="0" width="184" height="224">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;width:100%;height:100%;overflow:visible;">
+      <obc-automation-tank id="ob_el" style="position:absolute;left:86px;top:22px;"></obc-automation-tank>
+    </div>
+  </foreignObject>
+  <script type="text/javascript"><![CDATA[
+//!export-start
+let _pn_level = 50;
+let _pn_max = 100;
+let _ps_trend = 'stable';
+let _ps_medium = 'water';
+let _ps_tag = 'T-101';
+//!export-end
+
+function toBool(v) {
+    if (v === true || v === 1) return true;
+    var s = String(v).toLowerCase();
+    return s === 'true' || s === '1' || s === 'on';
+}
+
+function toNum(v) {
+    var n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+}
+
+function apply() {
+    var el = document.getElementById('ob_el');
+    if (!el) return;
+    el.value = toNum(_pn_level);
+    el.max = toNum(_pn_max);
+    el.trend = String(_ps_trend);
+    el.medium = String(_ps_medium);
+    el.tag = String(_ps_tag);
+}
+
+function putValue(id, value) {
+    if (id === '_pn_level') { _pn_level = toNum(value); }
+    if (id === '_pn_max') { _pn_max = toNum(value); }
+    if (id === '_ps_trend') { _ps_trend = String(value); }
+    if (id === '_ps_medium') { _ps_medium = String(value); }
+    if (id === '_ps_tag') { _ps_tag = String(value); }
+    apply();
+}
+
+function postValue(id, value) {
+    // replaced at runtime: writes value to the tag bound to "id"
+}
+
+apply();
+]]></script>
+</svg>

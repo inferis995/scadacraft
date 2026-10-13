@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="90" viewBox="0 0 60 90">
+  <desc>OpenBridge Fan (OpenBridge obc-fan, Apache-2.0).
+Bindable properties:
+  _pb_running (default false): Running feedback
+  _pb_vertical (default false): Vertical orientation
+  _pb_alarm (default false): Alarm active (red alert frame)
+  _pb_auto (default false): Auto mode badge
+  _ps_tag (default ''): Numeric equipment ID shown as #NNNN (empty = hidden)
+  _pb_command (default false): Start/stop command: written with !running on click</desc>
+  <rect id="ob_bg" x="0" y="0" width="60" height="90" fill="none" />
+  <foreignObject id="ob_fo" x="0" y="0" width="60" height="90">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;width:100%;height:100%;overflow:visible;">
+      <obc-fan id="ob_el" style="position:absolute;left:30px;top:26px;"></obc-fan>
+    </div>
+  </foreignObject>
+  <script type="text/javascript"><![CDATA[
+//!export-start
+let _pb_running = false;
+let _pb_vertical = false;
+let _pb_alarm = false;
+let _pb_auto = false;
+let _ps_tag = '';
+let _pb_command = false;
+//!export-end
+
+function toBool(v) {
+    if (v === true || v === 1) return true;
+    var s = String(v).toLowerCase();
+    return s === 'true' || s === '1' || s === 'on';
+}
+
+function toNum(v) {
+    var n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+}
+
+function apply() {
+    var el = document.getElementById('ob_el');
+    if (!el) return;
+    el.on = toBool(_pb_running);
+    el.vertical = toBool(_pb_vertical);
+    el.alert = toBool(_pb_alarm);
+    el.badgeAuto = toBool(_pb_auto);
+    el.tag = String(_ps_tag);
+    el.hasIdTag = String(_ps_tag).length > 0;
+}
+
+function putValue(id, value) {
+    if (id === '_pb_running') { _pb_running = toBool(value); }
+    if (id === '_pb_vertical') { _pb_vertical = toBool(value); }
+    if (id === '_pb_alarm') { _pb_alarm = toBool(value); }
+    if (id === '_pb_auto') { _pb_auto = toBool(value); }
+    if (id === '_ps_tag') { _ps_tag = String(value); }
+    if (id === '_pb_command') { _pb_command = toBool(value); }
+    apply();
+}
+
+function postValue(id, value) {
+    // replaced at runtime: writes value to the tag bound to "id"
+}
+
+function onClick() {
+    _pb_command = !toBool(_pb_running);
+    postValue('_pb_command', _pb_command ? 1 : 0);
+}
+
+(function () {
+    var el = document.getElementById('ob_el');
+    if (el) { el.addEventListener('click', onClick); }
+})();
+
+apply();
+]]></script>
+</svg>
