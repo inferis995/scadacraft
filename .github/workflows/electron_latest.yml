@@ -1,0 +1,118 @@
+name: Build FUXA Electron App (Latest)
+
+on:
+  #push:
+    #branches:
+  #pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: x64
+          - os: ubuntu-24.04-arm
+            arch: arm64
+          - os: windows-latest
+            arch: x64
+          - os: macos-latest
+            arch: x64
+          - os: macos-latest
+            arch: arm64
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install build dependencies
+      if: startsWith(matrix.os, 'ubuntu')
+      run: sudo apt-get update && sudo apt-get install -y build-essential unixodbc unixodbc-dev
+
+    - name: Install server dependencies
+      run: |
+        npm config set fetch-retry-maxtimeout 120000
+        npm config set fetch-retries 5
+        npm ci --prefer-offline --no-audit
+      working-directory: ./server
+
+    - name: Install client dependencies
+      run: |
+        npm config set fetch-retry-maxtimeout 120000
+        npm config set fetch-retries 5
+        npm ci --prefer-offline --no-audit
+      working-directory: ./client
+
+    - name: Build client
+      run: npm run build -- --configuration=production
+      working-directory: ./client
+
+    - name: Install app dependencies
+      run: |
+        npm config set fetch-retry-maxtimeout 120000
+        npm config set fetch-retries 5
+        npm ci --prefer-offline --no-audit
+      working-directory: ./app/electron
+
+    - name: Copy server and client build to app/electron
+      run: |
+        mkdir -p app/electron/server
+        mkdir -p app/electron/client/dist
+        cp -r server/. app/electron/server/
+        cp -r client/dist/. app/electron/client/dist
+      shell: bash
+
+    - name: Install app dependencies for Electron
+      run: npx electron-builder install-app-deps
+      working-directory: ./app/electron
+      env:
+        ELECTRON_ARCH: ${{ matrix.arch }}
+
+    - name: Package for Windows
+      if: matrix.os == 'windows-latest' && matrix.arch == 'x64'
+      run: npx electron-builder --win nsis --x64
+      working-directory: ./app/electron
+
+    - name: Package for Linux
+      if: startsWith(matrix.os, 'ubuntu')
+      run: |
+        if [ "${{ matrix.arch }}" = "arm64" ]; then
+          npx electron-builder --linux appimage --arm64
+        else
+          npx electron-builder --linux appimage --${{ matrix.arch }}
+        fi
+      working-directory: ./app/electron
+
+    - name: Package for macOS
+      if: matrix.os == 'macos-latest'
+      run: npx electron-builder --mac dmg --${{ matrix.arch }}
+      working-directory: ./app/electron
+
+    - name: Prepare artifacts
+      run: |
+        mkdir -p artifacts
+        if [ "${{ matrix.os }}" = "windows-latest" ]; then
+          mv dist/*.exe artifacts/FUXA-windows-x64.exe
+        elif [ "${{ matrix.os }}" = "ubuntu-latest" ] && [ "${{ matrix.arch }}" = "x64" ]; then
+          mv dist/*.AppImage artifacts/FUXA-linux-x64.AppImage
+        elif [ "${{ matrix.os }}" = "ubuntu-24.04-arm" ] && [ "${{ matrix.arch }}" = "arm64" ]; then
+          mv dist/*.AppImage artifacts/FUXA-linux-arm64.AppImage
+        elif [ "${{ matrix.os }}" = "macos-latest" ] && [ "${{ matrix.arch }}" = "x64" ]; then
+          mv dist/*.dmg artifacts/FUXA-macos-x64.dmg
+        elif [ "${{ matrix.os }}" = "macos-latest" ]; then
+          mv dist/*.dmg artifacts/FUXA-macos-arm64.dmg
+        fi
+      working-directory: ./app/electron
+      shell: bash
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: FUXA-${{ matrix.os }}-${{ matrix.arch }}
+        path: app/electron/artifacts/*
