@@ -10,7 +10,7 @@ API keys, logs, backups).
 Everything is written in the same format as the ScadaCraft editor, so devices, alarms and
 pages created through MCP appear, run and can be edited by hand like any other.
 
-## Tools (82)
+## Tools (86)
 
 **Project**
 
@@ -67,6 +67,10 @@ pages created through MCP appear, run and can be edited by hand like any other.
 | `scadacraft_set_properties` | Change values or bindings of a placed widget |
 | `scadacraft_draw_shapes` | Cards, titles, labels and separators (plain editor shapes); colours can follow the OpenBridge palette (`ob:container-global`, `ob:element-active`, …) |
 | `scadacraft_remove_items` | Remove items or shapes from a page |
+| `scadacraft_set_events` | Click / mouse events on any item (widget, chart, value, button, shape): open a page, a popup or a floating card, close it, write / add to / toggle a tag, run a script, open a link |
+| `scadacraft_animate_shape` | Shape animation from tags: colour by value range, blink, hide/show, rotate by value, spin, move |
+| `scadacraft_place_value` | Native value display: tag value with unit and decimals |
+| `scadacraft_place_button` | Native button with its events (and background colour by tag value) |
 | `scadacraft_place_chart` | ScadaCraft trend chart on a page, bound to a chart definition (realtime window or history with time toolbar) |
 | `scadacraft_create_trend_page` | One step: chart definition with the tags, a page with the chart filling it, menu entry |
 
@@ -146,6 +150,8 @@ Requires Node.js 20 or later and a running ScadaCraft server.
 | `SCADACRAFT_USERNAME`, `SCADACRAFT_PASSWORD` | — | Admin user, only if ScadaCraft security is enabled |
 | `TRANSPORT` | `stdio` | `stdio` or `http` |
 | `HOST`, `PORT` | `127.0.0.1`, `3001` | Listen address for `TRANSPORT=http` (endpoint `/mcp`) |
+| `SCADACRAFT_MCP_TOKEN` | — | Bearer token for `TRANSPORT=http`; **required** when `HOST` is not localhost (min. 24 characters) |
+| `MCP_ALLOWED_HOSTS` | — | Comma-separated `Host` names accepted by the HTTP endpoint (DNS-rebinding protection) |
 
 ### Claude Code
 
@@ -172,12 +178,19 @@ claude mcp add scadacraft --env SCADACRAFT_URL=http://127.0.0.1:1881 -- node /pa
 ### HTTP transport
 
 ```bash
-TRANSPORT=http PORT=3001 SCADACRAFT_URL=http://hmi-server:1881 node dist/index.js
+# same machine: localhost only, Host header checked (DNS-rebinding protection)
+TRANSPORT=http PORT=3001 SCADACRAFT_URL=http://127.0.0.1:1881 node dist/index.js
+
+# on the network: a bearer token is mandatory
+export SCADACRAFT_MCP_TOKEN=$(openssl rand -hex 32)
+TRANSPORT=http HOST=0.0.0.0 PORT=3001 MCP_ALLOWED_HOSTS=hmi-server,hmi-server.local \
+  SCADACRAFT_URL=http://127.0.0.1:1881 node dist/index.js
 ```
 
-The HTTP endpoint has no authentication of its own. Keep it on `127.0.0.1` or behind a
-reverse proxy with authentication: anyone who reaches it can change the project and write
-tags.
+Clients send `Authorization: Bearer <token>`; requests without it get `401`. The server refuses
+to listen on a non-localhost address without a token, because whoever reaches it can change the
+project and write tags. Use HTTPS (a reverse proxy) when the token crosses an untrusted network,
+and keep the MCP server on the OT side of the firewall.
 
 ## Safety
 
@@ -206,11 +219,14 @@ npm test
 ```
 
 - `test/parity.mjs`: widget script processing matches the editor's code for every widget.
+- `test/http-auth.mjs`: HTTP transport security (token required on the network, 401 without it, DNS-rebinding protection on localhost).
 - `test/e2e.mjs`: page building with server memory tags (tank, pump, valve, readout, pipes).
 - `test/e2e-library.mjs`: widget import into the library, placement of imported widgets with
   bindings, trend chart on a page (history mode), one-step trend page with menu entry.
 - `test/e2e-widgets.mjs`: the five OpenBridge libraries; builds the page "OpenBridge showcase" with
   every instrument, chart, control and alert bound to server tags (sizes in cells, top-left anchor).
+- `test/e2e-interaction.mjs`: events (page, popup, card, close, set/add/toggle tag, script, link) on
+  widgets, buttons and shapes; value display; shape colour/blink/hide animation; stored format as the editor expects.
 - `test/e2e-plant.mjs`: full plant against a simulated Modbus TCP PLC (`test/modbus-sim.mjs`):
   driver install, device, tags with scaling and history, live read, write to the PLC,
   connection status, alarm raise/acknowledge/history, tag history with CSV, page bound to

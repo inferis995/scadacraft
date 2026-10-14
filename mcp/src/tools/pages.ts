@@ -3,6 +3,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import type { PlaceSpec, PropertyValue } from '../services/pages.js';
 import type { ShapeSpec } from '../fuxa/view.js';
+import { EVENT_ACTIONS, EVENT_TRIGGERS, type AnimationSpec, type EventSpec } from '../fuxa/interaction.js';
 import { itemLine, ok, RELOAD_NOTE, run, ViewRef, type Ctx } from './common.js';
 
 const NodeSchema = z.object({
@@ -507,7 +508,7 @@ Returns: the new view id and name.`,
     - view (string)
     - unit: "cell" (default, 24 px grid, fractions allowed) | "px"
     - shapes (array, 1-500), each one of:
-        {type:"rect", x, y, width, height, radius?, fill?, stroke?, stroke_width?, opacity?}   (default card colours)
+        {type:"rect", x, y, width, height, radius? (px), fill?, stroke?, stroke_width?, opacity?}   (default card colours)
         {type:"text", x, y (baseline), text, size? (px, default 14), weight? normal|bold|600, color?, anchor? start|middle|end, uppercase?}
         {type:"line", x1, y1, x2, y2, stroke?, stroke_width?}
   Colours accept OpenBridge palette tokens ("ob:container-global", "ob:element-neutral", ...) so the page follows the theme.
@@ -533,5 +534,163 @@ Returns: the new view id and name.`,
   }, async ({ view, unit, shapes }) => run(async () => {
     const r = await ctx.pages.drawShapes(view, shapes as ShapeSpec[], unit);
     return ok(`Drew ${r.ids.length} shape(s) on **${r.view.name}**: ${r.ids.join(', ')}\n\n${RELOAD_NOTE}`, { view: r.view.name, ids: r.ids });
+  }));
+
+  // ------------------------------------------------------------------ events, animations, native controls
+  const EventSchema = z.object({
+    on: z.enum(EVENT_TRIGGERS).default('click').describe('Mouse trigger, default click'),
+    action: z.enum(EVENT_ACTIONS),
+    page: z.string().optional().describe('open_page / open_popup / open_card: page name or id'),
+    tag: z.string().optional().describe('set_value / toggle_value: "Device.Tag" (default: the item\'s own tag, for value/button/shape)'),
+    value: z.union([z.string(), z.number(), z.boolean()]).optional().describe('set_value: value to write (or amount for add/remove)'),
+    mode: z.enum(['set', 'add', 'remove']).optional().describe('set_value: write (default), add to or subtract from the current value'),
+    bit: z.number().int().min(0).max(31).optional().describe('toggle_value: toggle only this bit'),
+    script: z.string().optional().describe('run_script: script name or id (scadacraft_list_scripts)'),
+    params: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional().describe('run_script: parameter values by name (tagid parameters take "Device.Tag")'),
+    url: z.string().optional().describe('open_link: URL'),
+    new_tab: z.boolean().optional(),
+    x: z.number().optional().describe('open_card: left, px'),
+    y: z.number().optional().describe('open_card: top, px'),
+    relative_to: z.enum(['window', 'mouse']).optional().describe('open_card: position relative to the window (default) or the mouse'),
+    single: z.boolean().optional().describe('open_card: close the other cards first'),
+    hide_close: z.boolean().optional().describe('open_popup / open_card: no close button (put a button with action "close" on that page)'),
+  }).strict();
+  const EVENT_HELP = `Each event: {on? (click|dblclick|mousedown|mouseup|mouseover|mouseout, default click), action, ...}
+    action "open_page"    {page}                         navigate to another page
+    action "open_popup"   {page, hide_close?}            modal popup showing that page
+    action "open_card"    {page, x?, y?, relative_to?, single?, hide_close?}   floating, draggable window
+    action "close"                                       close the popup/card this item is in
+    action "set_value"    {tag?, value, mode? set|add|remove}   write a tag (e.g. setpoint +1, start command)
+    action "toggle_value" {tag?, bit?}                   invert a boolean / one bit
+    action "run_script"   {script, params?}              run a server/client script
+    action "open_link"    {url, new_tab?}`;
+
+  server.registerTool('scadacraft_set_events', {
+    title: 'Set click events',
+    description: `Make any item on a page interactive, like the editor's "Events" tab: OpenBridge widgets, charts, value displays,
+  buttons and plain shapes (rect/text/circle/path/line drawn with scadacraft_draw_shapes or in the editor).
+  Typical: click on a pump → open its faceplate popup; click on a card → go to the detail page; button → write a tag.
+
+  Args:
+    - view, item_id (from scadacraft_get_view, or a shape id from scadacraft_draw_shapes)
+    - events (array, 0-20; [] removes all events)
+    - append (default false: replace the existing events)
+  ${EVENT_HELP}
+
+  Events work in the runtime (/home); in the editor they are only stored. ${RELOAD_NOTE}`,
+    inputSchema: {
+      view: ViewRef,
+      item_id: z.string().min(1),
+      events: z.array(EventSchema).max(20),
+      append: z.boolean().default(false),
+    },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async ({ view, item_id, events, append }) => run(async () => {
+    const item = await ctx.pages.setEvents(view, item_id, events as EventSpec[], append);
+    return ok(`Events of \`${item_id}\`:\n${itemLine(item)}\n\n${RELOAD_NOTE}`, { item });
+  }));
+
+  const AnimColor = z.string().describe('Fixed colour "#RRGGBB" / "rgb(...)" (animated colours cannot be ob: tokens)');
+  server.registerTool('scadacraft_animate_shape', {
+    title: 'Animate a shape',
+    description: `Animate a plain shape (rect, circle, ellipse, path, line, text) with tag values, like the editor's shape properties:
+  colour by value ranges, blink, hide/show, rotate by value, continuous spin, move. Good for status lamps, level bars,
+  tank fill colours, fans, simple indicators drawn with scadacraft_draw_shapes. (OpenBridge widgets animate through their own properties.)
+
+  Args:
+    - view, shape_id
+    - tag: "Device.Tag" for the colours (and default for actions); null removes it
+    - colors: [{min, max, fill?, stroke?}] — first matching range wins (later ones override). E.g. 0..0 grey, 1..1 green
+    - actions: [{type, tag?, min? (default 1), max? (default = min), bit?, ...}]
+        blink {fill_a?, fill_b?, stroke_a?, stroke_b?, interval? ms}   while the value is in range
+        hide / show                                                     while in range
+        rotate {min_angle, max_angle}                                   angle proportional to the value
+        spin_clockwise / spin_anticlockwise / stop                      continuous rotation while in range
+        move {x, y, duration?}                                          translate to x, y px while in range
+    - base_fill / base_stroke: colour before the first value arrives
+  Omitted colors/actions are kept. Colour animation replaces the shape's ob: token colours with fixed ones.
+  ${RELOAD_NOTE}`,
+    inputSchema: {
+      view: ViewRef,
+      shape_id: z.string().min(1),
+      tag: z.string().nullable().optional(),
+      colors: z.array(z.object({ min: z.number(), max: z.number(), fill: AnimColor.optional(), stroke: AnimColor.optional() }).strict()).max(20).optional(),
+      actions: z.array(z.object({
+        type: z.enum(['blink', 'hide', 'show', 'rotate', 'spin_clockwise', 'spin_anticlockwise', 'stop', 'move']),
+        tag: z.string().optional(), min: z.number().optional(), max: z.number().optional(), bit: z.number().int().min(0).max(31).optional(),
+        fill_a: AnimColor.optional(), fill_b: AnimColor.optional(), stroke_a: AnimColor.optional(), stroke_b: AnimColor.optional(),
+        interval: z.number().int().min(100).max(10000).optional(),
+        min_angle: z.number().optional(), max_angle: z.number().optional(),
+        x: z.number().optional(), y: z.number().optional(), duration: z.number().int().min(0).optional(),
+      }).strict()).max(10).optional(),
+      base_fill: AnimColor.optional(),
+      base_stroke: AnimColor.optional(),
+    },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async ({ view, shape_id, ...input }) => run(async () => {
+    const item = await ctx.pages.animateShape(view, shape_id, { ...input, actions: input.actions as AnimationSpec[] | undefined });
+    return ok(`Animation of \`${shape_id}\`:\n${itemLine(item)}\n\n${RELOAD_NOTE}`, { item });
+  }));
+
+  server.registerTool('scadacraft_place_value', {
+    title: 'Place a value display',
+    description: `Place the native value display (editor "Value" control): a text showing a tag value with unit and decimals,
+  e.g. "12.4 bar". Lighter than an OpenBridge instrument; good inside tables and cards.
+
+  Args:
+    - view, x, y (text anchor point; with anchor "middle" the centre of the text baseline), unit: "cell" (default) | "px"
+    - tag, value_unit? (text after the value), decimals?, size? (px, default 14), color? (hex or ob: token), anchor? start|middle|end (default middle), weight?
+    - events? (same as scadacraft_set_events)
+  ${RELOAD_NOTE}`,
+    inputSchema: {
+      view: ViewRef,
+      x: z.number(), y: z.number(),
+      unit: z.enum(['cell', 'px']).default('cell'),
+      tag: z.string().min(1),
+      value_unit: z.string().max(20).optional(),
+      decimals: z.number().int().min(0).max(10).optional(),
+      size: z.number().min(4).max(200).optional(),
+      color: z.string().optional(),
+      anchor: z.enum(['start', 'middle', 'end']).optional(),
+      weight: z.enum(['normal', 'bold']).optional(),
+      name: z.string().optional(),
+      events: z.array(EventSchema).max(20).optional(),
+    },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+  }, async ({ view, unit, value_unit, ...spec }) => run(async () => {
+    const item = await ctx.pages.placeValue(view, { ...spec, unit: value_unit, events: spec.events as EventSpec[] | undefined }, unit);
+    return ok(`Placed value display:\n${itemLine(item)}\n\n${RELOAD_NOTE}`, { item });
+  }));
+
+  server.registerTool('scadacraft_place_button', {
+    title: 'Place a button',
+    description: `Place the native button (editor "Button" control) with its click events: navigation, popups, tag writes, scripts.
+  For an OpenBridge-styled command button with state feedback use the "ob-command-button" widget instead.
+
+  Args:
+    - view, x, y, width?, height? (default 4 x 1.5 cells), unit: "cell" (default) | "px"
+    - text, background?, color? (hex or ob: token; default OpenBridge raised button), font_size?
+    - tag? (own tag: target of set_value/toggle_value without "tag", and source of colors)
+    - colors? [{min, max, fill? (background), stroke? (text colour)}] by the tag value
+    - events (same as scadacraft_set_events; usually [{action:"set_value", value:1}] or [{action:"open_page", page:"Trend"}])
+  ${EVENT_HELP}
+  ${RELOAD_NOTE}`,
+    inputSchema: {
+      view: ViewRef,
+      x: z.number(), y: z.number(),
+      width: z.number().positive().default(4), height: z.number().positive().default(1.5),
+      unit: z.enum(['cell', 'px']).default('cell'),
+      text: z.string().min(1).max(100),
+      background: z.string().optional(), color: z.string().optional(),
+      font_size: z.number().min(6).max(100).optional(),
+      tag: z.string().optional(),
+      colors: z.array(z.object({ min: z.number(), max: z.number(), fill: z.string().optional(), stroke: z.string().optional() }).strict()).max(20).optional(),
+      name: z.string().optional(),
+      events: z.array(EventSchema).max(20).optional(),
+    },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+  }, async ({ view, unit, ...spec }) => run(async () => {
+    const item = await ctx.pages.placeButton(view, { ...spec, events: spec.events as EventSpec[] | undefined }, unit);
+    return ok(`Placed button:\n${itemLine(item)}\n\n${RELOAD_NOTE}`, { item });
   }));
 }

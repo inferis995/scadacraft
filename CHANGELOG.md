@@ -5,6 +5,12 @@ All notable changes to ScadaCraft. Versions of the MCP server are in brackets.
 ## Unreleased
 
 ### Added
+- MCP: interaction on pages. `scadacraft_set_events` (click → page, popup, floating card, close,
+  set / add / toggle a tag, script, link) on widgets, charts, buttons and shapes;
+  `scadacraft_animate_shape` (colour by value, blink, hide/show, rotate, spin, move);
+  native value display and button (`scadacraft_place_value`, `scadacraft_place_button`).
+- MCP HTTP transport: bearer token (`SCADACRAFT_MCP_TOKEN`) required on the network, refusal to
+  listen on a non-localhost address without it, DNS-rebinding protection on localhost.
 - `tools/promo/record-video.mjs`: presentation video recorded from the real screens.
 - Widget property panel: readable label, description and direction (read / command / read-write)
   next to every variable; OpenBridge widgets carry the metadata, custom widgets can use trailing

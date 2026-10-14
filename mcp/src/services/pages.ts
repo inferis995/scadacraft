@@ -11,9 +11,13 @@ import { DOMParser } from '@xmldom/xmldom';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, extname, join, resolve } from 'node:path';
 import {
-  addShapes, addWidgetGroup, buildWidgetItem, CHART_GAUGE_TYPE, removeShapes, type ShapeSpec, itemBoxes, newView, removeGroup, shortGuid, widgetNameFromAddress, WIDGET_GAUGE_TYPE,
+  addShapes, addWidgetGroup, buildWidgetItem, CHART_GAUGE_TYPE, elementBoxes, removeShapes, type ShapeSpec, itemBoxes, newView, removeGroup, shortGuid, widgetNameFromAddress, WIDGET_GAUGE_TYPE,
 } from '../fuxa/view.js';
 import { processWidget } from '../fuxa/widget-script.js';
+import {
+  addButtonControl, addValueControl, applyShapeAnimation, buildEvents, describeAnimation, describeEvents, ensureItem, removeElement,
+  type AnimationSpec, type ButtonSpec, type ColorRange, type EventSpec, type GaugeEvent, type ValueSpec,
+} from '../fuxa/interaction.js';
 import type { Catalog, CatalogWidget, GaugeSettings, Project, View, WidgetProperty } from '../fuxa/types.js';
 
 /** folder of the catalog (widgets.json); the widgets themselves live in one folder per library */
@@ -68,6 +72,10 @@ export interface PlacedItem {
   node: Node;
   box: { x: number; y: number; width: number; height: number };
   bindings: Record<string, string>;
+  /** click/mouse events, readable */
+  events?: string[];
+  /** shape animations, readable */
+  animations?: string[];
 }
 
 export class PagesService {
@@ -284,6 +292,7 @@ export class PagesService {
     const project = await this.getProject();
     const tagsById = new Map(allTags(project).map((t) => [t.id, t.ref]));
     const boxes = itemBoxes(view);
+    const shapeBoxes = elementBoxes(view);
     const out: PlacedItem[] = [];
     for (const [id, item] of Object.entries(view.items)) {
       const box = boxes[id];
@@ -293,7 +302,26 @@ export class PagesService {
         const chart = ((project as unknown as { charts?: { id: string; name: string }[] }).charts ?? []).find((c) => c.id === cp.id);
         const node = box ? { x: box.x / cat.grid, y: box.y / cat.grid } : { x: NaN, y: NaN };
         out.push({ id, widget: 'chart', name: item.name, node, box: box ?? { x: NaN, y: NaN, width: NaN, height: NaN },
-          bindings: { chart: chart ? chart.name : `missing (${cp.id})`, mode: cp.type === 'history' ? 'history' : `realtime ${cp.options?.realtime ?? ''} min` } });
+          bindings: { chart: chart ? chart.name : `missing (${cp.id})`, mode: cp.type === 'history' ? 'history' : `realtime ${cp.options?.realtime ?? ''} min` },
+          ...(((item.property as { events?: GaugeEvent[] }).events ?? []).length ? { events: describeEvents(project, (item.property as { events?: GaugeEvent[] }).events) } : {}) });
+        continue;
+      }
+      if (item.type !== WIDGET_GAUGE_TYPE) {
+        const p = item.property as { variableId?: string; text?: string; events?: GaugeEvent[]; ranges?: { text?: string; fractionDigits?: number }[] };
+        const b = box ?? shapeBoxes[id] ?? { x: NaN, y: NaN, width: NaN, height: NaN };
+        const bindings: Record<string, string> = {};
+        if (p.variableId) bindings.tag = `tag ${tagsById.get(p.variableId) ?? p.variableId}`;
+        if (item.type === 'svg-ext-value' && p.ranges?.[0]) {
+          if (p.ranges[0].text) bindings.unit = p.ranges[0].text;
+          if (p.ranges[0].fractionDigits !== undefined) bindings.decimals = String(p.ranges[0].fractionDigits);
+        }
+        if (item.type === 'svg-ext-html_button' && p.text) bindings.text = p.text;
+        const kind = item.type === 'svg-ext-value' ? 'value' : item.type === 'svg-ext-html_button' ? 'button'
+          : item.type.startsWith('svg-ext-shapes-') ? `shape-${item.type.slice('svg-ext-shapes-'.length)}` : item.type;
+        const events = describeEvents(project, p.events);
+        const animations = item.type.startsWith('svg-ext-shapes-') ? describeAnimation(project, item) : [];
+        out.push({ id, widget: kind, name: item.name, node: { x: b.x / cat.grid, y: b.y / cat.grid }, box: b, bindings,
+          ...(events.length ? { events } : {}), ...(animations.length ? { animations } : {}) });
         continue;
       }
       let wname = widgetNameFromAddress(prop.address);
@@ -312,7 +340,8 @@ export class PagesService {
       }
       const anchor = w?.anchor ?? { x: 0, y: 0 };
       const node = box ? { x: (box.x + anchor.x) / cat.grid, y: (box.y + anchor.y) / cat.grid } : { x: NaN, y: NaN };
-      out.push({ id, widget: wname ?? item.type, name: item.name, node, box: box ?? { x: NaN, y: NaN, width: NaN, height: NaN }, bindings });
+      const events = describeEvents(project, prop.events as GaugeEvent[] | undefined);
+      out.push({ id, widget: wname ?? item.type, name: item.name, node, box: box ?? { x: NaN, y: NaN, width: NaN, height: NaN }, bindings, ...(events.length ? { events } : {}) });
     }
     return out;
   }
@@ -438,7 +467,7 @@ export class PagesService {
     for (const id of ids) {
       if (view.items[id]) {
         delete view.items[id];
-        removeGroup(view, id);
+        if (!removeGroup(view, id)) removeElement(view, id);
         removed.push(id);
       } else shapeIds.push(id);
     }
@@ -449,6 +478,53 @@ export class PagesService {
     }
     if (removed.length) await this.client.saveView(view);
     return { removed, missing };
+  }
+
+  // ---------------------------------------------------------------- events, animations, native controls
+  /** Set (replace or append) the mouse events of any item: widget, chart, value, button or plain shape. */
+  async setEvents(viewRef: string, itemId: string, specs: EventSpec[], append = false): Promise<PlacedItem> {
+    const project = await this.getProject();
+    const view = this.findView(project, viewRef);
+    const item = ensureItem(view, itemId);
+    const p = item.property as Record<string, unknown>;
+    const ownTag = typeof p.variableId === 'string' ? p.variableId : undefined;
+    const events = buildEvents(project, specs, ownTag);
+    p.events = append ? [...((p.events as GaugeEvent[] | undefined) ?? []), ...events] : events;
+    await this.client.saveView(view);
+    return (await this.describeItems(view)).find((x) => x.id === itemId)!;
+  }
+
+  /** Colour by value, blink, hide/show, rotate, spin, move on a plain shape. */
+  async animateShape(viewRef: string, shapeId: string, input: { tag?: string | null; colors?: ColorRange[]; actions?: AnimationSpec[]; base_fill?: string; base_stroke?: string }): Promise<PlacedItem> {
+    const project = await this.getProject();
+    const view = this.findView(project, viewRef);
+    applyShapeAnimation(project, view, shapeId, input);
+    await this.client.saveView(view);
+    return (await this.describeItems(view)).find((x) => x.id === shapeId)!;
+  }
+
+  /** Native value display. x/y: text anchor point in cells (or px). */
+  async placeValue(viewRef: string, spec: ValueSpec & { events?: EventSpec[] }, unit: 'cell' | 'px' = 'cell'): Promise<PlacedItem> {
+    const cat = await this.getCatalog();
+    const project = await this.getProject();
+    const view = this.findView(project, viewRef);
+    const k = unit === 'cell' ? cat.grid : 1;
+    const item = addValueControl(project, view, { ...spec, x: spec.x * k, y: spec.y * k });
+    if (spec.events?.length) (item.property as Record<string, unknown>).events = buildEvents(project, spec.events, spec.tag);
+    await this.client.saveView(view);
+    return (await this.describeItems(view)).find((x) => x.id === item.id)!;
+  }
+
+  /** Native button, optionally with events (default trigger: click) and colours by tag value. */
+  async placeButton(viewRef: string, spec: ButtonSpec & { events?: EventSpec[] }, unit: 'cell' | 'px' = 'cell'): Promise<PlacedItem> {
+    const cat = await this.getCatalog();
+    const project = await this.getProject();
+    const view = this.findView(project, viewRef);
+    const k = unit === 'cell' ? cat.grid : 1;
+    const item = addButtonControl(project, view, { ...spec, x: spec.x * k, y: spec.y * k, width: spec.width * k, height: spec.height * k });
+    if (spec.events?.length) (item.property as Record<string, unknown>).events = buildEvents(project, spec.events, spec.tag);
+    await this.client.saveView(view);
+    return (await this.describeItems(view)).find((x) => x.id === item.id)!;
   }
 
   // ---------------------------------------------------------------- native trend charts
@@ -486,7 +562,7 @@ export class PagesService {
     };
     view.items[id] = item;
     addWidgetGroup(view, id, x, y, width, height, {
-      type: CHART_GAUGE_TYPE, hostPrefix: 'HXC_', attrs: { style: 'pointer-events:none', stroke: '#000000', 'stroke-width': '1' },
+      type: CHART_GAUGE_TYPE, hostPrefix: 'HXC_', attrs: { style: 'pointer-events:inherit', stroke: '#000000', 'stroke-width': '1' },
     });
     await this.client.saveView(view);
     const placed = (await this.describeItems(view)).find((i) => i.id === id)!;

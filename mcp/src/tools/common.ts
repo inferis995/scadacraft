@@ -46,7 +46,9 @@ export async function run(fn: () => Promise<ToolResult>): Promise<ToolResult> {
 
 export function itemLine(i: PlacedItem): string {
   const b = Object.entries(i.bindings).map(([k, v]) => `${k}=${v}`).join(', ');
-  return `- \`${i.id}\` ${i.widget}${i.name ? ` "${i.name}"` : ''} at node (${i.node.x}, ${i.node.y}), box ${i.box.width}x${i.box.height}${b ? ` — ${b}` : ''}`;
+  const extra = [...(i.events ?? []).map((e) => `on ${e}`), ...(i.animations ?? [])];
+  return `- \`${i.id}\` ${i.widget}${i.name ? ` "${i.name}"` : ''} at node (${i.node.x}, ${i.node.y}), box ${i.box.width}x${i.box.height}${b ? ` — ${b}` : ''}`
+    + (extra.length ? `\n    ${extra.join('\n    ')}` : '');
 }
 
 export const RELOAD_NOTE = 'If the editor is open, reload it to see the change (the editor keeps its own copy of the project until reloaded).';

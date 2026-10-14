@@ -28,6 +28,9 @@ jobs:
       - name: Widget scripts match the editor's processing
         working-directory: mcp
         run: node test/parity.mjs
+      - name: HTTP transport security
+        working-directory: mcp
+        run: node test/http-auth.mjs
 
   e2e:
     name: End-to-end — MCP against a running ScadaCraft
@@ -61,7 +64,7 @@ jobs:
       - name: Install and build MCP server
         working-directory: mcp
         run: npm ci && npm run build
-      - name: Tests (parity, pages, widget libraries, import and trends, Modbus plant, administration)
+      - name: Tests (parity, HTTP auth, pages, widget libraries, import and trends, interaction, Modbus plant, administration)
         working-directory: mcp
         env:
           SCADACRAFT_URL: http://127.0.0.1:1881

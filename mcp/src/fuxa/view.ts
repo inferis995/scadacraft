@@ -270,6 +270,27 @@ export function itemBoxes(view: View): Record<string, Box> {
   return boxes;
 }
 
+/** Approximate box of items that are plain elements or value texts (shapes, svg-ext-value). */
+export function elementBoxes(view: View): Record<string, Box> {
+  const { doc } = parseSvg(view.svgcontent);
+  const out: Record<string, Box> = {};
+  const n = (el: XElement, a: string) => Number(el.getAttribute(a) ?? 0);
+  const walk = (el: XElement) => {
+    const id = el.getAttribute?.('id');
+    if (id && view.items[id]) {
+      const tag = el.nodeName.toLowerCase();
+      if (tag === 'rect' || tag === 'image' || tag === 'foreignobject') out[id] = { x: n(el, 'x'), y: n(el, 'y'), width: n(el, 'width'), height: n(el, 'height') };
+      else if (tag === 'circle') out[id] = { x: n(el, 'cx') - n(el, 'r'), y: n(el, 'cy') - n(el, 'r'), width: 2 * n(el, 'r'), height: 2 * n(el, 'r') };
+      else if (tag === 'ellipse') out[id] = { x: n(el, 'cx') - n(el, 'rx'), y: n(el, 'cy') - n(el, 'ry'), width: 2 * n(el, 'rx'), height: 2 * n(el, 'ry') };
+      else if (tag === 'line') out[id] = { x: Math.min(n(el, 'x1'), n(el, 'x2')), y: Math.min(n(el, 'y1'), n(el, 'y2')), width: Math.abs(n(el, 'x2') - n(el, 'x1')), height: Math.abs(n(el, 'y2') - n(el, 'y1')) };
+      else if (tag === 'text' || tag === 'g') out[id] = { x: n(el, 'x'), y: n(el, 'y'), width: 0, height: 0 };
+    }
+    for (const c of Array.from(el.childNodes)) if (c.nodeType === 1) walk(c as unknown as XElement);
+  };
+  walk(doc.documentElement as unknown as XElement);
+  return out;
+}
+
 /** Widget catalog name from a stored address (…/_widgets/openbridge/ob-pump.svg -> ob-pump). */
 export function widgetNameFromAddress(address: unknown): string | undefined {
   if (typeof address !== 'string') return undefined;
