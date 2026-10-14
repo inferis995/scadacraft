@@ -181,12 +181,12 @@ return 'ok';`,
     // tanks
     { widget: 'ob-tank', node: { x: 5, y: 6 }, name: 'S1', properties: { level: T('Livello_S1'), tag: 'S1', fluid: 'fresh-water' } },
     { widget: 'ob-tank', node: { x: 14, y: 6 }, name: 'S2', properties: { level: T('Livello_S2'), tag: 'S2', fluid: 'fresh-water' } },
-    // pump card: pump symbol, state, speed, alarm frame
+    // pump card: alarm frame first (under the pump, so the pump stays selectable), pump symbol, state, speed
+    { widget: 'ob-alert-frame', node: { x: 1, y: 18 }, size: { width: 17, height: 13 }, properties: { active: T('Fault_Inverter') } },
     { widget: 'ob-pump', node: { x: 9, y: 21 }, name: 'P1', properties: { running: T('Marcia'), alarm: T('Fault_Inverter'), speed: T('Velocita_Pct'), auto: T('Modo_Auto'), tag: '1' } },
     { widget: 'ob-tag', node: { x: 7, y: 25 }, size: { width: 5, height: 2 }, properties: { label: T('Pompa_Testo'), color: T('Pompa_Colore') } },
     { widget: 'ob-instrument-field', node: { x: 2, y: 28 }, size: { width: 7, height: 3 }, properties: { value: T('Frequenza'), unit: 'Hz', tag: 'Frequenza', digits: 2, decimals: 1 } },
     { widget: 'ob-instrument-field', node: { x: 10, y: 28 }, size: { width: 7, height: 3 }, properties: { value: T('Giri'), unit: 'rpm', tag: 'Giri', digits: 4, decimals: 0 } },
-    { widget: 'ob-alert-frame', node: { x: 1, y: 18 }, size: { width: 17, height: 13 }, properties: { active: T('Fault_Inverter') } },
     // pressure
     { widget: 'ob-gauge-radial', node: { x: 20, y: 5 }, name: 'PT-101', properties: { value: T('Pressione'), max: 60, hasSetpoint: true, setpoint: T('SP_Pressione') } },
     { widget: 'ob-instrument-field', node: { x: 29, y: 5 }, size: { width: 8, height: 3 }, properties: { value: T('Pressione'), unit: 'bar', tag: 'PT-101', hasSetpoint: true, setpoint: T('SP_Pressione'), digits: 2, decimals: 1 } },

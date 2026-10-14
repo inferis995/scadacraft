@@ -5,6 +5,9 @@ All notable changes to ScadaCraft. Versions of the MCP server are in brackets.
 ## Unreleased
 
 ### Added
+- Widget property panel: readable label, description and direction (read / command / read-write)
+  next to every variable; OpenBridge widgets carry the metadata, custom widgets can use trailing
+  comments (see docs/HowTo-Widgets.md).
 - MCP `scadacraft_draw_shapes`: cards, titles, labels and separators as plain editor shapes, with
   colours that follow the OpenBridge palette; example `mcp/examples/stazione-pompaggio.mjs`
   (pumping-station page, simulated plant, alarms, trend page).
@@ -32,6 +35,7 @@ All notable changes to ScadaCraft. Versions of the MCP server are in brackets.
 - Rebranded from FUXA 1.3.5 to ScadaCraft (logo, UI strings, docs site, packages).
 
 ### Fixed
+- The OpenBridge alert frame no longer takes clicks meant for the equipment under it.
 - Widget uploads go to the folder the widget library is served from (also with `--userDir`).
 - Reports no longer fail when the chart renderer is missing.
 - OpenBridge clock and live charts stop their timers when the widget leaves the page.

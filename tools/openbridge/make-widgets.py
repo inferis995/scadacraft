@@ -461,7 +461,7 @@ ALERTS = [
          events=[dict(event='click', var='_pb_command', expr='true')],
          preview=[['_pn_count', 3]]),
     dict(file='ob-alert-frame.svg', el='obc-alert-frame', title='Alert frame', cat='alerts',
-         layout='fill', size=(192, 120),
+         layout='fill', size=(192, 120), pass_through=True,
          props=[p('_pb_active', 'false', None, 'bool', 'Frame visible (alert active); place it around the equipment'),
                 p('_ps_status', "'alarm'", 'status', 'str', 'Type: alarm | warning | caution'),
                 p('_ps_thickness', "'regular'", 'thickness', 'str', 'Border: regular | thick')],
@@ -669,6 +669,22 @@ def element_style(w):
     return ''
 
 
+def short_label(desc):
+    """Readable label for the property panel: the description up to its first qualifier."""
+    cut = len(desc)
+    for sep in (':', ' (', ', ', '; ', ' — ', ' = '):
+        i = desc.find(sep)
+        if 0 < i < cut:
+            cut = i
+    return desc[:cut].strip()
+
+
+def props_meta(w, props):
+    """Property metadata read by the editor's widget property panel (label, description, direction)."""
+    return json.dumps({'widget': w['title'], 'properties': {
+        x[0]: {'label': short_label(x[4]), 'description': x[4], 'dir': x[5]} for x in props}}, ensure_ascii=False)
+
+
 def build(w):
     width, height = w['size']
     ax, ay = w['anchor']
@@ -740,9 +756,10 @@ def build(w):
 
     return f'''<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="ob_root" width="{width}" height="{height}" viewBox="0 0 {width} {height}" overflow="visible">
   <desc>{escape(chr(10).join(doc))}</desc>
+  <metadata data-scadacraft="widget-properties">{escape(props_meta(w, props))}</metadata>
   <rect id="ob_bg" x="0" y="0" width="{width}" height="{height}" fill="none" />{preview}
   <foreignObject id="ob_fo" x="0" y="0" width="{width}" height="{height}" overflow="visible">
-    <div xmlns="http://www.w3.org/1999/xhtml" style="{CONTAINER[w['layout']]}">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="{CONTAINER[w['layout']]}{'pointer-events:none;' if w.get('pass_through') else ''}">
       <{w["el"]} id="ob_el" style="{element_style(w)}">{w.get('inner', '')}</{w["el"]}>
     </div>
   </foreignObject>

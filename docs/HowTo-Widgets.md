@@ -81,3 +81,22 @@ You can also use CSS in the SVG and full JS and access the elements/ids using st
 
 For full working examples, see the examples in the widget section https://github.com/frangoteam/FUXA/tree/master/server/_widgets 
  
+
+**ScadaCraft: readable names in the property panel**
+
+The property panel shows, for every variable, a readable label and a description next to the tag
+selection. A widget declares them in one of two ways:
+
+- a trailing comment in the export section, label first and an optional description after `|`:
+```
+//!export-start
+let _pn_level = 0;      // Level | Tank level in %
+let _pb_cmd = false;    // Start/stop command | Written 1/0 on click
+//!export-end
+```
+- or a metadata element in the SVG (used by the OpenBridge widgets), with the direction of each
+  variable (`read`, `write` = command written by the widget, `rw` = shown and written):
+```
+<metadata data-scadacraft="widget-properties">{"widget": "Level bar", "properties": {
+  "_pn_level": {"label": "Level", "description": "Tank level in %", "dir": "read"}}}</metadata>
+```

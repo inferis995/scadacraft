@@ -1,11 +1,16 @@
 <div class="container">
+    <div *ngIf="widgetTitle" class="widget-title">{{ widgetTitle }}</div>
     <div *ngFor="let varRef of property.varsToBind" class="var-ref">
-        <div class="my-form-field">
-            <input type="text"
-                   [value]="varRef.originalName"
-                   [readonly]="true">
+        <div class="var-info" [matTooltip]="info[varRef.originalName]?.description">
+            <div class="var-label">
+                {{ info[varRef.originalName]?.label || varRef.originalName }}
+                <span *ngIf="directionLabel(info[varRef.originalName]?.dir)" class="var-dir"
+                      [class.rw]="info[varRef.originalName]?.dir === 'rw'">{{ directionLabel(info[varRef.originalName]?.dir) }}</span>
+            </div>
+            <div class="var-name">{{ varRef.originalName }}</div>
+            <div *ngIf="info[varRef.originalName]?.description && info[varRef.originalName]?.description !== info[varRef.originalName]?.label"
+                 class="var-desc">{{ info[varRef.originalName]?.description }}</div>
         </div>
-        <span> - </span>
         <div class="inbk">
             <flex-variable
                     [data]="dataDevices"
