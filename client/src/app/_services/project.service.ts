@@ -4,7 +4,7 @@ import { Observable, Subject, firstValueFrom, of } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 import { ProjectData, ProjectDataCmdType, UploadFile } from '../_models/project';
-import { View, LayoutSettings, DaqQuery, ViewType } from '../_models/hmi';
+import { View, LayoutSettings, DaqQuery, ViewType, applyOpenBridgeTheme } from '../_models/hmi';
 import { Chart } from '../_models/chart';
 import { Graph } from '../_models/graph';
 import { Alarm, AlarmBaseType, AlarmQuery, AlarmsFilter } from '../_models/alarm';
@@ -519,6 +519,7 @@ export class ProjectService {
 
     setLayout(layout: LayoutSettings) {
         this.projectData.hmi.layout = layout;
+        applyOpenBridgeTheme(layout?.obcTheme);
         this.saveLayout();
     }
 

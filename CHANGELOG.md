@@ -5,6 +5,11 @@ All notable changes to ScadaCraft. Versions of the MCP server are in brackets.
 ## Unreleased
 
 ### Added
+- OpenBridge palettes: day / dusk / night / bright chosen in the layout (editor and MCP
+  `openbridge_theme`), page backgrounds follow the palette through the MCP.
+- Noto Sans font for OpenBridge components (they fell back to a serif font).
+- Alarm colours from the OpenBridge alert palette; alarm status system tags (active,
+  unacknowledged, per level) kept by the server, for the OpenBridge alert widgets.
 - MCP server [0.5.0]: import native SVG widgets into the editor library, place imported widgets
   with bindings, trend charts on pages (realtime or history), one-step trend pages with menu entry.
 - OpenBridge widget libraries: 49 widgets in five editor groups (automation P&ID, instruments,

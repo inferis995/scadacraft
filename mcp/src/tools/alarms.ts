@@ -140,4 +140,22 @@ Returns: events [{name, level, text, group, ontime, offtime, acktime, userack, v
     return ok(`${total} event(s) between ${iso(f)} and ${iso(t)}${total > rows.length ? `, showing ${rows.length}` : ''}.\n${text}`,
       { total, from: f, to: t, events: rows });
   }));
+
+  server.registerTool('scadacraft_create_alarm_status_tags', {
+    title: 'Create alarm status tags',
+    description: `Create (once) the alarm status tags on the ScadaCraft server device. ScadaCraft keeps them updated with the
+  number of alarms: "<prefix> Active", "Unacknowledged", "HighHigh", "High", "Low", "Info", "Total".
+  Bind them to OpenBridge alert widgets: ob-alert-button count = Active or Unacknowledged, ob-alert-icon active = HighHigh,
+  ob-badge number = Unacknowledged, ob-alert-frame active = HighHigh.
+
+  Args:
+    - prefix (string, default "Alarms"): tag name prefix
+
+  Returns: created and already existing tag names (refer to them as "FUXA Server.<name>").`,
+    inputSchema: { prefix: z.string().min(1).max(40).default('Alarms') },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async ({ prefix }) => run(async () => {
+    const r = await ctx.devices.ensureAlarmStatusTags(prefix);
+    return ok(`Alarm status tags — created: ${r.created.join(', ') || 'none'}; existing: ${r.existing.join(', ') || 'none'}.`, r);
+  }));
 }

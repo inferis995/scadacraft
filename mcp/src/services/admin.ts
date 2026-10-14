@@ -41,6 +41,10 @@ export interface LayoutInput {
   login_overlay?: 'none' | 'black' | 'white';
   show_connection_error?: boolean;
   custom_css?: string;
+  /** OpenBridge palette of the widgets */
+  openbridge_theme?: 'day' | 'dusk' | 'night' | 'bright';
+  /** with openbridge_theme: also set the page background of views that use a default/palette background (default true) */
+  page_background?: boolean;
   menu?: {
     mode?: (typeof NAV_MODES)[number];
     type?: (typeof NAV_TYPES)[number];
@@ -142,7 +146,7 @@ export class AdminService {
       readable: {
         start_view: vname(layout.start), show_dev_button: layout.showdev, zoom: layout.zoom, input_dialog: layout.inputdialog,
         hide_navigation: layout.hidenavigation, login_on_start: layout.loginonstart, login_overlay: layout.loginoverlaycolor,
-        theme: layout.theme, custom_css: layout.customStyles ? '(set)' : undefined,
+        theme: layout.theme, openbridge_theme: layout.obcTheme ?? 'day', custom_css: layout.customStyles ? '(set)' : undefined,
         menu: { mode: nav.mode, type: nav.type, background: nav.bkcolor, color: nav.fgcolor, logo: nav.logo || null, items: items(nav.items) },
         header: {
           title: header.title, background: header.bkcolor, color: header.fgcolor, height: header.height, font_family: header.fontFamily,
@@ -186,6 +190,10 @@ export class AdminService {
     if (input.login_overlay) layout.loginoverlaycolor = input.login_overlay;
     if (input.show_connection_error !== undefined) layout.show_connection_error = input.show_connection_error;
     if (input.custom_css !== undefined) layout.customStyles = input.custom_css;
+    if (input.openbridge_theme) {
+      layout.obcTheme = input.openbridge_theme;
+      if (input.page_background !== false) await this.applyPaletteBackground(project, input.openbridge_theme);
+    }
     const nav = layout.navigation as Rec;
     if (input.menu) {
       const m = input.menu;
@@ -208,6 +216,21 @@ export class AdminService {
     }
     await this.client.setProjectData('layout', layout);
     return (await this.getLayout()).readable;
+  }
+
+  /**
+   * Page background from the OpenBridge palette (--container-background-color of each theme).
+   * Only views with a white default or another palette background are changed; custom colours are kept.
+   */
+  private async applyPaletteBackground(project: Project, theme: 'day' | 'dusk' | 'night' | 'bright'): Promise<void> {
+    const palette = { day: '#F7F7F7', dusk: '#1F1F1F', night: '#000000', bright: '#FCFCFC' };
+    const replaceable = new Set(['', '#ffffff', '#ffffffff', '#fff', ...Object.values(palette).map((c) => c.toLowerCase())]);
+    for (const view of project.hmi?.views ?? []) {
+      const bk = String(view.profile?.bkcolor ?? '').toLowerCase();
+      if (!replaceable.has(bk) || bk === palette[theme].toLowerCase()) continue;
+      view.profile.bkcolor = palette[theme];
+      await this.client.saveView(view);
+    }
   }
 
   /** Append a menu entry (kept if a menu entry already opens the same view). */

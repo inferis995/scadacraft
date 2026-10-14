@@ -5,7 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 import { ProjectService } from '../../_services/project.service';
 
-import { LayoutSettings, NaviModeType, NaviItem, NaviItemType, NotificationModeType, ZoomModeType, InputModeType, HeaderBarModeType, View, HeaderItem, AnchorType, GaugeProperty, LoginInfoType, LoginOverlayColorType, LanguageShowModeType } from '../../_models/hmi';
+import { LayoutSettings, NaviModeType, NaviItem, NaviItemType, NotificationModeType, ZoomModeType, InputModeType, HeaderBarModeType, View, HeaderItem, AnchorType, GaugeProperty, LoginInfoType, LoginOverlayColorType, LanguageShowModeType, OPENBRIDGE_THEMES, applyOpenBridgeTheme } from '../../_models/hmi';
 import { Define } from '../../_helpers/define';
 import { Utils } from '../../_helpers/utils';
 import { ResourceGroup, ResourceItem, Resources, ResourceType } from '../../_models/resources';
@@ -48,6 +48,8 @@ export class LayoutPropertyComponent implements OnInit, OnDestroy {
     headerMode = HeaderBarModeType;
     logo = null;
     loginOverlayColor = LoginOverlayColorType;
+    openBridgeThemes = OPENBRIDGE_THEMES;
+    private initialObcTheme = document.documentElement.getAttribute('data-obc-theme');
     ready = false;
     @ViewChild(CodemirrorComponent, {static: false}) CodeMirror: CodemirrorComponent;
     codeMirrorContent: string;
@@ -271,7 +273,13 @@ export class LayoutPropertyComponent implements OnInit, OnDestroy {
         });
     }
 
+    /** Preview the OpenBridge palette while the dialog is open */
+    onOpenBridgeTheme(theme: string) {
+        applyOpenBridgeTheme(theme);
+    }
+
     onNoClick(): void {
+        applyOpenBridgeTheme(this.initialObcTheme);
         this.dialogRef.close();
     }
 

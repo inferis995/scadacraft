@@ -4,7 +4,19 @@
  * Pipe colour for water/air media: the line components read --automation-fresh-water,
  * but the palette only defines --automation-medium-fresh-water (also in OpenBridge 2.x).
  * Values below are the palette's fresh-water colours (cyan-200 / dusk-cyan-200).
+ *
+ * Font: OpenBridge components use --font-family-main ("Noto Sans"), which openbridge.css
+ * does not load; without it values and labels fall back to the browser's serif font.
+ * NotoSans.ttf (variable weight) ships with the package, SIL Open Font License 1.1.
  */
+@font-face {
+    font-family: "Noto Sans";
+    src: url("NotoSans.ttf") format("truetype");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
 [data-obc-theme="day"],
 [data-obc-theme="dusk"],
 [data-obc-theme="bright"] {

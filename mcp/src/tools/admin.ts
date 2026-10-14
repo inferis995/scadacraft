@@ -50,7 +50,9 @@ Args (all optional):
   - header: {title, background, color, height, font_family, font_size, alarms: ${NOTIFY_MODES.join('|')}, infos: ${NOTIFY_MODES.join('|')},
              login_info: nothing|username|fullname|both, date_time (Angular date format, e.g. "dd/MM/yyyy HH:mm:ss"), language: nothing|simple|key|fullname}
   - zoom: ${ZOOM_MODES.join('|')}; input_dialog: ${INPUT_MODES.join('|')}; hide_navigation; show_dev_button; login_on_start;
-    login_overlay: none|black|white; show_connection_error; custom_css
+    login_overlay: none|black|white; show_connection_error; custom_css;
+    openbridge_theme: day | dusk | night (control room) | bright (sunlight) — palette of all OpenBridge widgets;
+      page_background (default true): pages with a white/palette background take the palette background
 
 Example: {"start_view": "Overview", "menu": {"mode": "fix", "type": "block", "background": "#0B1F33", "color": "#FFFFFF",
   "items": [{"text": "Overview", "view": "Overview", "icon": "home"}, {"text": "Alarms", "alarms": true, "icon": "warning"}]},
@@ -68,6 +70,8 @@ ${RELOAD_NOTE}`,
       login_overlay: z.enum(['none', 'black', 'white']).optional(),
       show_connection_error: z.boolean().optional(),
       custom_css: z.string().optional(),
+      openbridge_theme: z.enum(['day', 'dusk', 'night', 'bright']).optional(),
+      page_background: z.boolean().optional().describe('with openbridge_theme: page backgrounds follow the palette (default true; custom colours are kept)'),
       menu: z.object({
         mode: z.enum(NAV_MODES).optional(), type: z.enum(NAV_TYPES).optional(),
         background: z.string().optional(), color: z.string().optional(), logo: z.string().nullable().optional(),

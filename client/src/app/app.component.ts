@@ -1,3 +1,4 @@
+import { applyOpenBridgeTheme } from './_models/hmi';
 import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ChangeDetectorRef, Inject } from '@angular/core';
 import { DOCUMENT, Location } from '@angular/common';
 import { Router } from '@angular/router';
@@ -131,6 +132,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
 	applyCustomCss() {
 		let hmi = this.projectService.getHmi();
+		applyOpenBridgeTheme(hmi?.layout?.obcTheme);
 		if (hmi?.layout?.customStyles) {
 			const style = this.document.createElement('style');
 			style.textContent = hmi.layout.customStyles;

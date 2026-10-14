@@ -209,11 +209,36 @@ empty when the page opens; for historical trends use the ScadaCraft chart contro
 For water and wastewater plants: `fresh-water` for potable and treated water, `waste` for
 raw sewage, `masses` for sludge, `air-ventilation` for blowers and aeration air.
 
-## 7. Themes
+## 7. Themes, font and alarm colours
 
-OpenBridge has four palettes: `day`, `dusk`, `night` and `bright`. The palette is selected by
-the `data-obc-theme` attribute on `<html>` (default `day`, set in `client/src/index.html`).
-Use `night` in control rooms with low lighting.
+**Palette.** OpenBridge has four palettes: `day`, `dusk`, `night` (control rooms with low
+lighting) and `bright` (sunlight). Choose it in the editor: *Layout → OpenBridge widget
+palette* (previewed while the dialog is open), or with the MCP server:
+`scadacraft_set_layout {"openbridge_theme": "night"}`. Every OpenBridge widget, on every page
+and in the editor, follows it (it sets `data-obc-theme` on `<html>`). Through the MCP the page
+backgrounds follow too (`page_background`, default on): pages with a white or palette
+background take the palette's container colour (day `#F7F7F7`, dusk `#1F1F1F`, night `#000000`,
+bright `#FCFCFC`); pages with a custom colour are left alone.
+
+**Font.** The components use Noto Sans (`--font-family-main`), shipped in
+`client/src/assets/lib/openbridge/NotoSans.ttf` (SIL Open Font License) and loaded by
+`scadacraft-openbridge.css`.
+
+**Alarm colours.** New alarms use the OpenBridge alert palette (day), in the editor and
+through the MCP server:
+
+| ScadaCraft level | OpenBridge alert | Background | Text |
+| --- | --- | --- | --- |
+| High-High | Alarm | `#E30019` | `#FFFFFF` |
+| High | Warning | `#FE9413` | `#1A1A1A` |
+| Low | Caution | `#FFDB42` | `#3D3D3D` |
+| Info | Notification | `#1D3C67` | `#FFFFFF` |
+
+**Alarm status tags.** `scadacraft_create_alarm_status_tags` adds server tags that ScadaCraft
+keeps equal to the alarm engine's counts: `Alarms Active`, `Alarms Unacknowledged`,
+`Alarms HighHigh`, `Alarms High`, `Alarms Low`, `Alarms Info`, `Alarms Total`. Bind them to
+the Alerts library: alert button count = *Unacknowledged*, alert icon and alert frame
+active = *HighHigh*, badge number = *Active*.
 
 ## 8. Known limitations of OpenBridge 1.0.0
 

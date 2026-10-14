@@ -54,6 +54,14 @@
                             </mat-select>
                         </div>
                         <div class="my-form-field block mt10">
+                            <span>{{'dlg.layout-openbridge-theme' | translate}}</span>
+                            <mat-select [(value)]="data.layout.obcTheme" (selectionChange)="onOpenBridgeTheme($event.value)" style="width: 400px">
+                                <mat-option *ngFor="let t of openBridgeThemes" [value]="t">
+                                    {{ 'dlg.layout-openbridge-theme-' + t | translate }}
+                                </mat-option>
+                            </mat-select>
+                        </div>
+                        <div class="my-form-field block mt10">
                             <span>{{'dlg.layout-connection-message' | translate}}</span>
                             <mat-select [(value)]="data.layout.show_connection_error" style="width: 400px">
                                 <mat-option [value]="true">{{'general.enabled' | translate}}</mat-option>

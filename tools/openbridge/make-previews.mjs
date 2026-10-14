@@ -40,7 +40,7 @@ const errors = [];
 page.on('pageerror', e => errors.push(e.message));
 await page.setContent(`<!doctype html><html data-obc-theme="day"><head>
 <style>${fs.readFileSync(path.join(OB, 'openbridge.css'), 'utf8')}</style>
-<style>${fs.readFileSync(path.join(OB, 'scadacraft-openbridge.css'), 'utf8')}</style>
+<style>${fs.readFileSync(path.join(OB, 'scadacraft-openbridge.css'), 'utf8').replace('url("NotoSans.ttf")', `url(data:font/ttf;base64,${fs.readFileSync(path.join(OB, 'NotoSans.ttf')).toString('base64')})`)}</style>
 <script>${fs.readFileSync(path.join(OB, 'openbridge-automation.min.js'), 'utf8')}</script>
 <style>body{font-family:var(--global-typography-ui-body-font-family, sans-serif)}</style>
 <script>${fs.readFileSync(path.join(tmp, 'svgutils.js'), 'utf8')}</script>
@@ -69,6 +69,7 @@ for (const w of catalog.widgets) {
     values.forEach(([k, v]) => window[moduleId].putValue(k, v));
   }, { svgContent, values: w.preview || [], panel: w.layout === 'anchor' ? null : [w.size.width, w.size.height] });
   // charts animate (Chart.js); give them time to settle
+  await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(w.category === 'charts' || w.element === 'obc-gauge-trend' ? 1500 : 250);
   await page.screenshot({
     path: path.join(OUT, `${w.widget}.png`), omitBackground: true,

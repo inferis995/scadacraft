@@ -127,6 +127,7 @@ function init(_io, _api, _settings, _log, eventsMain) {
     events.on('device-value:changed', updateDeviceValues);
     events.on('device-status:changed', updateDeviceStatus);
     events.on('alarms-status:changed', updateAlarmsStatus);
+    setInterval(updateAlarmsSummaryTags, 2000);
     events.on('tag-change:subscription', subscriptionTagChange);
     events.on('script-console', scriptConsoleOutput);
 
@@ -650,7 +651,32 @@ function getSocketPermission(socket) {
     return socket?.userGroups;
 }
 
+/** Server tags with sysType 2 mirror the alarm summary; memaddress = highhigh|high|low|info|active|unack|total */
+const ALARMS_SUMMARY_SYSTYPE = 2;
+function updateAlarmsSummaryTags() {
+    try {
+        const summary = alarmsMgr.getAlarmsSummary ? alarmsMgr.getAlarmsSummary() : null;
+        const server = summary && (project.getDevices() || {})['0'];
+        if (!server || !server.tags) {
+            return;
+        }
+        Object.values(server.tags).forEach(tag => {
+            if (tag.sysType === ALARMS_SUMMARY_SYSTYPE && Object.prototype.hasOwnProperty.call(summary, tag.memaddress)) {
+                const current = devices.getTagValue(tag.id);
+                if (current === undefined || current === null || Number(current) !== summary[tag.memaddress]) {
+                    devices.setTagValue(tag.id, summary[tag.memaddress]);
+                }
+            }
+        });
+    } catch (err) {
+        logger.error('runtime.failed-to-update-alarms-summary: ' + err);
+    }
+}
+
 function updateAlarmsStatus(socket) {
+    if (!socket) {
+        updateAlarmsSummaryTags();
+    }
     try {
         if (socket) {
             alarmsMgr.getAlarmsStatus(getSocketPermission(socket)).then(function (result) {

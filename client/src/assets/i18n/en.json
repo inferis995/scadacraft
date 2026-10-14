@@ -39,6 +39,11 @@
     "dlg.layout-lbl-zoom": "Zoom",
     "dlg.layout-navigation-mode": "Show Navigation",
     "dlg.layout-connection-message": "Show connection error (Toast)",
+    "dlg.layout-openbridge-theme": "OpenBridge widget palette",
+    "dlg.layout-openbridge-theme-day": "Day",
+    "dlg.layout-openbridge-theme-dusk": "Dusk",
+    "dlg.layout-openbridge-theme-night": "Night (control room)",
+    "dlg.layout-openbridge-theme-bright": "Bright (sunlight)",
     "dlg.layout-show-dev": "Show button",
     "dlg.layout-navigation": "Navigation Side Menu",
     "dlg.layout-nav-bkcolor": "Background Color",
@@ -604,7 +609,6 @@
     "editor.controls-scheduler-settings": "Time Scheduler settings",
     "editor.controls-recipe": "Recipe",
     "editor.controls-recipe-settings": "Recipe settings",
-
     "scheduler.property-settings-title": "Scheduler settings",
     "scheduler.devices": "Devices",
     "scheduler.device-name": "Device Name",
@@ -1944,7 +1948,6 @@
     "msg.texts-text-remove": "Would you like to remove Text '{{value}}'?",
     "msg.operation-unauthorized": "Operation Unauthorized!",
     "msg.secret-code-required": "Secret code required to sign authentication tokens",
-
     "recipe": {
         "loading": "Loading...",
         "retry": "Retry",
@@ -1997,7 +2000,6 @@
         "upload-completed-errors": "Upload completed with {{count}} error(s)",
         "instance-name": "Instance {{index}}"
     },
-
     "recipes": {
         "title": "Recipes",
         "new-recipe": "New",

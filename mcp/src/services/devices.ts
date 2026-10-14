@@ -277,6 +277,35 @@ export class DevicesService {
     await this.client.saveDevice(server);
   }
 
+  /**
+   * Alarm status tags on the server device (sysType 2): kept up to date by ScadaCraft with the
+   * number of alarms per level, active, unacknowledged and total. Bind them to OpenBridge alert widgets.
+   */
+  async ensureAlarmStatusTags(prefix = 'Alarms'): Promise<{ created: string[]; existing: string[] }> {
+    const project = await this.client.getProject();
+    const server = this.serverDevice(project);
+    server.tags = server.tags ?? {};
+    const kinds: [string, string][] = [
+      ['active', 'Active'], ['unack', 'Unacknowledged'], ['highhigh', 'HighHigh'], ['high', 'High'],
+      ['low', 'Low'], ['info', 'Info'], ['total', 'Total'],
+    ];
+    const created: string[] = [];
+    const existing: string[] = [];
+    for (const [key, label] of kinds) {
+      const found = Object.values(server.tags).find((t) => t.sysType === 2 && t.memaddress === key);
+      if (found) { existing.push(String(found.name)); continue; }
+      const id = guid(TAG_PREFIX);
+      const name = `${prefix} ${label}`;
+      server.tags[id] = {
+        id, name, label: name, type: 'number', memaddress: key, sysType: 2, init: '0', value: '0',
+        daq: { enabled: false, changed: false, interval: 60, restored: false },
+      };
+      created.push(name);
+    }
+    if (created.length) await this.client.saveDevice(server);
+    return { created, existing };
+  }
+
   /** Views, alarms that reference any of the given tag ids. */
   findReferences(project: Project, tagIds: Set<string>): string[] {
     const refs: string[] = [];

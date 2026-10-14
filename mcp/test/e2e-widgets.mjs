@@ -106,6 +106,37 @@ try {
   assert.deepEqual(gv.node, { x: 10, y: 1 });
   assert.equal(gv.box.height, 240);
   console.log(`placed ${v.items.length} widgets on "${VIEW}"`);
+
+  // OpenBridge palette from the layout
+  const bk = async () => (await (await fetch(`${url}/api/project`)).json()).hmi.views.find((x) => x.name === VIEW).profile.bkcolor;
+  await call('scadacraft_set_layout', { openbridge_theme: 'night' });
+  assert.equal((await call('scadacraft_get_layout')).structuredContent.layout.openbridge_theme, 'night');
+  assert.equal(await bk(), '#000000', 'page background follows the night palette');
+  await call('scadacraft_set_layout', { openbridge_theme: 'day' });
+  assert.equal(await bk(), '#F7F7F7', 'page background back to the day palette');
+
+  // alarm status tags follow the alarm engine; bound to the OpenBridge alert widgets
+  const st = (await call('scadacraft_create_alarm_status_tags')).structuredContent;
+  assert.equal(st.created.length + st.existing.length, 7);
+  await call('scadacraft_write_tags', { values: [{ tag: 'FUXA Server.OB_Level', value: 20 }] });
+  await call('scadacraft_set_alarm', { name: 'OB level', tag: 'FUXA Server.OB_Level', levels: { highhigh: { above: 90, text: 'OB level very high' } } });
+  const readStatus = async () => Object.fromEntries((await call('scadacraft_read_tags', { tags: ['FUXA Server.Alarms Active', 'FUXA Server.Alarms HighHigh', 'FUXA Server.Alarms Unacknowledged'] }))
+    .structuredContent.values.map((x) => [x.ref.replace('FUXA Server.Alarms ', ''), Number(x.value)]));
+  const waitFor = async (pred, what) => {
+    for (let i = 0; i < 40; i++) { const s = await readStatus(); if (pred(s)) return s; await new Promise((r) => setTimeout(r, 500)); }
+    throw new Error(`timeout: ${what} ${JSON.stringify(await readStatus())}`);
+  };
+  await waitFor((x) => x.Active === 0 && x.HighHigh === 0, 'no alarms');
+  await call('scadacraft_write_tags', { values: [{ tag: 'FUXA Server.OB_Level', value: 95 }] });
+  const on = await waitFor((x) => x.Active === 1 && x.HighHigh === 1 && x.Unacknowledged === 1, 'alarm on');
+  console.log(`alarm status tags: ${JSON.stringify(on)}`);
+  await call('scadacraft_write_tags', { values: [{ tag: 'FUXA Server.OB_Level', value: 20 }] });
+  await call('scadacraft_ack_alarms', {});
+  await waitFor((x) => x.Active === 0 && x.Unacknowledged === 0, 'alarm off and acknowledged');
+  await call('scadacraft_place_widgets', { view: VIEW, widgets: [
+    { widget: 'ob-alert-button', node: { x: 36, y: 31 }, properties: { count: { tag: 'FUXA Server.Alarms Unacknowledged' } } },
+  ] });
+  await call('scadacraft_delete_alarm', { name: 'OB level' });
   console.log('\ne2e-widgets OK');
 } finally {
   await client.close();

@@ -328,4 +328,5 @@ module.exports = {
 
 var TagSystemTypeEnum  = {
     deviceConnectionStatus: 1,
+    alarmsSummary: 2,
 }

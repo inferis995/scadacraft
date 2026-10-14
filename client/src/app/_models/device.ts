@@ -1104,4 +1104,5 @@ export enum TagScaleModeType {
 
 export enum TagSystemType {
     deviceConnectionStatus = 1,
+    alarmsSummary = 2,
 }

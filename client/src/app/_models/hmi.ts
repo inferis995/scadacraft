@@ -60,6 +60,8 @@ export class LayoutSettings {
     hidenavigation = false;
     /** GUI Theme */
     theme = '';
+    /** OpenBridge palette of the widgets: day | dusk | night | bright */
+    obcTheme?: OpenBridgeTheme = 'day';
     /** Show login by start */
     loginonstart?: boolean = false;
     /** Overlay color for login modal */
@@ -68,6 +70,17 @@ export class LayoutSettings {
     show_connection_error? = true;
     /** Customs Css Styles */
     customStyles = '';
+}
+
+export type OpenBridgeTheme = 'day' | 'dusk' | 'night' | 'bright';
+export const OPENBRIDGE_THEMES: OpenBridgeTheme[] = ['day', 'dusk', 'night', 'bright'];
+
+/** Apply the OpenBridge palette (html[data-obc-theme]) used by every OpenBridge widget. */
+export function applyOpenBridgeTheme(theme?: string) {
+    const value = OPENBRIDGE_THEMES.includes(<OpenBridgeTheme>theme) ? theme : 'day';
+    if (document.documentElement.getAttribute('data-obc-theme') !== value) {
+        document.documentElement.setAttribute('data-obc-theme', value);
+    }
 }
 
 export class NavigationSettings {

@@ -16,10 +16,11 @@ export const ID_SEPARATOR = '^~^';
 
 /** Default colours per level: same as the ScadaCraft alarm editor. */
 const DEFAULT_COLORS: Record<AlarmLevelName, { bkcolor: string; color: string }> = {
-  highhigh: { bkcolor: '#FF4848', color: '#FFF' },
-  high: { bkcolor: '#F9CF59', color: '#000' },
-  low: { bkcolor: '#E5E5E5', color: '#000' },
-  info: { bkcolor: '#22A7F2', color: '#FFF' },
+  // OpenBridge alert palette (day): alarm, warning, caution, notification
+  highhigh: { bkcolor: '#E30019', color: '#FFFFFF' },
+  high: { bkcolor: '#FE9413', color: '#1A1A1A' },
+  low: { bkcolor: '#FFDB42', color: '#3D3D3D' },
+  info: { bkcolor: '#1D3C67', color: '#FFFFFF' },
 };
 
 export interface LevelInput {

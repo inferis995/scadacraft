@@ -1,13 +1,16 @@
 # scadacraft-mcp-server
 
 MCP server for [ScadaCraft](../README.md). It gives an AI assistant (Claude or any MCP client)
-the whole project of a running ScadaCraft server: devices and tags, alarms, pages with
-OpenBridge process graphics, live and historical data, export and import.
+the whole project of a running ScadaCraft server, as the UI does: devices and tags, alarms,
+pages with OpenBridge widgets and imported widgets, trend charts, live and historical data,
+export and import, and the application itself (layout, menu, logo, colours and OpenBridge
+palette, settings and history database, users, scripts, notifications, languages, reports,
+API keys, logs, backups).
 
 Everything is written in the same format as the ScadaCraft editor, so devices, alarms and
 pages created through MCP appear, run and can be edited by hand like any other.
 
-## Tools (33)
+## Tools (81)
 
 **Project**
 
@@ -50,6 +53,7 @@ pages created through MCP appear, run and can be edited by hand like any other.
 | `scadacraft_get_active_alarms` | Active and unacknowledged alarms |
 | `scadacraft_ack_alarms` | Acknowledge one alarm or all |
 | `scadacraft_get_alarm_history` | Alarm events in a time range |
+| `scadacraft_create_alarm_status_tags` | Server tags with live alarm counts (active, unacknowledged, per level) for OpenBridge alert widgets |
 
 **Pages**
 
@@ -81,6 +85,27 @@ Resources: `scadacraft://docs/openbridge` (design and usage guide) and
 `scadacraft://docs/openbridge-widgets` (widget reference).
 
 Times accept ISO 8601, epoch ms, or relative values such as `-15m`, `-24h`, `-7d`.
+
+**Application**
+
+| Tool | What it does |
+| --- | --- |
+| `scadacraft_get_layout`, `scadacraft_set_layout` | Start page, menu (items, mode, colours, logo), header (title, colours, alarms, date/time, login info), zoom, OpenBridge palette (`openbridge_theme`, page backgrounds) |
+| `scadacraft_upload_image` | Upload a logo, icon or background image |
+| `scadacraft_get_settings`, `scadacraft_set_settings` | Language, port, security, SMTP, history database (type, retention), alarm and log retention, broadcast |
+| `scadacraft_send_test_mail` | Test the SMTP settings |
+| `scadacraft_clear_alarm_history` | Clear the alarm history |
+| `scadacraft_list_users`, `scadacraft_set_user`, `scadacraft_delete_user` | Users with groups, roles, start page, language |
+| `scadacraft_list_roles`, `scadacraft_set_role`, `scadacraft_delete_role` | Roles |
+| `scadacraft_list_scripts`, `scadacraft_set_script`, `scadacraft_run_script`, `scadacraft_delete_script` | Server/client scripts with parameters and scheduling |
+| `scadacraft_list_notifications`, `scadacraft_set_notification`, `scadacraft_delete_notification` | Alarm e-mail notifications |
+| `scadacraft_get_texts`, `scadacraft_set_languages`, `scadacraft_set_texts`, `scadacraft_delete_texts` | Languages and translated texts |
+| `scadacraft_list_charts`, `scadacraft_set_chart`, `scadacraft_delete_chart` | Chart definitions (pens on tags) |
+| `scadacraft_list_reports`, `scadacraft_set_report`, `scadacraft_build_report`, `scadacraft_delete_report` | PDF reports (tags table, chart, alarms), scheduled or on demand |
+| `scadacraft_list_api_keys`, `scadacraft_create_api_key`, `scadacraft_delete_api_key` | API keys |
+| `scadacraft_read_logs` | Server log |
+| `scadacraft_backup_status`, `scadacraft_create_backup`, `scadacraft_set_backup_schedule`, `scadacraft_restore_backup`, `scadacraft_delete_backup` | Backups of project, settings and history database; schedule, retention, restore on restart |
+| `scadacraft_get_section`, `scadacraft_set_section` | Raw project sections, for anything not covered above |
 
 ## Typical session
 

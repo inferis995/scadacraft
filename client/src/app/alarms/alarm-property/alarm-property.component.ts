@@ -47,32 +47,33 @@ export class AlarmPropertyComponent implements OnInit {
         } else {
             this.property = new AlarmProperty();
         }
+        // default colours: OpenBridge alert palette (day): alarm, warning, caution, notification
         if (!this.data.alarm.highhigh) {
             this.data.alarm.highhigh = new AlarmSubProperty();
-            this.data.alarm.highhigh.bkcolor = '#FF4848';
-            this.data.alarm.highhigh.color = '#FFF';
+            this.data.alarm.highhigh.bkcolor = '#E30019';
+            this.data.alarm.highhigh.color = '#FFFFFF';
             this.data.alarm.highhigh.enabled = false;
             this.data.alarm.highhigh.ackmode = <AlarmAckMode>Object.keys(AlarmAckMode)[Object.values(AlarmAckMode).indexOf(AlarmAckMode.ackactive)];
         }
         if (!this.data.alarm.high) {
             this.data.alarm.high = new AlarmSubProperty();
-            this.data.alarm.high.bkcolor = '#F9CF59';
-            this.data.alarm.high.color = '#000';
+            this.data.alarm.high.bkcolor = '#FE9413';
+            this.data.alarm.high.color = '#1A1A1A';
             this.data.alarm.high.enabled = false;
             this.data.alarm.high.ackmode = <AlarmAckMode>Object.keys(AlarmAckMode)[Object.values(AlarmAckMode).indexOf(AlarmAckMode.ackactive)];
             // this.data.alarm.info = new AlarmSubProperty();
         }
         if (!this.data.alarm.low) {
             this.data.alarm.low = new AlarmSubProperty();
-            this.data.alarm.low.bkcolor = '#E5E5E5';
-            this.data.alarm.low.color = '#000';
+            this.data.alarm.low.bkcolor = '#FFDB42';
+            this.data.alarm.low.color = '#3D3D3D';
             this.data.alarm.low.enabled = false;
             this.data.alarm.low.ackmode = <AlarmAckMode>Object.keys(AlarmAckMode)[Object.values(AlarmAckMode).indexOf(AlarmAckMode.ackactive)];
         }
         if (!this.data.alarm.info) {
             this.data.alarm.info = new AlarmSubProperty();
-            this.data.alarm.info.bkcolor = '#22A7F2';
-            this.data.alarm.info.color = '#FFF';
+            this.data.alarm.info.bkcolor = '#1D3C67';
+            this.data.alarm.info.color = '#FFFFFF';
             this.data.alarm.info.enabled = false;
             this.data.alarm.info.ackmode = <AlarmAckMode>Object.keys(AlarmAckMode)[Object.values(AlarmAckMode).indexOf(AlarmAckMode.float)];
         }

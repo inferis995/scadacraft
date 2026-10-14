@@ -97,6 +97,32 @@ function AlarmsManager(_runtime) {
     }
 
     /**
+     * Alarm summary for the alarm status system tags (no permission filter):
+     * count of alarms per level, active (on), unacknowledged and total.
+     */
+    this.getAlarmsSummary = function () {
+        var result = { highhigh: 0, high: 0, low: 0, info: 0, active: 0, unack: 0, total: 0 };
+        Object.keys(alarms).forEach(alrkey => {
+            alarms[alrkey].forEach(alr => {
+                if (!alr.status || alr.type === AlarmsTypes.ACTION) {
+                    return;
+                }
+                result.total++;
+                if (Object.prototype.hasOwnProperty.call(result, alr.type)) {
+                    result[alr.type]++;
+                }
+                if (alr.status === AlarmStatusEnum.ON || alr.status === AlarmStatusEnum.ACK) {
+                    result.active++;
+                }
+                if (alr.status === AlarmStatusEnum.ON || alr.status === AlarmStatusEnum.OFF) {
+                    result.unack++;
+                }
+            });
+        });
+        return result;
+    }
+
+    /**
      * Return the current active alarms values
      */
     this.getAlarmsValues = function (filter, permission) {
