@@ -263,7 +263,10 @@ module.exports = {
                         res.status(400).json({error:"invalid_destination", message: "Invalid destination path."});
                         return;
                     }
-                    const resolvedDestination = resolveWithin(baseDir, `_${normalizedDestination}`);
+                    // widgets go to the folder the widget library is served from (it follows --userDir)
+                    const resolvedDestination = normalizedDestination === 'widgets'
+                        ? { resolvedTarget: runtime.settings.widgetsFileDir }
+                        : resolveWithin(baseDir, `_${normalizedDestination}`);
                     if (!resolvedDestination) {
                         res.status(400).json({error:"invalid_destination", message: "Invalid destination path."});
                         return;

@@ -16,6 +16,7 @@ import { processWidget, type WidgetPropertyVariable } from './widget-script.js';
 import type { CatalogWidget, GaugeSettings, View, WidgetProperty } from './types.js';
 
 export const WIDGET_GAUGE_TYPE = 'svg-ext-own_ctrl-image';
+export const CHART_GAUGE_TYPE = 'svg-ext-html_chart';
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const XHTML_NS = 'http://www.w3.org/1999/xhtml';
 
@@ -128,18 +129,28 @@ export function buildWidgetItem(input: WidgetInstanceInput): { id: string; item:
   };
 }
 
-/** Add the editor group for a widget item to view.svgcontent. */
-export function addWidgetGroup(view: View, id: string, x: number, y: number, width: number, height: number): void {
+export interface GroupOptions {
+  /** gauge type stored on the group (default: widget) */
+  type?: string;
+  /** prefix of the host ids H-/D- (the runtime finds the host by "D-" + prefix) */
+  hostPrefix?: string;
+  /** extra attributes for the group */
+  attrs?: Record<string, string>;
+}
+
+/** Add the editor group for an item hosted in a foreignObject (widgets, charts) to view.svgcontent. */
+export function addWidgetGroup(view: View, id: string, x: number, y: number, width: number, height: number, opts: GroupOptions = {}): void {
+  const type = opts.type ?? WIDGET_GAUGE_TYPE;
   const { doc, root } = parseSvg(view.svgcontent);
   const layer = activeLayer(root as unknown as XElement);
   const g = doc.createElementNS(SVG_NS, 'g');
   for (const [k, v] of Object.entries({
     'xml:space': 'preserve', 'text-anchor': 'right', 'font-family': 'sans-serif', 'font-size': '14',
-    fill: '#FFFFFF', type: WIDGET_GAUGE_TYPE, id,
+    fill: '#FFFFFF', ...(opts.attrs ?? {}), type, id,
   })) g.setAttribute(k, v);
   const rect = doc.createElementNS(SVG_NS, 'rect');
   for (const [k, v] of Object.entries({ fill: 'transparent', id: shortGuid('svg_'), height, width, y, x, 'stroke-width': 0 })) rect.setAttribute(k, String(v));
-  const hostId = shortGuid('OXC_');
+  const hostId = shortGuid(opts.hostPrefix ?? 'OXC_');
   const fo = doc.createElementNS(SVG_NS, 'foreignObject');
   for (const [k, v] of Object.entries({ id: `H-${hostId}`, width, height, y, x })) fo.setAttribute(k, String(v));
   // the editor stores the host as a plain <DIV> (no XHTML prefix): its SVG sanitizer drops

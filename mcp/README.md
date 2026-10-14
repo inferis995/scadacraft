@@ -62,6 +62,20 @@ pages created through MCP appear, run and can be edited by hand like any other.
 | `scadacraft_draw_pipe` | Pipe along a path of nodes, elbows at bends |
 | `scadacraft_set_properties` | Change values or bindings of a placed widget |
 | `scadacraft_remove_items` | Remove items from a page |
+| `scadacraft_place_chart` | ScadaCraft trend chart on a page, bound to a chart definition (realtime window or history with time toolbar) |
+| `scadacraft_create_trend_page` | One step: chart definition with the tags, a page with the chart filling it, menu entry |
+
+**Widget library**
+
+| Tool | What it does |
+| --- | --- |
+| `scadacraft_list_library_widgets` | Groups and widgets of the editor's Widgets panel; describe one widget (size, properties) |
+| `scadacraft_import_widgets` | Import native FUXA/ScadaCraft SVG widgets (files, folders or inline SVG) into a library group |
+| `scadacraft_remove_library_widgets` | Remove imported widgets from the library |
+
+Imported widgets are placed with `scadacraft_place_widgets` using `"group/file"` as widget name,
+top-left on the node, with `size` in cells and properties bound like the OpenBridge ones.
+Chart pens (tags, labels, colours, Y axes) are defined with `scadacraft_set_chart`.
 
 Resources: `scadacraft://docs/openbridge` (design and usage guide) and
 `scadacraft://docs/openbridge-widgets` (widget reference).
@@ -157,6 +171,8 @@ npm test
 
 - `test/parity.mjs`: widget script processing matches the editor's code for every widget.
 - `test/e2e.mjs`: page building with server memory tags (tank, pump, valve, readout, pipes).
+- `test/e2e-library.mjs`: widget import into the library, placement of imported widgets with
+  bindings, trend chart on a page (history mode), one-step trend page with menu entry.
 - `test/e2e-widgets.mjs`: the five OpenBridge libraries; builds the page "OpenBridge showcase" with
   every instrument, chart, control and alert bound to server tags (sizes in cells, top-left anchor).
 - `test/e2e-plant.mjs`: full plant against a simulated Modbus TCP PLC (`test/modbus-sim.mjs`):

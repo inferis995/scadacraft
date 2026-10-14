@@ -153,6 +153,7 @@ export function registerPageTools(server: McpServer, ctx: Ctx): void {
   Example: pump P-101 on node (12,6), running feedback and command bound to tags, readout below:
     {"widget":"ob-pump","node":{"x":12,"y":6},"name":"P-101",
      "properties":{"running":{"tag":"P101.Run"},"command":{"tag":"P101.Cmd"},"tag":"101","labelDirection":"down"}}
+  Imported library widgets (scadacraft_import_widgets) are placed the same way with "group/file" as widget name.
   Example: setpoint slider 12x2 cells at node (2,20) writing the speed setpoint:
     {"widget":"ob-slider","node":{"x":2,"y":20},"size":{"width":12,"height":2},"properties":{"value":{"tag":"P101.SpeedSP"},"max":1500}}
 
@@ -309,5 +310,188 @@ Returns: the new view id and name.`,
   }, async ({ view, new_name }) => run(async () => {
     const v = await ctx.pages.duplicateView(view, new_name);
     return ok(`Created **${v.name}** (\`${v.id}\`) with ${Object.keys(v.items).length} items.`, { id: v.id, name: v.name });
+  }));
+
+  // ---------------------------------------------------------------- widget library (import)
+  server.registerTool('scadacraft_list_library_widgets', {
+    title: 'List editor widget library',
+    description: `List the widget library of the editor (Widgets panel): every group and its SVG widgets, the built-in
+  OpenBridge libraries and the widgets imported by users. With "widget", describe one widget: size and bindable properties.
+
+  Args:
+    - group (string, optional): only this group (folder name)
+    - widget (string, optional): "group/file" (or file name when unique) to describe
+
+  Returns: groups [{name, label, items [{path, name, label}]}], or the widget description.
+  Imported widgets are placed with scadacraft_place_widgets using "group/file" as widget name (top-left on the node).`,
+    inputSchema: {
+      group: z.string().optional(),
+      widget: z.string().optional(),
+    },
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async ({ group, widget }) => run(async () => {
+    if (widget) {
+      const w = await ctx.pages.describeLibraryWidget(widget);
+      const lines = [`## ${w.widget} — ${w.title}`, `file ${w.file}, box ${w.size.width}x${w.size.height} px, ${w.layout === 'anchor' ? `anchor (${w.anchor.x}, ${w.anchor.y})` : 'top-left anchored'}`];
+      for (const p of w.properties) lines.push(`- \`${p.name}\` ${p.type}, default ${p.default || '—'}${p.description ? `: ${p.description}` : ''}`);
+      if (!w.properties.length) lines.push('(no bindable properties)');
+      return ok(lines.join('\n'), { widget: w });
+    }
+    let groups = await ctx.pages.library();
+    if (group) groups = groups.filter((g) => g.name.toLowerCase() === group.toLowerCase());
+    const lines: string[] = [];
+    for (const g of groups) {
+      lines.push(`## ${g.label ?? g.name} (\`${g.name}\`, ${g.items.length})`);
+      for (const i of g.items) lines.push(`- \`${i.path.replace(/^_widgets\//, '').replace(/\.svg$/, '')}\`${i.label ? ` ${i.label}` : ''}`);
+    }
+    return ok(lines.join('\n') || '(no widgets)', { groups });
+  }));
+
+  server.registerTool('scadacraft_import_widgets', {
+    title: 'Import widgets into the library',
+    description: `Import SVG widgets in the native FUXA/ScadaCraft format into a group of the editor's widget library
+  (same as the Widgets panel import). A widget is an SVG with a <script> whose //!export-start ... //!export-end section declares
+  bindable variables: _pb_ boolean, _pn_ number, _ps_ string, _pc_ colour; putValue(id, value) receives tag values and
+  postValue(id, value) writes to the bound tag. The import reports each widget's properties.
+
+  Args:
+    - group (string): library group (folder), e.g. "Impianto" — created if missing; OpenBridge groups are reserved
+    - paths (string[], optional): .svg files or folders of .svg files on the machine running the MCP server
+    - svg (string, optional) + name (string): widget content given inline
+    - overwrite (boolean, default false): replace widgets with the same name
+
+  Returns: imported widgets (path, size, properties) and warnings (no script, no variables, skipped).
+  Then place them with scadacraft_place_widgets {"widget": "group/file", "node": {...}, "size": {...}, "properties": {...}}.`,
+    inputSchema: {
+      group: z.string().min(1).max(64),
+      paths: z.array(z.string().min(1)).max(200).optional(),
+      svg: z.string().max(5_000_000).optional(),
+      name: z.string().max(100).optional(),
+      overwrite: z.boolean().default(false),
+    },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async (input) => run(async () => {
+    const r = await ctx.pages.importWidgets(input);
+    const lines = [`Imported ${r.imported.length} widget(s) into **${input.group}**:`,
+      ...r.imported.map((i) => `- \`${i.path.replace(/^_widgets\//, '').replace(/\.svg$/, '')}\` ${i.size.width}x${i.size.height} px — ${i.properties.join(', ') || 'no properties'}`)];
+    if (r.warnings.length) lines.push('', 'Warnings:', ...r.warnings.map((w) => `- ${w}`));
+    lines.push('', 'Reload the editor to see them in the Widgets panel.');
+    return ok(lines.join('\n'), r);
+  }));
+
+  server.registerTool('scadacraft_remove_library_widgets', {
+    title: 'Remove widgets from the library',
+    description: `Delete imported widgets from the editor library ("group/file"). Pages that already use them keep working
+  (a placed widget stores its own copy). Built-in OpenBridge widgets cannot be removed.`,
+    inputSchema: { widgets: z.array(z.string().min(1)).min(1).max(100) },
+    annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: false },
+  }, async ({ widgets }) => run(async () => {
+    const removed = await ctx.pages.removeLibraryWidgets(widgets);
+    return ok(`Removed ${removed.length} widget(s): ${removed.join(', ')}`, { removed });
+  }));
+
+  // ---------------------------------------------------------------- native charts and trend pages
+  const ChartOptionsSchema = {
+    mode: z.enum(['realtime', 'history']).default('realtime')
+      .describe('realtime: rolling window of live values (filled from history at open); history: time-range toolbar and zoom on stored data'),
+    minutes: z.number().int().min(1).max(10080).optional().describe('realtime window in minutes (default 60)'),
+    load_history: z.boolean().optional().describe('realtime: fill the window from the history when the page opens (default true)'),
+    title: z.string().max(100).optional(),
+    legend: z.enum(['always', 'follow', 'bottom', 'never']).optional(),
+    decimals: z.number().int().min(0).max(6).optional(),
+    background: z.string().optional().describe('chart background, e.g. "#FFFFFF" or "rgba(0,0,0,0)"'),
+    text_color: z.string().optional().describe('axis and label colour'),
+    grid_color: z.string().optional(),
+  };
+
+  server.registerTool('scadacraft_place_chart', {
+    title: 'Place trend chart',
+    description: `Place ScadaCraft's trend chart control on a view, showing the pens of a chart definition
+  (create or change pens with scadacraft_set_chart: tags, labels, colours, Y axes). Tags need history (DAQ) enabled for past data.
+
+  Args:
+    - view (string), chart (string): chart definition name or id
+    - node {x, y}: top-left grid node; size {width, height} in cells (default 16 x 10)
+    - mode realtime | history, minutes, load_history, title, legend, decimals, background, text_color, grid_color, name
+
+  Returns: the created item. ${RELOAD_NOTE}`,
+    inputSchema: {
+      view: ViewRef,
+      chart: z.string().min(1),
+      node: NodeSchema,
+      size: z.object({ width: z.number().int().min(4).max(200), height: z.number().int().min(3).max(200) }).strict().optional(),
+      name: z.string().max(100).optional(),
+      ...ChartOptionsSchema,
+    },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+  }, async ({ view, ...spec }) => run(async () => {
+    const r = await ctx.pages.placeChart(view, spec);
+    const lines = [`Placed chart on **${r.view.name}**:`, itemLine(r.placed)];
+    if (r.warnings.length) lines.push('', 'Warnings:', ...r.warnings.map((w) => `- ${w}`));
+    lines.push('', RELOAD_NOTE);
+    return ok(lines.join('\n'), { view: r.view.name, placed: r.placed, warnings: r.warnings });
+  }));
+
+  server.registerTool('scadacraft_create_trend_page', {
+    title: 'Create trend page',
+    description: `One step trend page: chart definition with the given tags, a new view with the chart filling it, and
+  (optionally) a menu entry. Tags without history are reported (enable it with scadacraft_update_tags {history:{enabled:true}}).
+
+  Args:
+    - name (string): page name (also the chart definition name unless "chart" is given)
+    - tags (array, optional): pens [{tag: "Device.Tag", label?, color?, yaxis? 1-4}] — required unless "chart" names an existing definition
+    - chart (string, optional): use this existing chart definition
+    - width, height (px, default 1440 x 840), background (default "#FFFFFF")
+    - menu (object | false, default {}): {text?, icon?} adds a menu entry to the page ("show_chart" icon); false = no entry
+    - mode, minutes, load_history, title, legend, decimals, text_color, grid_color: chart options (see scadacraft_place_chart)
+
+  Returns: view, chart definition, chart item, warnings.`,
+    inputSchema: {
+      name: z.string().min(1).max(80),
+      tags: z.array(z.object({
+        tag: z.string().min(1), label: z.string().optional(), color: z.string().optional(), yaxis: z.number().int().min(1).max(4).optional(),
+      }).strict()).max(20).optional(),
+      chart: z.string().optional(),
+      width: z.number().int().min(480).max(7680).default(1440),
+      height: z.number().int().min(320).max(4320).default(840),
+      menu: z.union([z.literal(false), z.object({ text: z.string().optional(), icon: z.string().optional() }).strict()]).default({}),
+      ...ChartOptionsSchema,
+    },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+  }, async (input) => run(async () => {
+    const warnings: string[] = [];
+    let chartName = input.chart;
+    if (input.tags?.length) {
+      const c = await ctx.admin.setChart({ name: input.chart ?? input.name, lines: input.tags });
+      chartName = String(c.name);
+    }
+    if (!chartName) throw new Error('Give "tags" (pens of a new chart) or "chart" (an existing chart definition).');
+    const project = await ctx.pages.getProject();
+    const chartDef = ((project as unknown as { charts?: { name: string; lines: { id: string; name: string }[] }[] }).charts ?? [])
+      .find((c) => c.name.toLowerCase() === chartName!.toLowerCase());
+    if (chartDef) {
+      const tagsById = new Map<string, { daq?: { enabled?: boolean } }>();
+      for (const d of Object.values(project.devices ?? {})) for (const t of Object.values((d as { tags?: Record<string, { id: string; daq?: { enabled?: boolean } }> }).tags ?? {})) tagsById.set(t.id, t);
+      const noHistory = chartDef.lines.filter((l) => !tagsById.get(l.id)?.daq?.enabled).map((l) => l.name);
+      if (noHistory.length) warnings.push(`No history on ${noHistory.join(', ')}: the chart shows only live values from page open.`);
+    }
+    const view = await ctx.pages.createView(input.name, input.width, input.height, input.background ?? '#FFFFFF');
+    const g = 24;
+    const r = await ctx.pages.placeChart(view.id, {
+      chart: chartName, node: { x: 0, y: 0 },
+      size: { width: Math.floor(input.width / g), height: Math.floor(input.height / g) },
+      mode: input.mode, minutes: input.minutes, load_history: input.load_history, title: input.title ?? input.name,
+      legend: input.legend, decimals: input.decimals, background: input.background ?? '#FFFFFF', text_color: input.text_color, grid_color: input.grid_color,
+    });
+    warnings.push(...r.warnings);
+    let menu = 'no menu entry';
+    if (input.menu !== false) {
+      const m = await ctx.admin.addMenuItem({ text: input.menu.text ?? input.name, view: input.name, icon: input.menu.icon ?? 'show_chart' });
+      menu = m.added ? 'menu entry added' : 'menu entry already present';
+    }
+    const lines = [`Created trend page **${input.name}** (\`${view.id}\`) with chart "${chartName}" (${input.mode}), ${menu}.`];
+    if (warnings.length) lines.push('', 'Warnings:', ...warnings.map((w) => `- ${w}`));
+    lines.push('', `Open it at /home?viewName=${encodeURIComponent(input.name)}. ${RELOAD_NOTE}`);
+    return ok(lines.join('\n'), { view: { id: view.id, name: input.name }, chart: chartName, item: r.placed, warnings });
   }));
 }

@@ -210,6 +210,19 @@ export class AdminService {
     return (await this.getLayout()).readable;
   }
 
+  /** Append a menu entry (kept if a menu entry already opens the same view). */
+  async addMenuItem(item: MenuItemInput): Promise<{ added: boolean }> {
+    const project = await this.client.getProject();
+    const current = JSON.parse(JSON.stringify(((project.hmi as Rec | undefined)?.layout ?? {}))) as Rec;
+    const nav = { mode: 'over', type: 'block', bkcolor: '#F4F5F7', fgcolor: '#1D1D1D', items: [], ...(current.navigation as Rec ?? {}) } as Rec;
+    const items = (nav.items as Rec[] | undefined) ?? [];
+    const [entry] = this.menuItems(project, [item]);
+    if (entry.view && items.some((i) => i.view === entry.view)) return { added: false };
+    nav.items = [...items, entry];
+    await this.client.setProjectData('layout', { ...current, navigation: nav });
+    return { added: true };
+  }
+
   /** Upload an image file (logo, menu icon, background) to the server resources. Returns its URL path. */
   async uploadImage(path: string, name?: string): Promise<string> {
     const full = resolve(path);

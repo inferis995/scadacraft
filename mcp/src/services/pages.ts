@@ -7,9 +7,13 @@
  */
 import { ScadaCraftClient } from '../fuxa/client.js';
 import { allTags, resolveTag } from '../fuxa/tags.js';
+import { DOMParser } from '@xmldom/xmldom';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { basename, extname, join, resolve } from 'node:path';
 import {
-  addWidgetGroup, buildWidgetItem, itemBoxes, newView, removeGroup, shortGuid, widgetNameFromAddress, WIDGET_GAUGE_TYPE,
+  addWidgetGroup, buildWidgetItem, CHART_GAUGE_TYPE, itemBoxes, newView, removeGroup, shortGuid, widgetNameFromAddress, WIDGET_GAUGE_TYPE,
 } from '../fuxa/view.js';
+import { processWidget } from '../fuxa/widget-script.js';
 import type { Catalog, CatalogWidget, GaugeSettings, Project, View, WidgetProperty } from '../fuxa/types.js';
 
 /** folder of the catalog (widgets.json); the widgets themselves live in one folder per library */
@@ -28,6 +32,33 @@ export interface PlaceSpec {
   size?: { width: number; height: number };
   name?: string;
   properties?: Record<string, PropertyValue>;
+}
+
+export interface LibraryItem { path: string; name: string; label?: string }
+export interface LibraryGroup { name: string; label?: string; items: LibraryItem[] }
+
+/** Folders of the built-in OpenBridge libraries (generated, not edited through the MCP). */
+const BUILTIN_GROUP = /^openbridge(-|$)/;
+
+export interface ChartSpec {
+  /** chart definition name or id (scadacraft_set_chart) */
+  chart: string;
+  node: Node;
+  /** box in grid cells, default 16 x 10 */
+  size?: { width: number; height: number };
+  /** realtime: rolling window fed by live values; history: time-range toolbar on DAQ data */
+  mode?: 'realtime' | 'history';
+  title?: string;
+  /** realtime window, minutes */
+  minutes?: number;
+  /** realtime: fill the window from the history at page open */
+  load_history?: boolean;
+  legend?: 'always' | 'follow' | 'bottom' | 'never';
+  decimals?: number;
+  background?: string;
+  text_color?: string;
+  grid_color?: string;
+  name?: string;
 }
 
 export interface PlacedItem {
@@ -54,14 +85,112 @@ export class PagesService {
     return this.catalog;
   }
 
+  /** A widget by catalog name (OpenBridge) or by library reference ("group/file", "file" or "_widgets/group/file.svg"). */
   async getWidget(name: string): Promise<CatalogWidget> {
     const cat = await this.getCatalog();
-    const key = name.replace(/\.svg$/, '');
-    const w = cat.widgets.find((x) => x.widget === key);
-    if (!w) {
-      throw new Error(`Unknown widget "${name}". Available: ${cat.widgets.map((x) => x.widget).join(', ')}.`);
+    const key = name.replace(/^.*?_widgets\//, '').replace(/\.svg$/, '');
+    const w = cat.widgets.find((x) => x.widget === key || `_widgets/${key}.svg` === x.file);
+    if (w) return w;
+    const lib = await this.findLibraryItem(key);
+    if (!lib) {
+      throw new Error(`Unknown widget "${name}". OpenBridge widgets: see scadacraft_list_widgets; imported widgets: scadacraft_list_library_widgets.`);
     }
-    return w;
+    return this.libraryWidget(lib.group, lib.item);
+  }
+
+  // ---------------------------------------------------------------- widget library (any FUXA SVG widget)
+  async library(): Promise<LibraryGroup[]> {
+    const res = await this.client.getJson<{ groups: LibraryGroup[] }>('/api/resources/widgets');
+    return res?.groups ?? [];
+  }
+
+  private async findLibraryItem(key: string): Promise<{ group: LibraryGroup; item: LibraryItem } | undefined> {
+    const groups = await this.library();
+    const hits: { group: LibraryGroup; item: LibraryItem }[] = [];
+    for (const group of groups) {
+      for (const item of group.items) {
+        const rel = item.path.replace(/^_widgets\//, '').replace(/\.svg$/, '');
+        const file = rel.slice(rel.indexOf('/') + 1);
+        if (rel === key || file === key || basename(rel) === key) hits.push({ group, item });
+      }
+    }
+    const exact = hits.filter((h) => h.item.path.replace(/^_widgets\//, '').replace(/\.svg$/, '') === key);
+    if (exact.length === 1) return exact[0];
+    if (hits.length > 1) {
+      throw new Error(`Widget "${key}" exists in several groups: ${hits.map((h) => h.item.path.replace(/^_widgets\//, '').replace(/\.svg$/, '')).join(', ')}. Use "group/file".`);
+    }
+    return hits[0];
+  }
+
+  /** Catalog-like description of an imported widget: top-left anchor, size from the SVG, properties from its script. */
+  private async libraryWidget(group: LibraryGroup, item: LibraryItem): Promise<CatalogWidget> {
+    const key = item.path.replace(/^_widgets\//, '').replace(/\.svg$/, '');
+    let svg = this.svgCache.get(key);
+    if (!svg) {
+      svg = await this.client.getText(`/${item.path}`);
+      this.svgCache.set(key, svg);
+    }
+    const info = inspectWidgetSvg(svg, key);
+    return {
+      widget: key, file: item.path, title: item.label ?? basename(key), category: `library:${group.name}`, group: group.name,
+      element: 'svg', layout: 'fill', size: info.size, anchor: { x: 0, y: 0 }, stretch: null,
+      properties: info.vars.map((v) => ({ name: v.name, type: v.type, default: v.default, dir: 'read' as const, write: false, description: '' })),
+    };
+  }
+
+  async describeLibraryWidget(ref: string): Promise<CatalogWidget> {
+    return this.getWidget(ref);
+  }
+
+  /** Import SVG widgets (FUXA format) into a library group of the editor. */
+  async importWidgets(input: { group: string; paths?: string[]; svg?: string; name?: string; overwrite?: boolean }): Promise<{ imported: { path: string; size: { width: number; height: number }; properties: string[] }[]; warnings: string[] }> {
+    const group = input.group.trim();
+    if (!/^[\w .-]+$/.test(group)) throw new Error('Group name may contain letters, digits, space, "-", "_" and "." only.');
+    if (BUILTIN_GROUP.test(group)) throw new Error(`"${group}" is a built-in OpenBridge library; import into another group.`);
+    const files: { name: string; svg: string }[] = [];
+    if (input.svg) {
+      if (!input.name) throw new Error('"name" is required with "svg".');
+      files.push({ name: input.name, svg: input.svg });
+    }
+    for (const p of input.paths ?? []) {
+      const full = resolve(p);
+      const list = statSync(full).isDirectory()
+        ? readdirSync(full).filter((f) => extname(f).toLowerCase() === '.svg').map((f) => join(full, f))
+        : [full];
+      for (const f of list) files.push({ name: basename(f), svg: readFileSync(f, 'utf8') });
+    }
+    if (!files.length) throw new Error('Nothing to import: pass "paths" (files or folders of .svg) or "svg" with "name".');
+    const existing = new Set((await this.library()).flatMap((g) => g.items.map((i) => i.path)));
+    const imported: { path: string; size: { width: number; height: number }; properties: string[] }[] = [];
+    const warnings: string[] = [];
+    for (const f of files) {
+      const file = f.name.toLowerCase().endsWith('.svg') ? f.name : `${f.name}.svg`;
+      if (!/^[\w .-]+\.svg$/i.test(file)) throw new Error(`Invalid file name "${file}".`);
+      const path = `_widgets/${group}/${file}`;
+      const info = inspectWidgetSvg(f.svg, file);
+      if (!info.hasScript) warnings.push(`${file}: no <script>, it will be a static picture (no bindable properties).`);
+      else if (!info.vars.length) warnings.push(`${file}: no //!export-start ... //!export-end variables (_pb_/_pn_/_ps_/_pc_), nothing to bind.`);
+      if (existing.has(path) && !input.overwrite) {
+        warnings.push(`${file}: already in "${group}", skipped (overwrite: true replaces it).`);
+        continue;
+      }
+      await this.client.postJson('/api/upload', { resource: { type: 'svg', name: file, fullPath: `${group}/${file}`, data: f.svg }, destination: 'widgets' });
+      this.svgCache.delete(`${group}/${file.replace(/\.svg$/i, '')}`);
+      imported.push({ path, size: info.size, properties: info.vars.map((v) => `${v.name} (${v.type})`) });
+    }
+    return { imported, warnings };
+  }
+
+  async removeLibraryWidgets(refs: string[]): Promise<string[]> {
+    const removed: string[] = [];
+    for (const ref of refs) {
+      const hit = await this.findLibraryItem(ref.replace(/^\/?_widgets\//, '').replace(/\.svg$/, ''));
+      if (!hit) throw new Error(`Library widget "${ref}" not found.`);
+      if (BUILTIN_GROUP.test(hit.group.name)) throw new Error(`"${hit.item.path}" belongs to a built-in OpenBridge library and cannot be removed here.`);
+      await this.client.postJson('/api/resources/removeWidget', { path: hit.item.path });
+      removed.push(hit.item.path);
+    }
+    return removed;
   }
 
   private async widgetSvg(w: CatalogWidget): Promise<string> {
@@ -159,8 +288,19 @@ export class PagesService {
     for (const [id, item] of Object.entries(view.items)) {
       const box = boxes[id];
       const prop = item.property as Partial<WidgetProperty>;
-      const wname = widgetNameFromAddress(prop.address);
-      const w = cat.widgets.find((x) => x.widget === wname);
+      if (item.type === CHART_GAUGE_TYPE) {
+        const cp = item.property as { id?: string; type?: string; options?: { realtime?: number } };
+        const chart = ((project as unknown as { charts?: { id: string; name: string }[] }).charts ?? []).find((c) => c.id === cp.id);
+        const node = box ? { x: box.x / cat.grid, y: box.y / cat.grid } : { x: NaN, y: NaN };
+        out.push({ id, widget: 'chart', name: item.name, node, box: box ?? { x: NaN, y: NaN, width: NaN, height: NaN },
+          bindings: { chart: chart ? chart.name : `missing (${cp.id})`, mode: cp.type === 'history' ? 'history' : `realtime ${cp.options?.realtime ?? ''} min` } });
+        continue;
+      }
+      let wname = widgetNameFromAddress(prop.address);
+      let w = cat.widgets.find((x) => x.widget === wname);
+      if (!w && typeof prop.address === 'string') {
+        wname = prop.address.replace(/^.*?_widgets\//, '').replace(/\.svg$/, '');
+      }
       // bindings: tags, plus fixed values that differ from the widget default
       const defaults = new Map((w?.properties ?? []).map((p) => [p.name, p.default]));
       const bindings: Record<string, string> = {};
@@ -170,9 +310,8 @@ export class PagesService {
           bindings[v.name] = `value ${v.variableValue}`;
         }
       }
-      const node = box && w
-        ? { x: (box.x + w.anchor.x) / cat.grid, y: (box.y + w.anchor.y) / cat.grid }
-        : { x: NaN, y: NaN };
+      const anchor = w?.anchor ?? { x: 0, y: 0 };
+      const node = box ? { x: (box.x + anchor.x) / cat.grid, y: (box.y + anchor.y) / cat.grid } : { x: NaN, y: NaN };
       out.push({ id, widget: wname ?? item.type, name: item.name, node, box: box ?? { x: NaN, y: NaN, width: NaN, height: NaN }, bindings });
     }
     return out;
@@ -268,7 +407,7 @@ export class PagesService {
     if (item.type !== WIDGET_GAUGE_TYPE || (item.property as Partial<WidgetProperty>).type !== 'widget') {
       throw new Error(`Item "${itemId}" is not a widget; only widget properties can be set with this tool.`);
     }
-    const w = await this.getWidget(widgetNameFromAddress((item.property as WidgetProperty).address) ?? '');
+    const w = await this.getWidget(String((item.property as WidgetProperty).address ?? ''));
     this.applyProperties(project, item, w, props);
     await this.client.saveView(view);
     return (await this.describeItems(view)).find((x) => x.id === itemId)!;
@@ -288,6 +427,59 @@ export class PagesService {
     }
     if (removed.length) await this.client.saveView(view);
     return { removed, missing };
+  }
+
+  // ---------------------------------------------------------------- native trend charts
+  /** Place ScadaCraft's own chart control (uPlot trend) bound to a chart definition. */
+  async placeChart(viewRef: string, spec: ChartSpec): Promise<{ view: View; placed: PlacedItem; warnings: string[] }> {
+    const cat = await this.getCatalog();
+    const project = await this.getProject();
+    const view = this.findView(project, viewRef);
+    const chart = this.findChart(project, spec.chart);
+    const g = cat.grid;
+    const width = (spec.size?.width ?? 16) * g;
+    const height = (spec.size?.height ?? 10) * g;
+    const x = spec.node.x * g;
+    const y = spec.node.y * g;
+    const warnings: string[] = [];
+    if (x + width > view.profile.width || y + height > view.profile.height) {
+      warnings.push(`chart at node (${spec.node.x}, ${spec.node.y}): part of its box is outside the view and may be clipped.`);
+    }
+    const id = shortGuid('HXC_');
+    const mode = spec.mode ?? 'realtime';
+    const options: Record<string, unknown> = {
+      title: spec.title ?? chart.name, fontFamily: 'Roboto-Regular', legendFontSize: 12,
+      colorBackground: spec.background ?? 'rgba(255,255,255,0)', legendBackground: 'rgba(255,255,255,0)',
+      titleHeight: 18, axisLabelFontSize: 12, labelsDivWidth: 0,
+      axisLineColor: spec.text_color ?? 'rgba(0,0,0,1)', axisLabelColor: spec.text_color ?? 'rgba(0,0,0,1)',
+      ...(spec.grid_color ? { gridLineColor: spec.grid_color } : {}),
+      legendMode: spec.legend ?? 'always', series: [], width, height, decimalsPrecision: spec.decimals ?? 2,
+      realtime: spec.minutes ?? 60, loadOldValues: spec.load_history ?? true,
+      mouseWheelScroll: false, mouseWheelZoom: mode === 'history', staticChart: false,
+      dateFormat: 'DD_MM_YYYY', timeFormat: 'hh_mm_ss',
+    };
+    const item: GaugeSettings = {
+      id, type: CHART_GAUGE_TYPE, name: spec.name ?? chart.name, label: 'HtmlChart', hide: false, lock: false,
+      property: { id: chart.id, type: mode === 'history' ? 'history' : 'realtime1', options, events: [] },
+    };
+    view.items[id] = item;
+    addWidgetGroup(view, id, x, y, width, height, {
+      type: CHART_GAUGE_TYPE, hostPrefix: 'HXC_', attrs: { style: 'pointer-events:none', stroke: '#000000', 'stroke-width': '1' },
+    });
+    await this.client.saveView(view);
+    const placed = (await this.describeItems(view)).find((i) => i.id === id)!;
+    const tagless = (chart.lines ?? []).length === 0;
+    if (tagless) warnings.push(`chart "${chart.name}" has no pens; add tags with scadacraft_set_chart.`);
+    return { view, placed, warnings };
+  }
+
+  private findChart(project: Project, ref: string): { id: string; name: string; lines?: unknown[] } {
+    const charts = (project as unknown as { charts?: { id: string; name: string; lines?: unknown[] }[] }).charts ?? [];
+    const c = charts.find((x) => x.id === ref) ?? charts.find((x) => x.name.toLowerCase() === ref.toLowerCase());
+    if (!c) {
+      throw new Error(`Chart "${ref}" not found. Charts: ${charts.map((x) => x.name).join(', ') || '(none)'}. Create it with scadacraft_set_chart.`);
+    }
+    return c;
   }
 
   // ---------------------------------------------------------------- properties
@@ -328,4 +520,28 @@ export class PagesService {
     }
     return out;
   }
+}
+
+/** Size and bindable variables of a FUXA SVG widget. */
+export function inspectWidgetSvg(svg: string, label: string): { size: { width: number; height: number }; hasScript: boolean; vars: { name: string; type: string; default: string }[] } {
+  const doc = new DOMParser().parseFromString(svg, 'image/svg+xml');
+  const root = doc.documentElement;
+  if (!root || root.nodeName !== 'svg') throw new Error(`${label}: not an SVG document.`);
+  const num = (v: string | null) => (v && !v.trim().endsWith('%') ? parseFloat(v) : NaN);
+  let width = num(root.getAttribute('width'));
+  let height = num(root.getAttribute('height'));
+  const vb = (root.getAttribute('viewBox') ?? '').split(/[\s,]+/).map(Number);
+  if ((Number.isNaN(width) || Number.isNaN(height)) && vb.length === 4 && vb.every((n) => !Number.isNaN(n))) {
+    width = Number.isNaN(width) ? vb[2] : width;
+    height = Number.isNaN(height) ? vb[3] : height;
+  }
+  if (Number.isNaN(width) || Number.isNaN(height)) { width = 100; height = 100; }
+  const scripts = Array.from(root.getElementsByTagName('script'));
+  const vars: { name: string; type: string; default: string }[] = [];
+  for (const sc of scripts) {
+    for (const v of processWidget(sc.textContent ?? '', 'wModule_probe', {}).vars) {
+      vars.push({ name: v.name, type: v.type, default: String(v.variableValue ?? '') });
+    }
+  }
+  return { size: { width: Math.round(width), height: Math.round(height) }, hasScript: scripts.length > 0, vars };
 }
