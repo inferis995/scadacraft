@@ -25,7 +25,7 @@ module.exports = {
     },
     start: function () {
         return runtime.start().then(function () {
-            logger.info('FUXA started!');
+            logger.info('ScadaCraft started!');
         });
     },
     stop: function () {

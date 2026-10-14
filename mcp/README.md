@@ -1,40 +1,82 @@
 # scadacraft-mcp-server
 
-MCP server for [ScadaCraft](../README.md). It lets an AI assistant (Claude or any MCP client)
-build HMI pages on a running ScadaCraft server: P&ID process graphics with OpenBridge
-components, placed on the 24 px grid, bound to tags, and checked against live values.
+MCP server for [ScadaCraft](../README.md). It gives an AI assistant (Claude or any MCP client)
+the whole project of a running ScadaCraft server: devices and tags, alarms, pages with
+OpenBridge process graphics, live and historical data, export and import.
 
-Pages created through MCP are saved in exactly the same format as the editor, so they open,
-run and can be edited by hand like any other page.
+Everything is written in the same format as the ScadaCraft editor, so devices, alarms and
+pages created through MCP appear, run and can be edited by hand like any other.
 
-## Tools
+## Tools (33)
 
-| Tool | What it does | Writes |
-| --- | --- | --- |
-| `scadacraft_list_widgets` | OpenBridge widgets with anchor, size and properties; explains the placement model | — |
-| `scadacraft_list_views` | Pages of the project | — |
-| `scadacraft_get_view` | Items on a page: id, widget, anchor node, bindings | — |
-| `scadacraft_create_view` | New empty page | project |
-| `scadacraft_place_widgets` | Place widgets by grid node, with properties and tag bindings (batch) | project |
-| `scadacraft_draw_pipe` | Pipe along a path of nodes: straight runs plus elbows at bends | project |
-| `scadacraft_set_properties` | Change fixed values or tag bindings of a placed widget | project |
-| `scadacraft_remove_items` | Remove items from a page | project |
-| `scadacraft_delete_view` | Delete a page | project |
-| `scadacraft_list_tags` | Tags of all devices, with the `Device.Tag` reference used for bindings | — |
-| `scadacraft_create_server_tags` | Memory tags on the ScadaCraft server device (simulation, setpoints) | project |
-| `scadacraft_read_tags` | Live tag values | — |
-| `scadacraft_write_tags` | Write tag values — **reaches field devices** | plant |
+**Project**
+
+| Tool | What it does |
+| --- | --- |
+| `scadacraft_get_project_summary` | Views, devices, tags, alarms, scripts at a glance |
+| `scadacraft_export_project` | Save the project to a JSON file (same as "Save Project As") |
+| `scadacraft_import_project` | Merge selected views/devices/alarms from a file, or replace the whole project (backup first) |
+
+**Devices and tags**
+
+| Tool | What it does |
+| --- | --- |
+| `scadacraft_list_devices` | Devices with connection settings, tag count and live connection status |
+| `scadacraft_create_device` | Modbus TCP/RTU, Siemens S7, OPC UA, MQTT, BACnet, EtherNet/IP, … |
+| `scadacraft_update_device` | Enable/disable, rename, polling, connection settings |
+| `scadacraft_delete_device` | Delete, listing views/alarms that used its tags |
+| `scadacraft_list_tags` | Tags of all devices with their `Device.Tag` reference |
+| `scadacraft_add_tags` | Tags with driver addresses (`40001`, `DB1,REAL0`, OPC UA node ids, MQTT topics), scaling, history; server memory tags |
+| `scadacraft_update_tags` | Rename, address, type, scaling, decimals, history logging, deadband |
+| `scadacraft_delete_tags` | Delete, listing remaining references |
+| `scadacraft_list_drivers` | Optional driver packages and whether they are installed |
+| `scadacraft_install_driver` | Install a driver on the ScadaCraft server |
+
+**Data**
+
+| Tool | What it does |
+| --- | --- |
+| `scadacraft_read_tags` | Live values |
+| `scadacraft_write_tags` | Write values — **reaches field devices** |
+| `scadacraft_get_history` | History with min/max/avg, optional points and CSV file |
+
+**Alarms**
+
+| Tool | What it does |
+| --- | --- |
+| `scadacraft_list_alarms` | Alarm definitions |
+| `scadacraft_set_alarm` | Create or replace an alarm: highhigh/high/low/info levels with `above`/`below`/range, text, group, delay, ack mode |
+| `scadacraft_delete_alarm` | Delete a definition |
+| `scadacraft_get_active_alarms` | Active and unacknowledged alarms |
+| `scadacraft_ack_alarms` | Acknowledge one alarm or all |
+| `scadacraft_get_alarm_history` | Alarm events in a time range |
+
+**Pages**
+
+| Tool | What it does |
+| --- | --- |
+| `scadacraft_list_widgets` | OpenBridge widgets, anchors, properties; explains the placement model |
+| `scadacraft_list_views`, `scadacraft_get_view` | Pages and their items |
+| `scadacraft_create_view`, `scadacraft_update_view`, `scadacraft_duplicate_view`, `scadacraft_delete_view` | Page management |
+| `scadacraft_place_widgets` | Widgets by grid node, with properties and tag bindings |
+| `scadacraft_draw_pipe` | Pipe along a path of nodes, elbows at bends |
+| `scadacraft_set_properties` | Change values or bindings of a placed widget |
+| `scadacraft_remove_items` | Remove items from a page |
 
 Resources: `scadacraft://docs/openbridge` (design and usage guide) and
 `scadacraft://docs/openbridge-widgets` (widget reference).
 
-## Placement model in one paragraph
+Times accept ISO 8601, epoch ms, or relative values such as `-15m`, `-24h`, `-7d`.
 
-The page is a 24 px grid; every pipe connection is a node `(x, y)` = pixel `(x × 24, y × 24)`.
-Each widget is placed by putting its **anchor** on a node: pumps, motors, fans and valves by
-the centre of the icon, the tank by the top-centre of its body, pipes by the start of their
-axis, fittings by their centre. A pipe that reaches a device stops one node before the
-device's anchor and the next pipe starts one node after it. Details: [docs/openbridge.md](../docs/openbridge.md).
+## Typical session
+
+> Add a Modbus TCP PLC at 192.168.1.10 (unit 1) with the tank level in 40001 (Float32),
+> pump running on coil 1 and start/stop on coil 2. Log the level. Alarm above 90 % and
+> below 10 %. Then draw a page with the tank and the pump.
+
+The assistant uses: `create_device` → `add_tags` → `update_device {enabled: true}` →
+`read_tags` (checks communication) → `set_alarm` → `create_view` → `place_widgets` /
+`draw_pipe` → `get_view`.
 
 ## Install and build
 
@@ -80,28 +122,32 @@ claude mcp add scadacraft --env SCADACRAFT_URL=http://127.0.0.1:1881 -- node /pa
 ### HTTP transport
 
 ```bash
-TRANSPORT=http PORT=3001 SCADACRAFT_URL=http://plc-hmi:1881 node dist/index.js
+TRANSPORT=http PORT=3001 SCADACRAFT_URL=http://hmi-server:1881 node dist/index.js
 ```
 
 The HTTP endpoint has no authentication of its own. Keep it on `127.0.0.1` or behind a
-reverse proxy with authentication; anyone who can reach it can edit pages and write tags.
+reverse proxy with authentication: anyone who reaches it can change the project and write
+tags.
 
-## Example
+## Safety
 
-> Create a page "Sollevamento Cariati" with tank T-101 (wastewater) feeding pump P-101 and
-> control valve FCV-201, flow readout on the outlet. Bind the pump to `PLC1.P101_Run` and
-> `PLC1.P101_Cmd`.
-
-The assistant calls `scadacraft_list_widgets`, `scadacraft_list_tags`,
-`scadacraft_create_view`, `scadacraft_place_widgets` and `scadacraft_draw_pipe`, then
-`scadacraft_get_view` to check the layout.
+- `scadacraft_write_tags` and enabling a device act on real equipment. Server memory tags
+  (`FUXA Server.*`) are safe for tests and simulation.
+- `scadacraft_import_project` with `mode: "replace"` replaces the whole project; a backup of
+  the current project is written first.
+- Delete tools report the pages and alarms that still reference removed tags.
+- Device passwords (OPC UA, MQTT) are stored as device security on the server, not in the
+  project file, and are masked in tool results.
+- Files (export, import, CSV) are read and written on the machine running the MCP server.
 
 ## Notes
 
-- If the editor is open on a page changed through MCP, reload the editor to see the change.
-- `scadacraft_write_tags` writes to real equipment for device tags. Server memory tags
-  (`FUXA Server.*`) are safe for tests and simulation.
+- If the editor is open while the project is changed through MCP, reload the editor.
 - Tag references accept `Device.Tag`, a unique tag name, or a tag id.
+- Optional drivers (Modbus, S7, OPC UA, …) must be installed on the ScadaCraft server;
+  `scadacraft_create_device` warns when the driver is missing and `scadacraft_install_driver`
+  installs it.
+- An acknowledged alarm shows as acknowledged at the next alarm check (about 1 s).
 
 ## Tests
 
@@ -109,9 +155,12 @@ The assistant calls `scadacraft_list_widgets`, `scadacraft_list_tags`,
 npm test
 ```
 
-- `test/parity.mjs` checks that the widget script processing matches the editor's code
-  (`client/src/app/_helpers/svg-utils.ts`) for every OpenBridge widget.
-- `test/e2e.mjs` runs the server over stdio against a running ScadaCraft
-  (`SCADACRAFT_URL`), creates server tags and a page "MCP e2e" with a tank, pump, valve,
-  readout and pipes, reads and writes tag values. Skipped when ScadaCraft is not reachable.
-  `E2E_CLEANUP=1` deletes the page afterwards.
+- `test/parity.mjs`: widget script processing matches the editor's code for every widget.
+- `test/e2e.mjs`: page building with server memory tags (tank, pump, valve, readout, pipes).
+- `test/e2e-plant.mjs`: full plant against a simulated Modbus TCP PLC (`test/modbus-sim.mjs`):
+  driver install, device, tags with scaling and history, live read, write to the PLC,
+  connection status, alarm raise/acknowledge/history, tag history with CSV, page bound to
+  the PLC, view update/duplicate, export, merge import and full replace.
+
+The end-to-end tests need a running ScadaCraft (`SCADACRAFT_URL`) and skip otherwise.
+`E2E_CLEANUP=1` removes what they create.

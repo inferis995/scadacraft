@@ -66,10 +66,37 @@ export interface View {
   [key: string]: unknown;
 }
 
+export interface AlarmLevel {
+  enabled: boolean;
+  checkdelay: number;
+  min: number;
+  max: number;
+  timedelay: number;
+  text: string;
+  group: string;
+  ackmode: string;
+  bkcolor: string;
+  color: string;
+}
+
+export type AlarmLevelName = 'highhigh' | 'high' | 'low' | 'info';
+
+export interface AlarmDefinition {
+  name: string;
+  property: { variableId: string; permission?: number; permissionRoles?: { show: string[]; enabled: string[] } };
+  highhigh?: AlarmLevel;
+  high?: AlarmLevel;
+  low?: AlarmLevel;
+  info?: AlarmLevel;
+  actions?: { enabled: boolean; values: unknown[] };
+  [key: string]: unknown;
+}
+
 export interface Project {
   devices?: Record<string, Device>;
   server?: Device;
   hmi?: { views?: View[]; [key: string]: unknown };
+  alarms?: AlarmDefinition[];
   [key: string]: unknown;
 }
 

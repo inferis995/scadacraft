@@ -1,13 +1,13 @@
 {
   "name": "scadacraft-mcp-server",
-  "version": "0.1.0",
-  "description": "MCP server for ScadaCraft: build P&ID pages with OpenBridge widgets, bind tags, manage server tags",
+  "version": "0.2.0",
+  "description": "MCP server for ScadaCraft: devices, tags, alarms, P&ID pages with OpenBridge widgets, live and historical data, project export/import",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc && node scripts/copy-docs.mjs",
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
-    "test": "node test/parity.mjs && node test/e2e.mjs",
+    "test": "node test/parity.mjs && node test/e2e.mjs && node test/e2e-plant.mjs",
     "clean": "rm -rf dist docs"
   },
   "license": "MIT",
@@ -21,6 +21,7 @@
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.5",
     "esbuild": "^0.28.2",
+    "modbus-serial": "^8.0.19",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   },

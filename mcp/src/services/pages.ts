@@ -3,13 +3,12 @@
  * Placement follows the OpenBridge P&ID anchor model (docs/openbridge.md):
  * a widget is placed so that its anchor lies on grid node (x, y) = pixel (x*24, y*24).
  */
-import { ScadaCraftClient } from './fuxa/client.js';
-import { allTags, resolveTag } from './fuxa/tags.js';
+import { ScadaCraftClient } from '../fuxa/client.js';
+import { allTags, resolveTag } from '../fuxa/tags.js';
 import {
-  addWidgetGroup, buildWidgetItem, itemBoxes, newView, removeGroup, widgetNameFromAddress, WIDGET_GAUGE_TYPE,
-} from './fuxa/view.js';
-import type { Catalog, CatalogWidget, Device, GaugeSettings, Project, Tag, View, WidgetProperty } from './fuxa/types.js';
-import { randomBytes } from 'node:crypto';
+  addWidgetGroup, buildWidgetItem, itemBoxes, newView, removeGroup, shortGuid, widgetNameFromAddress, WIDGET_GAUGE_TYPE,
+} from '../fuxa/view.js';
+import type { Catalog, CatalogWidget, GaugeSettings, Project, View, WidgetProperty } from '../fuxa/types.js';
 
 export const WIDGET_GROUP_PATH = '/_widgets/openbridge';
 
@@ -35,7 +34,7 @@ export interface PlacedItem {
   bindings: Record<string, string>;
 }
 
-export class ScadaCraftService {
+export class PagesService {
   private catalog?: Catalog;
   private svgCache = new Map<string, string>();
 
@@ -95,6 +94,47 @@ export class ScadaCraftService {
     const view = newView(name, width, height, background);
     await this.client.saveView(view);
     return view;
+  }
+
+  async updateView(ref: string, changes: { name?: string; width?: number; height?: number; background?: string }): Promise<View> {
+    const project = await this.getProject();
+    const view = this.findView(project, ref);
+    if (changes.name && changes.name.toLowerCase() !== view.name.toLowerCase()
+      && this.views(project).some((v) => v.name.toLowerCase() === changes.name!.toLowerCase())) {
+      throw new Error(`A view named "${changes.name}" already exists.`);
+    }
+    if (changes.name) view.name = changes.name;
+    if (changes.width) view.profile.width = changes.width;
+    if (changes.height) view.profile.height = changes.height;
+    if (changes.background) view.profile.bkcolor = changes.background;
+    if (changes.width || changes.height) {
+      view.svgcontent = view.svgcontent.replace(/^(<svg[^>]*?)\swidth="[^"]*"/, `$1 width="${view.profile.width}"`)
+        .replace(/^(<svg[^>]*?)\sheight="[^"]*"/, `$1 height="${view.profile.height}"`);
+    }
+    await this.client.saveView(view);
+    return view;
+  }
+
+  /** Copy a view with new item ids (same procedure as the editor's "clone view"). */
+  async duplicateView(ref: string, newName: string): Promise<View> {
+    const project = await this.getProject();
+    const view = this.findView(project, ref);
+    if (this.views(project).some((v) => v.name.toLowerCase() === newName.toLowerCase())) {
+      throw new Error(`A view named "${newName}" already exists.`);
+    }
+    let content = JSON.stringify(view);
+    for (const id of Object.keys(view.items ?? {})) {
+      const prefix = id.includes('_') ? id.slice(0, id.indexOf('_') + 1) : '';
+      content = content.split(id).join(shortGuid(prefix));
+    }
+    // widget host elements (H-/D- ids) are renamed too, so both views can be shown together
+    const hosts = new Set([...content.matchAll(/[HD]-(OXC_[0-9a-f]{8}-[0-9a-f]{8})/g)].map((m) => m[1]));
+    for (const h of hosts) content = content.split(h).join(shortGuid('OXC_'));
+    const copy = JSON.parse(content) as View;
+    copy.id = `v_${shortGuid()}`;
+    copy.name = newName;
+    await this.client.saveView(copy);
+    return copy;
   }
 
   async deleteView(ref: string): Promise<View> {
@@ -274,29 +314,5 @@ export class ScadaCraftService {
       }
     }
     return out;
-  }
-
-  // ---------------------------------------------------------------- tags
-  async createServerTags(tags: { name: string; type: 'number' | 'boolean' | 'string'; init?: string }[]): Promise<Tag[]> {
-    const project = await this.getProject();
-    // server memory tags live in devices['0']; project.server is only the template of that device
-    const template = project.devices?.['0'] ?? project.server;
-    if (!template) throw new Error('This project has no ScadaCraft server device.');
-    const server: Device = JSON.parse(JSON.stringify(template)) as Device;
-    server.id = '0';
-    server.enabled = true;
-    server.tags = server.tags ?? {};
-    const existing = new Set(Object.values(server.tags).map((t) => t.name.toLowerCase()));
-    const created: Tag[] = [];
-    for (const t of tags) {
-      if (existing.has(t.name.toLowerCase())) throw new Error(`Server tag "${t.name}" already exists.`);
-      const id = `t_${randomBytes(4).toString('hex')}-${randomBytes(4).toString('hex')}`;
-      const tag: Tag = { id, name: t.name, label: t.name, type: t.type, init: t.init ?? '', value: undefined };
-      server.tags[id] = tag;
-      existing.add(t.name.toLowerCase());
-      created.push(tag);
-    }
-    await this.client.saveDevice(server);
-    return created;
   }
 }

@@ -40,7 +40,8 @@ assert.equal(widgets.structuredContent.grid, 24);
 // server tags (unique suffix so the test can run repeatedly)
 const sfx = Date.now().toString(36);
 const T = (n) => `E2E_${n}_${sfx}`;
-await call('scadacraft_create_server_tags', {
+await call('scadacraft_add_tags', {
+  device: 'FUXA Server',
   tags: [
     { name: T('P101_Run'), type: 'boolean', init: '1' },
     { name: T('P101_Cmd'), type: 'boolean', init: '0' },
