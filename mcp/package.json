@@ -2,6 +2,28 @@
   "name": "scadacraft-mcp-server",
   "version": "0.5.0",
   "description": "MCP server for ScadaCraft: devices, tags, alarms, P&ID pages with OpenBridge widgets, live and historical data, project export/import",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "scada",
+    "hmi",
+    "fuxa",
+    "scadacraft",
+    "openbridge",
+    "modbus",
+    "opc-ua",
+    "industrial-automation"
+  ],
+  "author": "Andrea Allegretta <addeoninja@gmail.com> (NET CARING S.R.L.)",
+  "homepage": "https://github.com/inferis995/scadacraft/tree/main/mcp",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/inferis995/scadacraft.git",
+    "directory": "mcp"
+  },
+  "bugs": {
+    "url": "https://github.com/inferis995/scadacraft/issues"
+  },
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc && node scripts/copy-docs.mjs",
@@ -30,6 +52,11 @@
     "scadacraft-mcp-server": "dist/index.js"
   },
   "engines": {
-    "node": ">=20"
-  }
+    "node": ">=18"
+  },
+  "files": [
+    "dist",
+    "docs",
+    "README.md"
+  ]
 }

@@ -1,0 +1,27 @@
+# Changelog
+
+All notable changes to ScadaCraft. Versions of the MCP server are in brackets.
+
+## Unreleased
+
+### Added
+- MCP server [0.5.0]: import native SVG widgets into the editor library, place imported widgets
+  with bindings, trend charts on pages (realtime or history), one-step trend pages with menu entry.
+- OpenBridge widget libraries: 49 widgets in five editor groups (automation P&ID, instruments,
+  charts, controls, alerts); library titles and order from `group.json`.
+- MCP server [0.4.0]: widget libraries, resizable widgets (size in cells), read/write controls.
+- Scheduled backups of project, settings and history database, restore on restart; MCP [0.3.0]
+  covers layout, menu, logo and colours, settings, users and roles, scripts, notifications,
+  languages, charts, reports, API keys, logs and backups.
+- MCP server [0.2.0]: devices and tags for every driver, alarms, live and historical data,
+  project export and import (merge or replace).
+- OpenBridge P&ID: 24 px grid with snapping, anchor model, stretching pipes, library previews.
+- CI: MCP build and parity, end-to-end tests against a running ScadaCraft; Docker image on GHCR.
+
+### Changed
+- Rebranded from FUXA 1.3.5 to ScadaCraft (logo, UI strings, docs site, packages).
+
+### Fixed
+- Widget uploads go to the folder the widget library is served from (also with `--userDir`).
+- Reports no longer fail when the chart renderer is missing.
+- OpenBridge clock and live charts stop their timers when the widget leaves the page.

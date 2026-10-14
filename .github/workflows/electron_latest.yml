@@ -1,4 +1,4 @@
-name: Build FUXA Electron App (Latest)
+name: Build ScadaCraft Electron App
 
 on:
   #push:

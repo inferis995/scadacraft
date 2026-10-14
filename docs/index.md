@@ -1,4 +1,10 @@
-## Welcome to the FUXA wiki!
+## Welcome to the ScadaCraft documentation
+
+ScadaCraft is a web SCADA/HMI based on [FUXA](https://github.com/frangoteam/FUXA) (MIT), with the
+[OpenBridge](openbridge.md) widget libraries, scheduled backups and an [MCP server](mcp.md) that lets an
+AI assistant build and run the whole project. The guides below come from FUXA and apply to ScadaCraft
+unchanged; where they say FUXA, read ScadaCraft.
+
 
 FUXA is a powerful **web-based** software to rapidly build and deploy scalable SCADA, HMI, Dashboard or IIoT systems. With FUXA you can create modern process visualizations with individual designs for your machines and real-time data display, as well as control instrument of automated industrial plants.
 

@@ -1,6 +1,6 @@
 ---
 name: 'Feature request'
-about: Suggest an idea for improving FUXA
+about: Suggest an idea for improving ScadaCraft
 title: '[FEATURE]'
 labels: 'type:feature'
 assignees: ''

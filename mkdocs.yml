@@ -1,10 +1,10 @@
-site_name: FUXA Documentation
-site_url: https://frangoteam.github.io/FUXA/
+site_name: ScadaCraft Documentation
+site_url: https://inferis995.github.io/scadacraft/
 
 theme:
   name: material
-  logo: assets/logo.svg
-  favicon: assets/logo.svg
+  logo: assets/scadacraft-icon.png
+  favicon: assets/scadacraft-icon.png
 
   palette:
     # Light mode
@@ -12,18 +12,17 @@ theme:
       toggle:
         icon: material/weather-sunny
         name: Switch to dark mode
-      logo: assets/logo.svg
+      logo: assets/scadacraft-icon.png
 
     # Dark mode
     - scheme: slate
       toggle:
         icon: material/weather-night
         name: Switch to light mode
-      logo: assets/logo.svg
+      logo: assets/scadacraft-icon.png
 
 nav:
   - Home: index.md
-  - Live Demo: https://frangoteam.github.io/
   - Getting Started:
       - Installing and Running: Installing-and-Running.md
   - HowTo:
@@ -44,19 +43,19 @@ nav:
       - ODBC: HowTo-ODBC.md
       - Widgets: HowTo-Widgets.md
       - WebSockets: HowTo-WebSockets.md
+  - OpenBridge:
+      - Design and usage guide: openbridge.md
+      - Widget reference: openbridge-widgets.md
+  - AI (MCP server): mcp.md
   - Settings: Settings.md
   - Tips and Tricks: Tips-and-Tricks.md
 
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/frangoteam/FUXA
+      link: https://github.com/inferis995/scadacraft
       name: GitHub Repository
 
-    - icon: fontawesome/brands/discord
-      link: https://discord.gg/WZhxz9uHh4
-      name: Discord Community
-
 copyright: >
-  Powered by <a href="https://frangoteam.org" target="_blank" rel="noopener">
-  <strong>frangoteam</strong></a>
+  ScadaCraft by NET CARING S.R.L. — based on <a href="https://github.com/frangoteam/FUXA" target="_blank" rel="noopener">FUXA</a>
+  by frangoteam (MIT)

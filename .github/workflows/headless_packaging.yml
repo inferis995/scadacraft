@@ -1,4 +1,4 @@
-name: Build FUXA Headless (Latest)
+name: Build ScadaCraft Headless
 
 on:
   workflow_dispatch:

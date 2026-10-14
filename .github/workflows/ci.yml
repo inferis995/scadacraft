@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  mcp:
+    name: MCP server — build and widget parity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: mcp/package-lock.json
+      - name: Install
+        working-directory: mcp
+        run: npm ci
+      - name: Build
+        working-directory: mcp
+        run: npm run build
+      - name: Widget scripts match the editor's processing
+        working-directory: mcp
+        run: node test/parity.mjs
+
+  e2e:
+    name: End-to-end — MCP against a running ScadaCraft
+    runs-on: ubuntu-latest
+    needs: mcp
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            server/package-lock.json
+            mcp/package-lock.json
+      - name: Install server
+        working-directory: server
+        run: npm ci
+      - name: Start ScadaCraft
+        working-directory: server
+        run: |
+          nohup node main.js > "$RUNNER_TEMP/scadacraft.log" 2>&1 &
+          for i in $(seq 1 60); do
+            curl -sf http://127.0.0.1:1881/api/project > /dev/null && exit 0
+            sleep 2
+          done
+          cat "$RUNNER_TEMP/scadacraft.log"
+          exit 1
+      - name: Install and build MCP server
+        working-directory: mcp
+        run: npm ci && npm run build
+      - name: Tests (parity, pages, widget libraries, import and trends, Modbus plant, administration)
+        working-directory: mcp
+        env:
+          SCADACRAFT_URL: http://127.0.0.1:1881
+        run: npm test
+      - name: Server log
+        if: always()
+        run: tail -n 200 "$RUNNER_TEMP/scadacraft.log"

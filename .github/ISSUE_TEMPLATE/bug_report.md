@@ -29,7 +29,7 @@ Please provide an example project where the issue can be replicated.
 - **Or attach the JSON file** of your project
 
 **Environment**
- - FUXA version:
+ - ScadaCraft version:
  - Node.js version:
  - npm version:
  - Platform/OS:

@@ -12,7 +12,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/frangoteam/FUXA.git"
+    "url": "https://github.com/inferis995/scadacraft.git"
   },
   "dependencies": {
     "@influxdata/influxdb-client": "1.25.0",
