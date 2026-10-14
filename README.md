@@ -37,6 +37,9 @@ docker compose up --build
 
 Then open `http://localhost:1881`. Images are published to `ghcr.io/inferis995/scadacraft` on version tags.
 
+GitHub Actions (CI, docs site, Docker image) run only while the repository is public; on a private
+copy run the tests locally: start the server, then `cd mcp && npm test`.
+
 ## Documentation
 
 - [OpenBridge design and usage guide](docs/openbridge.md) and [widget reference](docs/openbridge-widgets.md)

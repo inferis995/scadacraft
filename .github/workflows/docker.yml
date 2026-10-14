@@ -16,6 +16,8 @@ permissions:
 jobs:
   image:
     runs-on: ubuntu-latest
+    # runs only while the repository is public (private repos have no free Actions minutes)
+    if: ${{ !github.event.repository.private }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3

@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    # runs only while the repository is public (private repos have no free Actions minutes)
+    if: ${{ !github.event.repository.private }}
     strategy:
       matrix:
         include:

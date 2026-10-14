@@ -10,6 +10,8 @@ jobs:
   mcp:
     name: MCP server — build and widget parity
     runs-on: ubuntu-latest
+    # runs only while the repository is public (private repos have no free Actions minutes)
+    if: ${{ !github.event.repository.private }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -30,6 +32,8 @@ jobs:
   e2e:
     name: End-to-end — MCP against a running ScadaCraft
     runs-on: ubuntu-latest
+    # runs only while the repository is public (private repos have no free Actions minutes)
+    if: ${{ !github.event.repository.private }}
     needs: mcp
     timeout-minutes: 30
     steps:

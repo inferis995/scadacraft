@@ -13,6 +13,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # runs only while the repository is public (private repos have no free Actions minutes)
+    if: ${{ !github.event.repository.private }}
 
     steps:
       - name: Checkout
