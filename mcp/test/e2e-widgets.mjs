@@ -117,7 +117,7 @@ try {
   let svg = (await (await fetch(`${url}/api/project`)).json()).hmi.views.find((x) => x.name === VIEW).svgcontent;
   assert.match(svg, /style="fill:var\(--container-global-color\)/);
   assert.match(svg, />CARD</);
-  const rm = (await call('scadacraft_remove_items', { view: VIEW, ids: [sh.ids[2]] })).structuredContent;
+  const rm = (await call('scadacraft_remove_items', { view: VIEW, item_ids: [sh.ids[2]] })).structuredContent;
   assert.deepEqual(rm.removed, [sh.ids[2]]);
   svg = (await (await fetch(`${url}/api/project`)).json()).hmi.views.find((x) => x.name === VIEW).svgcontent;
   assert.ok(!svg.includes(sh.ids[2]) && svg.includes(sh.ids[0]));
