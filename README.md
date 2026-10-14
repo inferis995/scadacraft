@@ -10,7 +10,7 @@ ScadaCraft is a fork of [FUXA](https://github.com/frangoteam/FUXA) by frangoteam
 
 - **OpenBridge process graphics** — pumps, valves, tanks, readouts and pipes from the OpenBridge design system, on a 24 px P&ID grid ([guide](docs/openbridge.md), [widget reference](docs/openbridge-widgets.md))
 - **HTML widgets with custom properties** — import custom HTML pages (AVEVA-style custom properties) and bind them to tags *(planned)*
-- **MCP server** — let an AI agent create devices, tags, views and widgets *(planned)*
+- **MCP server** — an AI assistant builds P&ID pages, binds tags and reads live values ([mcp/](mcp/README.md))
 
 ## Drivers
 

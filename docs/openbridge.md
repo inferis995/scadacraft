@@ -205,3 +205,5 @@ re-run the visual check. Rebuild the client afterwards (`client/dist` is version
 box size, anchor, stretch axis and properties (name, type, default, read/write). A tool that
 places a widget on node `(x, y)` computes the position with the formula in §3.2, sets the
 box size (stretch widgets: `cells × 24` on the stretch axis) and binds properties by name.
+The ScadaCraft MCP server ([mcp/](../mcp/README.md)) implements this: `scadacraft_place_widgets`
+places widgets by node and `scadacraft_draw_pipe` turns a path of nodes into pipes and elbows.
