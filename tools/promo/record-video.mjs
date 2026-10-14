@@ -100,7 +100,7 @@ function card(kind) {
   return base + `<img class="a1" src="data:image/png;base64,${LOGO}" style="width:300px">
     <div class="a2" style="font-size:48px;font-weight:700;margin-top:24px">github.com/inferis995/scadacraft</div>
     <div class="a3" style="font-size:28px;margin-top:22px;color:#3d5166">Open source (MIT) · basato su FUXA · componenti OpenBridge · server MCP per Claude</div>
-    <div class="a4" style="font-size:24px;margin-top:40px;color:#6b7c8d">Andrea Allegretta · NET CARING S.R.L.</div>
+    <div class="a4" style="font-size:24px;margin-top:40px;color:#6b7c8d">Giovanni Addeo · NET CARING S.R.L.</div>
     </div></body></html>`;
 }
 

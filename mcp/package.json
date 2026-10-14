@@ -14,7 +14,7 @@
     "opc-ua",
     "industrial-automation"
   ],
-  "author": "Andrea Allegretta <addeoninja@gmail.com> (NET CARING S.R.L.)",
+  "author": "Giovanni Addeo <addeoninja@gmail.com> (NET CARING S.R.L.)",
   "homepage": "https://github.com/inferis995/scadacraft/tree/main/mcp",
   "repository": {
     "type": "git",
