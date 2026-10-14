@@ -94,3 +94,4 @@ server/_widgets/*
 
 .agents/
 AGENTS.md
+server/_backups/

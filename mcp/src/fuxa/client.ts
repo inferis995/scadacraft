@@ -213,6 +213,25 @@ export class ScadaCraftClient {
     await this.request('/api/plugins', { method: 'POST', body: JSON.stringify({ params: plugin }) }, true, 600000);
   }
 
+  // ------------------------------------------------------------ generic JSON helpers
+  async getJson<T>(path: string, timeoutMs?: number): Promise<T> {
+    const res = await this.request(path, {}, true, timeoutMs);
+    const text = await res.text();
+    return (text ? JSON.parse(text) : null) as T;
+  }
+
+  async postJson<T>(path: string, body: unknown, timeoutMs?: number): Promise<T> {
+    const res = await this.request(path, { method: 'POST', body: JSON.stringify(body) }, true, timeoutMs);
+    const text = await res.text();
+    return (text ? JSON.parse(text) : null) as T;
+  }
+
+  async deleteJson<T>(path: string): Promise<T> {
+    const res = await this.request(path, { method: 'DELETE' });
+    const text = await res.text();
+    return (text ? JSON.parse(text) : null) as T;
+  }
+
   // ------------------------------------------------------------ static files
   async getText(path: string): Promise<string> {
     const res = await this.request(path);

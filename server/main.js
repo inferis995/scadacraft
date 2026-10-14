@@ -236,6 +236,15 @@ if (version.indexOf('beta') > 0) {
 if (!fs.existsSync(settings.dbDir)) {
     fs.mkdirSync(settings.dbDir);
 }
+// Apply a pending backup restore (databases are not open yet)
+try {
+    const restored = require('./runtime/backup').applyPendingRestore(workDir, settings.dbDir, settings.uploadFileDir, (msg) => logger.warn(msg));
+    if (restored) {
+        logger.warn('ScadaCraft restored from backup ' + restored.from);
+    }
+} catch (err) {
+    logger.error('backup.restore failed! ' + err);
+}
 // Check package folder
 if (!fs.existsSync(settings.packageDir)) {
     fs.mkdirSync(settings.packageDir);

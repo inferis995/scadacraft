@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { ScadaCraftClient } from '../fuxa/client.js';
+import type { AdminService } from '../services/admin.js';
 import type { AlarmsService } from '../services/alarms.js';
 import type { DevicesService } from '../services/devices.js';
 import type { PagesService, PlacedItem } from '../services/pages.js';
@@ -13,6 +14,7 @@ export interface Ctx {
   devices: DevicesService;
   alarms: AlarmsService;
   project: ProjectService;
+  admin: AdminService;
 }
 
 export type ToolResult = {

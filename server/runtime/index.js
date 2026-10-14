@@ -22,6 +22,7 @@ const schedulerService = require('./scheduler/scheduler-service');
 const recipeStorage = require('./recipes/recipe-storage');
 const recipeService = require('./recipes/recipe-service');
 var jobs = require('./jobs');
+const backup = require('./backup');
 
 var api;
 var settings
@@ -107,6 +108,11 @@ function init(_io, _api, _settings, _log, eventsMain) {
 
     project.init(settings, logger, runtime).then(result => {
         logger.info('runtime init project successful!', true);
+        try {
+            backup.init(settings, logger, runtime);
+        } catch (err) {
+            logger.error('runtime.failed-to-init backup: ' + err);
+        }
         events.emit('init-project-ok');
     }).catch(function (err) {
         logger.error('runtime.failed-to-init project');
@@ -784,6 +790,7 @@ var runtime = module.exports = {
     stop: stop,
     update: update,
     restart: restart,
+    get backup() { return backup },
 
     get io() { return io },
     get logger() { return logger },

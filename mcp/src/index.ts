@@ -8,6 +8,8 @@
  *   - alarms: definitions, active alarms, acknowledge, history
  *   - data: live read/write, history (DAQ) with statistics and CSV export
  *   - project: summary, export to file, import (merge or replace)
+ *   - app: layout (menu, header, logo, colours), settings and history database, users and roles, scripts,
+ *     notifications, languages and texts, charts, reports, API keys, logs, backups (scheduled, restore)
  *
  * Configuration (environment):
  *   SCADACRAFT_URL       ScadaCraft base URL (default http://127.0.0.1:1881)
@@ -24,10 +26,12 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ScadaCraftClient } from './fuxa/client.js';
+import { AdminService } from './services/admin.js';
 import { AlarmsService } from './services/alarms.js';
 import { DevicesService } from './services/devices.js';
 import { PagesService } from './services/pages.js';
 import { ProjectService } from './services/project.js';
+import { registerAdminTools } from './tools/admin.js';
 import { registerAlarmTools } from './tools/alarms.js';
 import type { Ctx } from './tools/common.js';
 import { registerDataTools } from './tools/data.js';
@@ -35,7 +39,7 @@ import { registerDeviceTools } from './tools/devices.js';
 import { registerPageTools } from './tools/pages.js';
 import { registerProjectTools } from './tools/project.js';
 
-const VERSION = '0.2.0';
+const VERSION = '0.3.0';
 const HERE = dirname(fileURLToPath(import.meta.url));
 
 const client = new ScadaCraftClient({
@@ -49,6 +53,7 @@ const ctx: Ctx = {
   devices: new DevicesService(client),
   alarms: new AlarmsService(client),
   project: new ProjectService(client),
+  admin: new AdminService(client),
 };
 
 const INSTRUCTIONS = `ScadaCraft is a web SCADA/HMI. This server edits the project of a running ScadaCraft and reads its live data.
@@ -65,6 +70,7 @@ function createServer(): McpServer {
   registerDataTools(server, ctx);
   registerAlarmTools(server, ctx);
   registerPageTools(server, ctx);
+  registerAdminTools(server, ctx);
 
   const doc = (file: string) => readFileSync(join(HERE, '..', 'docs', file), 'utf8');
   server.registerResource('openbridge-guide', 'scadacraft://docs/openbridge', {

@@ -22,6 +22,7 @@ var daqApi = require('./daq');
 var schedulerApi = require('./scheduler');
 var recipesApi = require('./recipes');
 var commandApi = require('./command');
+var backupApi = require('./backup');
 const reports = require('../dist/reports.service');
 const reportsApi = new reports.ReportsApiService();
 const verifyApiOrToken = require('./apikeys/verify-api-or-token');
@@ -92,6 +93,8 @@ function init(_server, _runtime) {
             apiApp.use(resourcesApi.app());
             commandApi.init(runtime, authMiddleware, verifyGroups);
             apiApp.use(commandApi.app());
+            backupApi.init(runtime, authMiddleware, verifyGroups);
+            apiApp.use(backupApi.app());
             reportsApi.init(runtime, authMiddleware, verifyGroups);
             apiApp.use(reportsApi.app());
             apiKeysApi.init(runtime, authMiddleware, verifyGroups);

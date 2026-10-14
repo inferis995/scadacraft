@@ -106,7 +106,7 @@ function Report(_property, _runtime) {
         return new Promise(async function (resolve, reject) {
             try {
                 let docDefinition = {...report.docproperty };
-                docDefinition['header'] = { text: 'FUXA by frangoteam', style:[{fontSize: 6}]};
+                docDefinition['header'] = { text: 'ScadaCraft', style:[{fontSize: 6}]};
                 docDefinition['footer'] = function(currentPage, pageCount) {
                     return { text: currentPage.toString() + ' / ' + pageCount, style:[{alignment: 'right', fontSize: 8}]} ;
                 },
@@ -208,7 +208,9 @@ function Report(_property, _runtime) {
                     }
                     resolve(content);
                 }).catch(function (err) {
-                    reject(err);
+                    // keep the rest of the report: show a note instead of the chart
+                    logger.warn(`report chart '${itemChart.chart?.name}' skipped: ${err}`);
+                    resolve({ text: `[Chart "${itemChart.chart?.name || ''}" not available: ${err && err.message ? err.message : err}]`, italics: true, fontSize: 8 });
                 });
             } catch (err) {
                 reject(err);
@@ -225,6 +227,9 @@ function Report(_property, _runtime) {
             try {
                 // TODO wait compatibility with arm
                 imageGenerator.createImage(itemChart, values).then((content) => {
+                    if (!content) {
+                        return reject(new Error('chart renderer not available (install the "Chart" plugins: chart.js, chartjs-node-canvas)'));
+                    }
                     resolve(content.toString('base64'));
                 }).catch(function (err) {
                     reject(err);
