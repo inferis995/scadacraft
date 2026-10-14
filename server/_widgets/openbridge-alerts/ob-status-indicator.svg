@@ -2,7 +2,8 @@
   <desc>ScadaCraft OpenBridge widget: Status indicator (obc-status-indicator, OpenBridge 1.0.0, Apache-2.0).
 Library: OpenBridge · Alerts and status. Box 48x24 px, anchor at (0,0).
 Bindable properties:
-  _pn_state (default 1, read): State: 0 inactive, 1 active, 2 running, 3 caution, 4 warning, 5 alarm</desc>
+  _pn_state (default 1, read): State: 0 inactive, 1 active, 2 running, 3 caution, 4 warning, 5 alarm; or a boolean (on/off) with _pn_onState
+  _pn_onState (default -1, read): For a boolean tag: state shown when it is on (e.g. 2 running, 5 alarm; off = inactive). -1 = _pn_state is the state code</desc>
   <rect id="ob_bg" x="0" y="0" width="48" height="24" fill="none" />
   <image id="ob_preview" x="0" y="0" width="48" height="24" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAAAwCAIAAABhdOiYAAABXklEQVR4nOzaMWoCQRjF8WcwITGg7BYhbVIIElOLJ9hdS71EcgDFK2hhm1xCLCwUcopAQNALBEHFwixsFcdAsNHXzEz1fix83RR/ZtmdZfNpmkJOy0POUiBCgQgFIhSIUCBCgQgFIhSIUCBCgQgFIhSIUCBCgQhXgcaf48HHYPY926Zb2FC6KVXuK524k1QTeJRz8cFs8jVpvjXhxuh1FFdj+OJkB/WnfTMKQABcwY4M2AA/6E17PgNdwIHFcmFGaK8ODksFZs6Xc3jkZAetdiszLmHZIfd6t4ZHeooRCkQoEKFAhAIRCkQoEOHkRTG8Dc3IYFl2tLgvTgKV78pmbKw2+jtq/C/ui5NbrB21W++t/bnJXLZ1ky48crKDGs+N4cuw9lArXhdhSVAI6o/1/VE+eorgUU7/B52npxihQIQCEQpEKBChQIQCEQpEKBChQIQCEQpEKBChQIQCEb8AAAD//3/PLiEAAAAGSURBVAMAF59AvlFDKgsAAAAASUVORK5CYII=" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAAAwCAIAAABhdOiYAAABXklEQVR4nOzaMWoCQRjF8WcwITGg7BYhbVIIElOLJ9hdS71EcgDFK2hhm1xCLCwUcopAQNALBEHFwixsFcdAsNHXzEz1fix83RR/ZtmdZfNpmkJOy0POUiBCgQgFIhSIUCBCgQgFIhSIUCBCgQgFIhSIUCBCgQhXgcaf48HHYPY926Zb2FC6KVXuK524k1QTeJRz8cFs8jVpvjXhxuh1FFdj+OJkB/WnfTMKQABcwY4M2AA/6E17PgNdwIHFcmFGaK8ODksFZs6Xc3jkZAetdiszLmHZIfd6t4ZHeooRCkQoEKFAhAIRCkQoEOHkRTG8Dc3IYFl2tLgvTgKV78pmbKw2+jtq/C/ui5NbrB21W++t/bnJXLZ1ky48crKDGs+N4cuw9lArXhdhSVAI6o/1/VE+eorgUU7/B52npxihQIQCEQpEKBChQIQCEQpEKBChQIQCEQpEKBChQIQCEb8AAAD//3/PLiEAAAAGSURBVAMAF59AvlFDKgsAAAAASUVORK5CYII=" />
   <foreignObject id="ob_fo" x="0" y="0" width="48" height="24" overflow="visible">
@@ -13,6 +14,7 @@ Bindable properties:
   <script type="text/javascript"><![CDATA[
 //!export-start
 let _pn_state = 1;
+let _pn_onState = -1;
 //!export-end
 
 var __busyUntil = 0;
@@ -24,6 +26,8 @@ function toBool(v) {
 }
 
 function toNum(v) {
+    if (v === true || v === 'true') return 1;
+    if (v === false || v === 'false') return 0;
     var n = parseFloat(v);
     return isNaN(n) ? 0 : n;
 }
@@ -33,11 +37,13 @@ function apply() {
     if (preview && preview.parentNode) { preview.parentNode.removeChild(preview); }
     var el = document.getElementById('ob_el');
     if (!el) return;
-    el.status = ['inactive', 'active', 'running', 'caution', 'warning', 'alarm'][Math.round(toNum(_pn_state))] || 'inactive';
+    var code = toNum(_pn_onState) >= 0 ? (toNum(_pn_state) ? toNum(_pn_onState) : 0) : toNum(_pn_state);
+    el.status = ['inactive', 'active', 'running', 'caution', 'warning', 'alarm'][Math.round(code)] || 'inactive';
 }
 
 function putValue(id, value) {
     if (id === '_pn_state') { _pn_state = toNum(value); }
+    if (id === '_pn_onState') { _pn_onState = toNum(value); }
     apply();
 }
 

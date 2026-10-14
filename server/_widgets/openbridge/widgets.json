@@ -3195,7 +3195,7 @@
     {
       "widget": "ob-mode-selector",
       "file": "_widgets/openbridge-controls/ob-mode-selector.svg",
-      "title": "Mode selector (3 options)",
+      "title": "Mode selector (2-3 options)",
       "category": "controls",
       "group": "controls",
       "element": "obc-toggle-button-group",
@@ -3240,7 +3240,15 @@
           "default": "Off",
           "dir": "read",
           "write": false,
-          "description": "Option 2 text (empty = only two options)"
+          "description": "Option 2 text"
+        },
+        {
+          "name": "_pn_options",
+          "type": "num",
+          "default": "3",
+          "dir": "read",
+          "write": false,
+          "description": "Number of options shown: 2 or 3"
         },
         {
           "name": "_pb_disabled",
@@ -3543,7 +3551,15 @@
           "default": "1",
           "dir": "read",
           "write": false,
-          "description": "State: 0 inactive, 1 active, 2 running, 3 caution, 4 warning, 5 alarm"
+          "description": "State: 0 inactive, 1 active, 2 running, 3 caution, 4 warning, 5 alarm; or a boolean (on/off) with _pn_onState"
+        },
+        {
+          "name": "_pn_onState",
+          "type": "num",
+          "default": "-1",
+          "dir": "read",
+          "write": false,
+          "description": "For a boolean tag: state shown when it is on (e.g. 2 running, 5 alarm; off = inactive). -1 = _pn_state is the state code"
         }
       ],
       "preview": [

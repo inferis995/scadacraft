@@ -167,6 +167,79 @@ export function addWidgetGroup(view: View, id: string, x: number, y: number, wid
   view.svgcontent = new XMLSerializer().serializeToString(doc);
 }
 
+export type ShapeSpec =
+  | { type: 'rect'; x: number; y: number; width: number; height: number; fill?: string; stroke?: string; stroke_width?: number; radius?: number; opacity?: number }
+  | { type: 'text'; x: number; y: number; text: string; size?: number; weight?: 'normal' | 'bold' | number; color?: string; anchor?: 'start' | 'middle' | 'end'; font?: string; uppercase?: boolean }
+  | { type: 'line'; x1: number; y1: number; x2: number; y2: number; stroke?: string; stroke_width?: number };
+
+/**
+ * Colour: hex/rgb, or an OpenBridge palette token "ob:<name>" (e.g. "ob:container-global") that follows the
+ * day/dusk/night/bright palette. Tokens are written as CSS (style) because SVG presentation attributes do not
+ * resolve CSS variables.
+ */
+function paint(el: XElement, prop: 'fill' | 'stroke', value: string | undefined, styles: string[]): void {
+  if (!value) return;
+  if (value.startsWith('ob:')) styles.push(`${prop}:var(--${value.slice(3).replace(/-color$/, '')}-color)`);
+  else el.setAttribute(prop, value);
+}
+
+/** Plain editor shapes (cards, labels, separators): SVG elements in the active layer, no gauge item. */
+export function addShapes(view: View, shapes: ShapeSpec[]): string[] {
+  const { doc, root } = parseSvg(view.svgcontent);
+  const layer = activeLayer(root as unknown as XElement);
+  const ids: string[] = [];
+  for (const sh of shapes) {
+    const id = shortGuid('svg_');
+    const styles: string[] = [];
+    let el: XElement;
+    if (sh.type === 'rect') {
+      el = doc.createElementNS(SVG_NS, 'rect') as unknown as XElement;
+      for (const [k, v] of Object.entries({ x: sh.x, y: sh.y, width: sh.width, height: sh.height, rx: sh.radius ?? 0, ry: sh.radius ?? 0 })) el.setAttribute(k, String(v));
+      paint(el, 'fill', sh.fill ?? 'ob:container-global', styles);
+      paint(el, 'stroke', sh.stroke ?? 'ob:border-outline', styles);
+      el.setAttribute('stroke-width', String(sh.stroke_width ?? 1));
+      if (sh.opacity !== undefined) el.setAttribute('opacity', String(sh.opacity));
+    } else if (sh.type === 'text') {
+      el = doc.createElementNS(SVG_NS, 'text') as unknown as XElement;
+      for (const [k, v] of Object.entries({
+        x: sh.x, y: sh.y, 'font-size': sh.size ?? 14, 'font-family': sh.font ?? 'Noto Sans, sans-serif',
+        'font-weight': sh.weight ?? 'normal', 'text-anchor': sh.anchor ?? 'start', 'stroke-width': 0, 'xml:space': 'preserve',
+      })) el.setAttribute(k, String(v));
+      paint(el, 'fill', sh.color ?? 'ob:element-active', styles);
+      el.appendChild(doc.createTextNode(sh.uppercase ? sh.text.toUpperCase() : sh.text));
+    } else {
+      el = doc.createElementNS(SVG_NS, 'line') as unknown as XElement;
+      for (const [k, v] of Object.entries({ x1: sh.x1, y1: sh.y1, x2: sh.x2, y2: sh.y2 })) el.setAttribute(k, String(v));
+      paint(el, 'stroke', sh.stroke ?? 'ob:border-divider', styles);
+      el.setAttribute('stroke-width', String(sh.stroke_width ?? 1));
+      el.setAttribute('fill', 'none');
+    }
+    el.setAttribute('id', id);
+    if (styles.length) el.setAttribute('style', styles.join(';'));
+    layer.appendChild(el);
+    ids.push(id);
+  }
+  view.svgcontent = new XMLSerializer().serializeToString(doc);
+  return ids;
+}
+
+/** Remove plain shapes (rect/text/line/…) by element id. Returns the ids removed. */
+export function removeShapes(view: View, ids: string[]): string[] {
+  const { doc } = parseSvg(view.svgcontent);
+  const removed: string[] = [];
+  for (const tag of ['rect', 'text', 'line', 'path', 'ellipse', 'circle', 'polyline', 'polygon', 'image']) {
+    for (const el of Array.from(doc.getElementsByTagName(tag))) {
+      const id = el.getAttribute('id');
+      if (id && ids.includes(id)) {
+        el.parentNode?.removeChild(el);
+        removed.push(id);
+      }
+    }
+  }
+  if (removed.length) view.svgcontent = new XMLSerializer().serializeToString(doc);
+  return removed;
+}
+
 /** Remove the editor group with the given id. Returns false if not found. */
 export function removeGroup(view: View, id: string): boolean {
   const { doc } = parseSvg(view.svgcontent);

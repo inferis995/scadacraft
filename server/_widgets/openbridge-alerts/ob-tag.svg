@@ -26,6 +26,8 @@ function toBool(v) {
 }
 
 function toNum(v) {
+    if (v === true || v === 'true') return 1;
+    if (v === false || v === 'false') return 0;
     var n = parseFloat(v);
     return isNaN(n) ? 0 : n;
 }

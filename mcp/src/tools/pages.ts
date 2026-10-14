@@ -2,6 +2,7 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import type { PlaceSpec, PropertyValue } from '../services/pages.js';
+import type { ShapeSpec } from '../fuxa/view.js';
 import { itemLine, ok, RELOAD_NOTE, run, ViewRef, type Ctx } from './common.js';
 
 const NodeSchema = z.object({
@@ -493,5 +494,44 @@ Returns: the new view id and name.`,
     if (warnings.length) lines.push('', 'Warnings:', ...warnings.map((w) => `- ${w}`));
     lines.push('', `Open it at /home?viewName=${encodeURIComponent(input.name)}. ${RELOAD_NOTE}`);
     return ok(lines.join('\n'), { view: { id: view.id, name: input.name }, chart: chartName, item: r.placed, warnings });
+  }));
+
+  const Color = z.string().describe('"#RRGGBB", "rgb(...)" or an OpenBridge palette token that follows day/dusk/night: "ob:container-global" (card), "ob:container-section", "ob:container-background", "ob:border-outline", "ob:border-divider", "ob:element-active" (main text), "ob:element-neutral" (secondary text)');
+  server.registerTool('scadacraft_draw_shapes', {
+    title: 'Draw shapes and labels',
+    description: `Draw plain editor shapes on a view: rectangles (cards, panels), texts (titles, labels, units) and lines (separators).
+  They are the same elements the editor's drawing tools create, editable by hand afterwards. Use them to lay out
+  a page around the widgets: a card is a rounded rect, its title a small uppercase text.
+
+  Args:
+    - view (string)
+    - unit: "cell" (default, 24 px grid, fractions allowed) | "px"
+    - shapes (array, 1-500), each one of:
+        {type:"rect", x, y, width, height, radius?, fill?, stroke?, stroke_width?, opacity?}   (default card colours)
+        {type:"text", x, y (baseline), text, size? (px, default 14), weight? normal|bold|600, color?, anchor? start|middle|end, uppercase?}
+        {type:"line", x1, y1, x2, y2, stroke?, stroke_width?}
+  Colours accept OpenBridge palette tokens ("ob:container-global", "ob:element-neutral", ...) so the page follows the theme.
+
+  Returns: the element ids (remove them with scadacraft_remove_items). Draw the cards before placing the widgets on them.
+  ${RELOAD_NOTE}`,
+    inputSchema: {
+      view: ViewRef,
+      unit: z.enum(['cell', 'px']).default('cell'),
+      shapes: z.array(z.discriminatedUnion('type', [
+        z.object({ type: z.literal('rect'), x: z.number(), y: z.number(), width: z.number().positive(), height: z.number().positive(),
+          radius: z.number().min(0).optional(), fill: Color.optional(), stroke: Color.optional(), stroke_width: z.number().min(0).optional(),
+          opacity: z.number().min(0).max(1).optional() }).strict(),
+        z.object({ type: z.literal('text'), x: z.number(), y: z.number(), text: z.string().min(1).max(500),
+          size: z.number().min(4).max(200).optional(), weight: z.union([z.enum(['normal', 'bold']), z.number().int().min(100).max(900)]).optional(),
+          color: Color.optional(), anchor: z.enum(['start', 'middle', 'end']).optional(), font: z.string().optional(),
+          uppercase: z.boolean().optional() }).strict(),
+        z.object({ type: z.literal('line'), x1: z.number(), y1: z.number(), x2: z.number(), y2: z.number(),
+          stroke: Color.optional(), stroke_width: z.number().min(0).optional() }).strict(),
+      ])).min(1).max(500),
+    },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+  }, async ({ view, unit, shapes }) => run(async () => {
+    const r = await ctx.pages.drawShapes(view, shapes as ShapeSpec[], unit);
+    return ok(`Drew ${r.ids.length} shape(s) on **${r.view.name}**: ${r.ids.join(', ')}\n\n${RELOAD_NOTE}`, { view: r.view.name, ids: r.ids });
   }));
 }

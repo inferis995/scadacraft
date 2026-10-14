@@ -107,6 +107,21 @@ try {
   assert.equal(gv.box.height, 240);
   console.log(`placed ${v.items.length} widgets on "${VIEW}"`);
 
+  // plain shapes: a card, a title following the palette, a separator; removable by id
+  const sh = (await call('scadacraft_draw_shapes', { view: VIEW, shapes: [
+    { type: 'rect', x: 44, y: 24, width: 10, height: 4, radius: 0.3 },
+    { type: 'text', x: 44.5, y: 25, text: 'Card', size: 11, weight: 700, color: 'ob:element-neutral', uppercase: true },
+    { type: 'line', x1: 44, y1: 26, x2: 54, y2: 26 },
+  ] })).structuredContent;
+  assert.equal(sh.ids.length, 3);
+  let svg = (await (await fetch(`${url}/api/project`)).json()).hmi.views.find((x) => x.name === VIEW).svgcontent;
+  assert.match(svg, /style="fill:var\(--container-global-color\)/);
+  assert.match(svg, />CARD</);
+  const rm = (await call('scadacraft_remove_items', { view: VIEW, ids: [sh.ids[2]] })).structuredContent;
+  assert.deepEqual(rm.removed, [sh.ids[2]]);
+  svg = (await (await fetch(`${url}/api/project`)).json()).hmi.views.find((x) => x.name === VIEW).svgcontent;
+  assert.ok(!svg.includes(sh.ids[2]) && svg.includes(sh.ids[0]));
+
   // OpenBridge palette from the layout
   const bk = async () => (await (await fetch(`${url}/api/project`)).json()).hmi.views.find((x) => x.name === VIEW).profile.bkcolor;
   await call('scadacraft_set_layout', { openbridge_theme: 'night' });

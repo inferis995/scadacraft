@@ -5,6 +5,11 @@ All notable changes to ScadaCraft. Versions of the MCP server are in brackets.
 ## Unreleased
 
 ### Added
+- MCP `scadacraft_draw_shapes`: cards, titles, labels and separators as plain editor shapes, with
+  colours that follow the OpenBridge palette; example `mcp/examples/stazione-pompaggio.mjs`
+  (pumping-station page, simulated plant, alarms, trend page).
+- OpenBridge status indicator: boolean tags with an "on" state (running, active, alarm);
+  mode selector with 2 or 3 options.
 - OpenBridge palettes: day / dusk / night / bright chosen in the layout (editor and MCP
   `openbridge_theme`), page backgrounds follow the palette through the MCP.
 - Noto Sans font for OpenBridge components (they fell back to a serif font).

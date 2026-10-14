@@ -11,7 +11,7 @@ import { DOMParser } from '@xmldom/xmldom';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, extname, join, resolve } from 'node:path';
 import {
-  addWidgetGroup, buildWidgetItem, CHART_GAUGE_TYPE, itemBoxes, newView, removeGroup, shortGuid, widgetNameFromAddress, WIDGET_GAUGE_TYPE,
+  addShapes, addWidgetGroup, buildWidgetItem, CHART_GAUGE_TYPE, removeShapes, type ShapeSpec, itemBoxes, newView, removeGroup, shortGuid, widgetNameFromAddress, WIDGET_GAUGE_TYPE,
 } from '../fuxa/view.js';
 import { processWidget } from '../fuxa/widget-script.js';
 import type { Catalog, CatalogWidget, GaugeSettings, Project, View, WidgetProperty } from '../fuxa/types.js';
@@ -413,17 +413,39 @@ export class PagesService {
     return (await this.describeItems(view)).find((x) => x.id === itemId)!;
   }
 
+  /** Plain shapes (cards, labels, separators). Coordinates in grid cells (fractions allowed) or px. */
+  async drawShapes(viewRef: string, shapes: ShapeSpec[], unit: 'cell' | 'px' = 'cell'): Promise<{ view: View; ids: string[] }> {
+    const cat = await this.getCatalog();
+    const project = await this.getProject();
+    const view = this.findView(project, viewRef);
+    const k = unit === 'cell' ? cat.grid : 1;
+    const px = shapes.map((sh) => {
+      if (sh.type === 'rect') return { ...sh, x: sh.x * k, y: sh.y * k, width: sh.width * k, height: sh.height * k };
+      if (sh.type === 'text') return { ...sh, x: sh.x * k, y: sh.y * k };
+      return { ...sh, x1: sh.x1 * k, y1: sh.y1 * k, x2: sh.x2 * k, y2: sh.y2 * k };
+    }) as ShapeSpec[];
+    const ids = addShapes(view, px);
+    await this.client.saveView(view);
+    return { view, ids };
+  }
+
   async removeItems(viewRef: string, ids: string[]): Promise<{ removed: string[]; missing: string[] }> {
     const project = await this.getProject();
     const view = this.findView(project, viewRef);
     const removed: string[] = [];
     const missing: string[] = [];
+    const shapeIds: string[] = [];
     for (const id of ids) {
       if (view.items[id]) {
         delete view.items[id];
         removeGroup(view, id);
         removed.push(id);
-      } else missing.push(id);
+      } else shapeIds.push(id);
+    }
+    if (shapeIds.length) {
+      const gone = removeShapes(view, shapeIds);
+      removed.push(...gone);
+      missing.push(...shapeIds.filter((i) => !gone.includes(i)));
     }
     if (removed.length) await this.client.saveView(view);
     return { removed, missing };

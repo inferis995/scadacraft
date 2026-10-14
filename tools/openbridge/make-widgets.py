@@ -403,7 +403,7 @@ function commitInput() {
     el.addEventListener('focusout', commitInput);
 })();
 ''', preview=[['_pn_value', 12.5], ['_ps_unit', 'bar']]),
-    dict(file='ob-mode-selector.svg', el='obc-toggle-button-group', title='Mode selector (3 options)', cat='controls',
+    dict(file='ob-mode-selector.svg', el='obc-toggle-button-group', title='Mode selector (2-3 options)', cat='controls',
          layout='hfill', size=(288, 48),
          inner=('<obc-toggle-button-option id="ob_o1" value="0">Man</obc-toggle-button-option>'
                 '<obc-toggle-button-option id="ob_o2" value="1">Auto</obc-toggle-button-option>'
@@ -411,12 +411,14 @@ function commitInput() {
          props=[p('_pn_value', '0', None, 'num', 'Selected option index 0, 1, 2 (written on selection)', 'rw'),
                 p('_ps_option1', "'Man'", None, 'str', 'Option 0 text'),
                 p('_ps_option2', "'Auto'", None, 'str', 'Option 1 text'),
-                p('_ps_option3', "'Off'", None, 'str', 'Option 2 text (empty = only two options)'),
+                p('_ps_option3', "'Off'", None, 'str', 'Option 2 text'),
+                p('_pn_options', '3', None, 'num', 'Number of options shown: 2 or 3'),
                 DISABLED],
          apply_extra=["    el.value = String(Math.round(toNum(_pn_value)));",
                       "    [['ob_o1', _ps_option1], ['ob_o2', _ps_option2], ['ob_o3', _ps_option3]].forEach(function (o) {",
                       "        var opt = document.getElementById(o[0]); if (!opt) return;",
-                      "        opt.textContent = String(o[1]); opt.style.display = String(o[1]) ? '' : 'none';",
+                      "        opt.textContent = String(o[1]);",
+                      "        opt.style.display = (o[0] === 'ob_o3' && Math.round(toNum(_pn_options)) < 3) || !String(o[1]).trim() ? 'none' : '';",
                       "    });"],
          events=[dict(event='value', var='_pn_value', expr='toNum(ev.detail && ev.detail.value)')],
          preview=[['_pn_value', 1]]),
@@ -467,8 +469,10 @@ ALERTS = [
          preview=[['_pb_active', 1]]),
     dict(file='ob-status-indicator.svg', el='obc-status-indicator', title='Status indicator', cat='alerts',
          layout='center', size=(48, 24),
-         props=[p('_pn_state', '1', None, 'num', 'State: 0 inactive, 1 active, 2 running, 3 caution, 4 warning, 5 alarm')],
-         apply_extra=["    el.status = ['inactive', 'active', 'running', 'caution', 'warning', 'alarm'][Math.round(toNum(_pn_state))] || 'inactive';"],
+         props=[p('_pn_state', '1', None, 'num', 'State: 0 inactive, 1 active, 2 running, 3 caution, 4 warning, 5 alarm; or a boolean (on/off) with _pn_onState'),
+                p('_pn_onState', '-1', None, 'num', 'For a boolean tag: state shown when it is on (e.g. 2 running, 5 alarm; off = inactive). -1 = _pn_state is the state code')],
+         apply_extra=["    var code = toNum(_pn_onState) >= 0 ? (toNum(_pn_state) ? toNum(_pn_onState) : 0) : toNum(_pn_state);",
+                      "    el.status = ['inactive', 'active', 'running', 'caution', 'warning', 'alarm'][Math.round(code)] || 'inactive';"],
          preview=[['_pn_state', 2]]),
     dict(file='ob-badge.svg', el='obc-badge', title='Badge (count)', cat='alerts',
          layout='center', size=(48, 48),
@@ -521,6 +525,8 @@ function toBool(v) {{
 }}
 
 function toNum(v) {{
+    if (v === true || v === 'true') return 1;
+    if (v === false || v === 'false') return 0;
     var n = parseFloat(v);
     return isNaN(n) ? 0 : n;
 }}

@@ -621,7 +621,7 @@ OpenBridge element `obc-number-input-field`, file `server/_widgets/openbridge-co
 | `_ps_unit` | str | `—` | read | Engineering unit |
 | `_pb_disabled` | bool | `false` | read | Disabled (operator cannot act) |
 
-### Mode selector (3 options) — `ob-mode-selector`
+### Mode selector (2-3 options) — `ob-mode-selector`
 
 OpenBridge element `obc-toggle-button-group`, file `server/_widgets/openbridge-controls/ob-mode-selector.svg`.
 
@@ -630,7 +630,8 @@ OpenBridge element `obc-toggle-button-group`, file `server/_widgets/openbridge-c
 | `_pn_value` | num | `0` | rw | Selected option index 0, 1, 2 (written on selection) |
 | `_ps_option1` | str | `Man` | read | Option 0 text |
 | `_ps_option2` | str | `Auto` | read | Option 1 text |
-| `_ps_option3` | str | `Off` | read | Option 2 text (empty = only two options) |
+| `_ps_option3` | str | `Off` | read | Option 2 text |
+| `_pn_options` | num | `3` | read | Number of options shown: 2 or 3 |
 | `_pb_disabled` | bool | `false` | read | Disabled (operator cannot act) |
 
 ### Check button — `ob-check-button`
@@ -691,7 +692,8 @@ OpenBridge element `obc-status-indicator`, file `server/_widgets/openbridge-aler
 
 | Property | Type | Default | Dir | Description |
 | --- | --- | --- | --- | --- |
-| `_pn_state` | num | `1` | read | State: 0 inactive, 1 active, 2 running, 3 caution, 4 warning, 5 alarm |
+| `_pn_state` | num | `1` | read | State: 0 inactive, 1 active, 2 running, 3 caution, 4 warning, 5 alarm; or a boolean (on/off) with _pn_onState |
+| `_pn_onState` | num | `-1` | read | For a boolean tag: state shown when it is on (e.g. 2 running, 5 alarm; off = inactive). -1 = _pn_state is the state code |
 
 ### Badge (count) — `ob-badge`
 

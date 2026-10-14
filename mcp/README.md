@@ -10,7 +10,7 @@ API keys, logs, backups).
 Everything is written in the same format as the ScadaCraft editor, so devices, alarms and
 pages created through MCP appear, run and can be edited by hand like any other.
 
-## Tools (81)
+## Tools (82)
 
 **Project**
 
@@ -65,7 +65,8 @@ pages created through MCP appear, run and can be edited by hand like any other.
 | `scadacraft_place_widgets` | Widgets by grid node, with properties and tag bindings; `size` in cells for instruments, charts, controls and alerts |
 | `scadacraft_draw_pipe` | Pipe along a path of nodes, elbows at bends |
 | `scadacraft_set_properties` | Change values or bindings of a placed widget |
-| `scadacraft_remove_items` | Remove items from a page |
+| `scadacraft_draw_shapes` | Cards, titles, labels and separators (plain editor shapes); colours can follow the OpenBridge palette (`ob:container-global`, `ob:element-active`, …) |
+| `scadacraft_remove_items` | Remove items or shapes from a page |
 | `scadacraft_place_chart` | ScadaCraft trend chart on a page, bound to a chart definition (realtime window or history with time toolbar) |
 | `scadacraft_create_trend_page` | One step: chart definition with the tags, a page with the chart filling it, menu entry |
 
@@ -106,6 +107,16 @@ Times accept ISO 8601, epoch ms, or relative values such as `-15m`, `-24h`, `-7d
 | `scadacraft_read_logs` | Server log |
 | `scadacraft_backup_status`, `scadacraft_create_backup`, `scadacraft_set_backup_schedule`, `scadacraft_restore_backup`, `scadacraft_delete_backup` | Backups of project, settings and history database; schedule, retention, restore on restart |
 | `scadacraft_get_section`, `scadacraft_set_section` | Raw project sections, for anything not covered above |
+
+## Example
+
+`examples/stazione-pompaggio.mjs` builds a complete pumping-station page through the MCP server:
+34 simulated tags, a server script that simulates the plant, alarms, a page with cards and labels
+in the OpenBridge palette and 42 OpenBridge widgets (tanks, pump, pressure gauge with setpoint,
+inverter values, mode selector, setpoint input, coil states), plus a trend page. Run it against
+any ScadaCraft: `node examples/stazione-pompaggio.mjs`.
+
+![Pumping station example](../docs/images/example-stazione.png)
 
 ## Typical session
 
