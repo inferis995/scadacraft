@@ -5,6 +5,7 @@ All notable changes to ScadaCraft. Versions of the MCP server are in brackets.
 ## Unreleased
 
 ### Added
+- `tools/promo/record-video.mjs`: presentation video recorded from the real screens.
 - Widget property panel: readable label, description and direction (read / command / read-write)
   next to every variable; OpenBridge widgets carry the metadata, custom widgets can use trailing
   comments (see docs/HowTo-Widgets.md).

@@ -10,10 +10,18 @@
 // disable the "simulazione_stazione" script; the page bindings refer to tag names only through ids.
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const url = process.env.SCADACRAFT_URL ?? 'http://127.0.0.1:1881';
+export const VIEW = 'Stazione di pompaggio';
+const DEV = 'FUXA Server';
+const T = (n) => ({ tag: `${DEV}.${n}` });
+
+/**
+ * Build the station. onStep(tool, what) is awaited after each page-building call (used to film the
+ * page being built step by step).
+ */
+export async function buildStation({ onStep = async () => {}, url = process.env.SCADACRAFT_URL ?? 'http://127.0.0.1:1881' } = {}) {
 const here = dirname(fileURLToPath(import.meta.url));
 const client = new Client({ name: 'example-stazione', version: '1.0.0' });
 await client.connect(new StdioClientTransport({
@@ -24,10 +32,6 @@ async function call(name, args = {}) {
   if (res.isError) throw new Error(`${name}: ${res.content[0].text}`);
   return res.structuredContent ?? {};
 }
-
-const VIEW = 'Stazione di pompaggio';
-const DEV = 'FUXA Server';
-const T = (n) => ({ tag: `${DEV}.${n}` });
 
 try {
   // ---------------------------------------------------------------- tags (server memory, simulated)
@@ -130,6 +134,7 @@ return 'ok';`,
   const views = (await call('scadacraft_list_views')).views;
   if (views.some((v) => v.name === VIEW)) await call('scadacraft_delete_view', { view: VIEW });
   await call('scadacraft_create_view', { name: VIEW, width: 1488, height: 888, background: '#F7F7F7' });
+  await onStep('scadacraft_create_view', 'pagina vuota 1488 × 888');
 
   // cards, titles and labels (OpenBridge palette tokens follow day / dusk / night)
   const card = (x, y, w, h) => ({ type: 'rect', x, y, width: w, height: h, radius: 0.33, fill: 'ob:container-global', stroke: 'ob:border-outline' });
@@ -170,62 +175,75 @@ return 'ok';`,
     if (i < coils.length - 1) shapes.push({ type: 'line', x1: 46, y1: y + 1.75, x2: 61, y2: y + 1.75, stroke: 'ob:border-divider' });
   });
   await call('scadacraft_draw_shapes', { view: VIEW, shapes });
+  await onStep('scadacraft_draw_shapes', `${shapes.length} schede, titoli ed etichette`);
 
-  // widgets
-  const widgets = [
-    // top bar: general state, mode, alarms, clock
+  // widgets, placed group by group
+  const groups = [
+    ['stato, allarmi, modo e orologio', [
     { widget: 'ob-tag', node: { x: 13, y: 0 }, size: { width: 4, height: 2 }, properties: { label: T('Stato_Testo'), color: T('Stato_Colore') } },
     { widget: 'ob-alert-button', node: { x: 17, y: 0 }, size: { width: 5, height: 2 }, properties: { count: T('Alarms Unacknowledged') } },
     { widget: 'ob-tag', node: { x: 45, y: 0 }, size: { width: 7, height: 2 }, properties: { label: T('Modo_Testo'), color: T('Modo_Colore') } },
     { widget: 'ob-clock', node: { x: 53, y: 0 }, size: { width: 5, height: 2 }, properties: { seconds: true } },
-    // tanks
+    ]], ['2 serbatoi con livello', [
     { widget: 'ob-tank', node: { x: 5, y: 6 }, name: 'S1', properties: { level: T('Livello_S1'), tag: 'S1', fluid: 'fresh-water' } },
     { widget: 'ob-tank', node: { x: 14, y: 6 }, name: 'S2', properties: { level: T('Livello_S2'), tag: 'S2', fluid: 'fresh-water' } },
+    ]], ['pompa, stato e cornice di allarme', [
     // pump card: alarm frame first (under the pump, so the pump stays selectable), pump symbol, state, speed
     { widget: 'ob-alert-frame', node: { x: 1, y: 18 }, size: { width: 17, height: 13 }, properties: { active: T('Fault_Inverter') } },
     { widget: 'ob-pump', node: { x: 9, y: 21 }, name: 'P1', properties: { running: T('Marcia'), alarm: T('Fault_Inverter'), speed: T('Velocita_Pct'), auto: T('Modo_Auto'), tag: '1' } },
     { widget: 'ob-tag', node: { x: 7, y: 25 }, size: { width: 5, height: 2 }, properties: { label: T('Pompa_Testo'), color: T('Pompa_Colore') } },
     { widget: 'ob-instrument-field', node: { x: 2, y: 28 }, size: { width: 7, height: 3 }, properties: { value: T('Frequenza'), unit: 'Hz', tag: 'Frequenza', digits: 2, decimals: 1 } },
     { widget: 'ob-instrument-field', node: { x: 10, y: 28 }, size: { width: 7, height: 3 }, properties: { value: T('Giri'), unit: 'rpm', tag: 'Giri', digits: 4, decimals: 0 } },
-    // pressure
+    ]], ['manometro con setpoint e barra', [
     { widget: 'ob-gauge-radial', node: { x: 20, y: 5 }, name: 'PT-101', properties: { value: T('Pressione'), max: 60, hasSetpoint: true, setpoint: T('SP_Pressione') } },
     { widget: 'ob-instrument-field', node: { x: 29, y: 5 }, size: { width: 8, height: 3 }, properties: { value: T('Pressione'), unit: 'bar', tag: 'PT-101', hasSetpoint: true, setpoint: T('SP_Pressione'), digits: 2, decimals: 1 } },
     { widget: 'ob-gauge-horizontal', node: { x: 29, y: 10 }, size: { width: 15, height: 3 }, properties: { value: T('Pressione'), max: 60, hasSetpoint: true, setpoint: T('SP_Pressione') } },
-    // inverter values
+    ]], ['6 valori inverter', [
     ...[['Corrente', 'A', 'Corrente uscita'], ['Frequenza', 'Hz', 'Frequenza uscita'], ['Potenza', 'kW', 'Potenza uscita'],
       ['Tensione', 'V', 'Tensione uscita'], ['Giri', 'rpm', 'Numero di giri'], ['Temp_Inverter', '°C', 'Temperatura inverter']]
       .map(([tag, unit, text], i) => ({
         widget: 'ob-instrument-field', node: { x: 20 + (i % 3) * 8, y: 16 + Math.floor(i / 3) * 4 }, size: { width: 8, height: 3 },
         properties: { value: T(tag), unit, tag: text, digits: tag === 'Giri' || tag === 'Tensione' ? 4 : 2, decimals: tag === 'Giri' || tag === 'Tensione' ? 0 : 1 },
       })),
-    // mode control
+    ]], ['comandi: modo, setpoint, bypass', [
     { widget: 'ob-mode-selector', node: { x: 20, y: 26 }, size: { width: 12, height: 2 }, properties: { value: T('Modo'), option1: 'MANUALE', option2: 'AUTO (PID)', options: 2 } },
     { widget: 'ob-number-input', node: { x: 33, y: 26 }, size: { width: 7, height: 2 }, properties: { value: T('SP_Manuale_Hz'), unit: 'Hz', decimals: 0 } },
     { widget: 'ob-check-button', node: { x: 20, y: 29 }, size: { width: 9, height: 2 }, properties: { value: T('Bypass_Sonda'), label: 'Bypass sonda' } },
     { widget: 'ob-check-button', node: { x: 30, y: 29 }, size: { width: 9, height: 2 }, properties: { value: T('Freq_Costante'), label: 'Freq. costante' } },
-    // coil states: running/OK as status indicators, faults as alert icons
+    ]], ['13 LED delle coil', [
     // LED colours as in OpenBridge: running/OK green, modes and requests blue (active), faults red (alarm)
     ...coils.map(([tag, , , onState], i) => ({
       widget: 'ob-status-indicator', node: { x: 46, y: 5 + i * 2 }, size: { width: 2, height: 2 }, properties: { state: T(tag), onState },
     })),
-    // bottom bar
+    ]], ['energia e setpoint', [
     { widget: 'ob-instrument-field', node: { x: 1, y: 33 }, size: { width: 8, height: 3 }, properties: { value: T('Energia_kWh'), unit: 'kWh', tag: 'Energia consumata', digits: 5, decimals: 0 } },
     { widget: 'ob-instrument-field', node: { x: 10, y: 33 }, size: { width: 7, height: 3 }, properties: { value: T('Energia_MWh'), unit: 'MWh', tag: 'Energia', digits: 3, decimals: 0 } },
     { widget: 'ob-instrument-field', node: { x: 19, y: 33 }, size: { width: 9, height: 3 }, properties: { value: T('SP_Manuale_Hz'), unit: 'Hz', tag: 'SP velocità manuale', digits: 2, decimals: 0 } },
     { widget: 'ob-instrument-field', node: { x: 29, y: 33 }, size: { width: 9, height: 3 }, properties: { value: T('SP_Pressione'), unit: 'bar', tag: 'SP pressione impianto', digits: 2, decimals: 0 } },
     { widget: 'ob-status-indicator', node: { x: 44, y: 34 }, size: { width: 2, height: 1 }, properties: { state: 2 } },
+    ]],
   ];
-  const placed = await call('scadacraft_place_widgets', { view: VIEW, widgets });
-  if (placed.warnings?.length) console.log('warnings:', placed.warnings);
-  console.log(`page "${VIEW}": ${shapes.length} shapes, ${placed.placed.length} widgets`);
+  let count = 0;
+  for (const [what, widgets] of groups) {
+    const placed = await call('scadacraft_place_widgets', { view: VIEW, widgets });
+    if (placed.warnings?.length) console.log('warnings:', placed.warnings);
+    count += placed.placed.length;
+    await onStep('scadacraft_place_widgets', `${widgets.length} widget: ${what}`);
+  }
+  console.log(`page "${VIEW}": ${shapes.length} shapes, ${count} widgets`);
 
-  // pressure trend page and menu entries
-  await call('scadacraft_create_trend_page', {
+  // pressure trend page with menu entry (kept if it already exists)
+  if (!(await call('scadacraft_list_views')).views.some((v) => v.name === 'Trend stazione')) await call('scadacraft_create_trend_page', {
     name: 'Trend stazione', title: 'Pressione e livelli', minutes: 30,
     tags: [{ tag: `${DEV}.Pressione`, label: 'Pressione (bar)' }, { tag: `${DEV}.Livello_S1`, label: 'Livello S1 (%)', yaxis: 2 },
       { tag: `${DEV}.Livello_S2`, label: 'Livello S2 (%)', yaxis: 2 }],
-  }).catch((e) => console.log(`trend page: ${e.message.split('\n')[0]}`));
+  });
   console.log(`open ${url}/home?viewName=${encodeURIComponent(VIEW)}`);
 } finally {
   await client.close();
+}
+}
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await buildStation();
 }
