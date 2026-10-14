@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="ob_root" width="96" height="48" viewBox="0 0 96 48" overflow="visible">
+  <desc>ScadaCraft OpenBridge widget: Pipe horizontal (obc-horizontal-line, OpenBridge 1.0.0, Apache-2.0).
+Box 96x48 px, anchor at (0,24).
+Bindable properties:
+  _ps_medium (default 'normal'): Pipe content: normal | water | air | empty
+  _ps_lineType (default 'fluid'): Line type: fluid | electric | air | connector
+  _ps_fluid (default ''): Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)</desc>
+  <rect id="ob_bg" x="0" y="0" width="96" height="48" fill="none" />
+  <image id="ob_preview" x="0" y="0" width="96" height="48" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAABgCAYAAABLwH3pAAABJElEQVR4nOzZQQ3AMBADwYsUhsFTeAVSJA2QneGw8sN7IGwPhAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApO1zzj8QZQFIW8/7WQCyLABpAiBNAKQJgDQBkCYA0gRA2vIEU2YBSFsDYRaANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmAtAsAAP//r7V5dQAAAAZJREFUAwDwBQiK83tfFAAAAABJRU5ErkJggg==" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAABgCAYAAABLwH3pAAABJElEQVR4nOzZQQ3AMBADwYsUhsFTeAVSJA2QneGw8sN7IGwPhAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApO1zzj8QZQFIW8/7WQCyLABpAiBNAKQJgDQBkCYA0gRA2vIEU2YBSFsDYRaANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmAtAsAAP//r7V5dQAAAAZJREFUAwDwBQiK83tfFAAAAABJRU5ErkJggg==" />
+  <foreignObject id="ob_fo" x="0" y="0" width="96" height="48" overflow="visible">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;width:100%;height:100%;overflow:visible;">
+      <obc-horizontal-line id="ob_el" style="position:absolute;left:0px;top:24px;"></obc-horizontal-line>
+    </div>
+  </foreignObject>
+  <script type="text/javascript"><![CDATA[
+//!export-start
+let _ps_medium = 'normal';
+let _ps_lineType = 'fluid';
+let _ps_fluid = '';
+//!export-end
+
+function toBool(v) {
+    if (v === true || v === 1) return true;
+    var s = String(v).toLowerCase();
+    return s === 'true' || s === '1' || s === 'on';
+}
+
+function toNum(v) {
+    var n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+}
+
+function apply() {
+    var preview = document.getElementById('ob_preview');
+    if (preview && preview.parentNode) { preview.parentNode.removeChild(preview); }
+    var el = document.getElementById('ob_el');
+    if (!el) return;
+    el.medium = String(_ps_medium);
+    el.lineType = String(_ps_lineType);
+    if (String(_ps_fluid)) { el.style.setProperty('--automation-fresh-water', 'var(--automation-medium-' + String(_ps_fluid) + ')'); } else { el.style.removeProperty('--automation-fresh-water'); }
+}
+
+function putValue(id, value) {
+    if (id === '_ps_medium') { _ps_medium = String(value); }
+    if (id === '_ps_lineType') { _ps_lineType = String(value); }
+    if (id === '_ps_fluid') { _ps_fluid = String(value); }
+    apply();
+}
+
+function postValue(id, value) {
+    // replaced at runtime: writes value to the tag bound to "id"
+}
+
+function fitLength() {
+    var root = document.getElementById('ob_root');
+    var fo = document.getElementById('ob_fo');
+    var el = document.getElementById('ob_el');
+    if (!root || !fo || !el) return;
+    var w = parseFloat(root.getAttribute('width')) || 96;
+    var h = parseFloat(root.getAttribute('height')) || 48;
+    if (root.getAttribute('viewBox') !== '0 0 ' + w + ' ' + h) {
+        root.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    }
+    fo.setAttribute('width', w);
+    fo.setAttribute('height', h);
+    el.length = Math.max(1, Math.round(w / 24));
+}
+
+(function () {
+    var root = document.getElementById('ob_root');
+    fitLength();
+    if (root && window.MutationObserver) {
+        new MutationObserver(fitLength).observe(root, { attributes: true, attributeFilter: ['width', 'height'] });
+    }
+})();
+
+apply();
+]]></script>
+</svg>

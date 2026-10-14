@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="ob_root" width="48" height="48" viewBox="0 0 48 48" overflow="visible">
+  <desc>ScadaCraft OpenBridge widget: Pipe crossover (no junction) (obc-line-overlap, OpenBridge 1.0.0, Apache-2.0).
+Box 48x48 px, anchor at (24,24).
+Bindable properties:
+  _ps_medium (default 'normal'): Pipe content: normal | water | air | empty
+  _ps_lineType (default 'fluid'): Line type: fluid | electric | air | connector
+  _ps_fluid (default ''): Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)</desc>
+  <rect id="ob_bg" x="0" y="0" width="48" height="48" fill="none" />
+  <image id="ob_preview" x="0" y="0" width="48" height="48" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAABMklEQVR4nOzbsQnCUABF0QjuYe8KjpFN7K3s3SRjuIK9kygKdmIXLl/OadKkuzwC+cl2IrWdSAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiwwSY5/nxuu6Pl5/33S7H93VZls00AAuICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAsSFe2f4zC4gJEFs9wOcka1Rrn6xZQGz1h/Dpeh96AefDzgL+mQAxAWICxASICRATILZ6gM+3mnxnATGvo2MWEBMg5geNmAXEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmBOxmAXEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATICYALEnAAAA///h4tJMAAAABklEQVQDAFsRGUvNhBuKAAAAAElFTkSuQmCC" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAABMklEQVR4nOzbsQnCUABF0QjuYe8KjpFN7K3s3SRjuIK9kygKdmIXLl/OadKkuzwC+cl2IrWdSAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiwwSY5/nxuu6Pl5/33S7H93VZls00AAuICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAsSFe2f4zC4gJEFs9wOcka1Rrn6xZQGz1h/Dpeh96AefDzgL+mQAxAWICxASICRATILZ6gM+3mnxnATGvo2MWEBMg5geNmAXEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmBOxmAXEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATICYALEnAAAA///h4tJMAAAABklEQVQDAFsRGUvNhBuKAAAAAElFTkSuQmCC" />
+  <foreignObject id="ob_fo" x="0" y="0" width="48" height="48" overflow="visible">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;width:100%;height:100%;overflow:visible;">
+      <obc-line-overlap id="ob_el" style="position:absolute;left:24px;top:24px;"></obc-line-overlap>
+    </div>
+  </foreignObject>
+  <script type="text/javascript"><![CDATA[
+//!export-start
+let _ps_medium = 'normal';
+let _ps_lineType = 'fluid';
+let _ps_fluid = '';
+//!export-end
+
+function toBool(v) {
+    if (v === true || v === 1) return true;
+    var s = String(v).toLowerCase();
+    return s === 'true' || s === '1' || s === 'on';
+}
+
+function toNum(v) {
+    var n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+}
+
+function apply() {
+    var preview = document.getElementById('ob_preview');
+    if (preview && preview.parentNode) { preview.parentNode.removeChild(preview); }
+    var el = document.getElementById('ob_el');
+    if (!el) return;
+    el.medium = String(_ps_medium);
+    el.lineType = String(_ps_lineType);
+    if (String(_ps_fluid)) { el.style.setProperty('--automation-fresh-water', 'var(--automation-medium-' + String(_ps_fluid) + ')'); } else { el.style.removeProperty('--automation-fresh-water'); }
+}
+
+function putValue(id, value) {
+    if (id === '_ps_medium') { _ps_medium = String(value); }
+    if (id === '_ps_lineType') { _ps_lineType = String(value); }
+    if (id === '_ps_fluid') { _ps_fluid = String(value); }
+    apply();
+}
+
+function postValue(id, value) {
+    // replaced at runtime: writes value to the tag bound to "id"
+}
+
+apply();
+]]></script>
+</svg>

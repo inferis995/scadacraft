@@ -1,0 +1,16 @@
+/*
+ * ScadaCraft fixes on top of OpenBridge 1.0.0 (loaded after openbridge.css).
+ *
+ * Pipe colour for water/air media: the line components read --automation-fresh-water,
+ * but the palette only defines --automation-medium-fresh-water (also in OpenBridge 2.x).
+ * Values below are the palette's fresh-water colours (cyan-200 / dusk-cyan-200).
+ */
+[data-obc-theme="day"],
+[data-obc-theme="dusk"],
+[data-obc-theme="bright"] {
+    --automation-fresh-water: rgb(125, 197, 225);
+}
+
+[data-obc-theme="night"] {
+    --automation-fresh-water: rgb(37, 81, 97);
+}

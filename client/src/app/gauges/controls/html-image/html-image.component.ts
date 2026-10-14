@@ -66,6 +66,9 @@ export class HtmlImageComponent extends GaugeBaseComponent {
                     const originSize = SvgUtils.getSvgSize(svgElement);
                     SvgUtils.resizeSvgNodes(svgImageContainer.parentElement.parentElement, originSize);
                     svgImageContainer.parentElement?.parentElement?.removeAttribute('stroke');
+                    // widget background stays transparent (still hit-testable for selection), so
+                    // overlapping widgets such as P&ID pipes and devices do not hide each other
+                    svgImageContainer.parentElement?.parentElement?.querySelector(':scope > rect')?.setAttribute('fill', 'transparent');
                     svgElement.setAttribute('width', originSize.width.toString());
                     svgElement.setAttribute('height', originSize.height.toString());
                     if (!gaugeSettings.property.svgContent) {

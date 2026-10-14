@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="ob_root" width="48" height="96" viewBox="0 0 48 96" overflow="visible">
+  <desc>ScadaCraft OpenBridge widget: Pipe vertical (obc-vertical-line, OpenBridge 1.0.0, Apache-2.0).
+Box 48x96 px, anchor at (24,0).
+Bindable properties:
+  _ps_medium (default 'normal'): Pipe content: normal | water | air | empty
+  _ps_lineType (default 'fluid'): Line type: fluid | electric | air | connector
+  _ps_fluid (default ''): Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)</desc>
+  <rect id="ob_bg" x="0" y="0" width="48" height="96" fill="none" />
+  <image id="ob_preview" x="0" y="0" width="48" height="96" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAADACAYAAAD7hGbWAAAB0klEQVR4nOzRMQ3DQAAEwY9kNKHzTAzETJ5O6MSyAbhdWZpprrlut/ESc87/td/9ePz9jv3etdZnvMA2SAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiJwAAAP//4P1nbAAAAAZJREFUAwD1rAoBWlDx4wAAAABJRU5ErkJggg==" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAADACAYAAAD7hGbWAAAB0klEQVR4nOzRMQ3DQAAEwY9kNKHzTAzETJ5O6MSyAbhdWZpprrlut/ESc87/td/9ePz9jv3etdZnvMA2SAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiJwAAAP//4P1nbAAAAAZJREFUAwD1rAoBWlDx4wAAAABJRU5ErkJggg==" />
+  <foreignObject id="ob_fo" x="0" y="0" width="48" height="96" overflow="visible">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;width:100%;height:100%;overflow:visible;">
+      <obc-vertical-line id="ob_el" style="position:absolute;left:24px;top:0px;"></obc-vertical-line>
+    </div>
+  </foreignObject>
+  <script type="text/javascript"><![CDATA[
+//!export-start
+let _ps_medium = 'normal';
+let _ps_lineType = 'fluid';
+let _ps_fluid = '';
+//!export-end
+
+function toBool(v) {
+    if (v === true || v === 1) return true;
+    var s = String(v).toLowerCase();
+    return s === 'true' || s === '1' || s === 'on';
+}
+
+function toNum(v) {
+    var n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+}
+
+function apply() {
+    var preview = document.getElementById('ob_preview');
+    if (preview && preview.parentNode) { preview.parentNode.removeChild(preview); }
+    var el = document.getElementById('ob_el');
+    if (!el) return;
+    el.medium = String(_ps_medium);
+    el.lineType = String(_ps_lineType);
+    if (String(_ps_fluid)) { el.style.setProperty('--automation-fresh-water', 'var(--automation-medium-' + String(_ps_fluid) + ')'); } else { el.style.removeProperty('--automation-fresh-water'); }
+}
+
+function putValue(id, value) {
+    if (id === '_ps_medium') { _ps_medium = String(value); }
+    if (id === '_ps_lineType') { _ps_lineType = String(value); }
+    if (id === '_ps_fluid') { _ps_fluid = String(value); }
+    apply();
+}
+
+function postValue(id, value) {
+    // replaced at runtime: writes value to the tag bound to "id"
+}
+
+function fitLength() {
+    var root = document.getElementById('ob_root');
+    var fo = document.getElementById('ob_fo');
+    var el = document.getElementById('ob_el');
+    if (!root || !fo || !el) return;
+    var w = parseFloat(root.getAttribute('width')) || 48;
+    var h = parseFloat(root.getAttribute('height')) || 96;
+    if (root.getAttribute('viewBox') !== '0 0 ' + w + ' ' + h) {
+        root.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    }
+    fo.setAttribute('width', w);
+    fo.setAttribute('height', h);
+    el.length = Math.max(1, Math.round(h / 24));
+}
+
+(function () {
+    var root = document.getElementById('ob_root');
+    fitLength();
+    if (root && window.MutationObserver) {
+        new MutationObserver(fitLength).observe(root, { attributes: true, attributeFilter: ['width', 'height'] });
+    }
+})();
+
+apply();
+]]></script>
+</svg>

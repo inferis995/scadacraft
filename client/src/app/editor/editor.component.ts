@@ -90,9 +90,11 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
     setModeParam: string | any;
     imagefile: string;
     ctrlInitParams: any;
+    /** P&ID grid (OpenBridge anchor model): every pipe connection is a 24 px grid node */
+    static readonly PID_GRID = 24;
     gridOn = false;
     moveStep = 1;
-    readonly moveStepOptions = [1, 2, 3, 5, 10];
+    readonly moveStepOptions = [1, 2, 3, 5, 10, EditorComponent.PID_GRID];
     isAnySelected = false;
     selectedElement: SelElement = new SelElement();
     panelsState: PanelsStateType = {
@@ -846,8 +848,13 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
      */
     onShowGrid() {
         this.gridOn = this.gridOn = !this.gridOn;
-        this.winRef.nativeWindow.svgEditor.clickExtension('view_grid');
-        this.winRef.nativeWindow.svgEditor.enableGridSnapping(this.gridOn);
+        const svgEditor = this.winRef.nativeWindow.svgEditor;
+        // P&ID grid: 24 px cells (OpenBridge anchor model), snapping on the same step
+        svgEditor.curConfig.pidGrid = EditorComponent.PID_GRID;
+        svgEditor.curConfig.snappingStep = this.gridOn ? EditorComponent.PID_GRID : 2;
+        svgEditor.canvas?.setConfig?.({ snappingStep: svgEditor.curConfig.snappingStep });
+        svgEditor.clickExtension('view_grid');
+        svgEditor.enableGridSnapping(this.gridOn);
     }
 
     onMoveStepChange(step: number | string) {

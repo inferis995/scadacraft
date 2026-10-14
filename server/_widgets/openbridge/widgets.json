@@ -1,0 +1,899 @@
+{
+  "grid": 24,
+  "openbridge": "1.0.0",
+  "widgets": [
+    {
+      "widget": "ob-pump",
+      "file": "_widgets/openbridge/ob-pump.svg",
+      "title": "Pump",
+      "group": "device",
+      "element": "obc-pump",
+      "size": {
+        "width": 120,
+        "height": 120
+      },
+      "anchor": {
+        "x": 48,
+        "y": 48
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pb_running",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Running feedback"
+        },
+        {
+          "name": "_pn_speed",
+          "type": "num",
+          "default": "0",
+          "write": false,
+          "description": "Speed % (readout)"
+        },
+        {
+          "name": "_pb_vertical",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Vertical orientation (pipe runs top-bottom)"
+        },
+        {
+          "name": "_ps_labelDirection",
+          "type": "str",
+          "default": "down",
+          "write": false,
+          "description": "Readout side: up | down | left | right"
+        },
+        {
+          "name": "_pb_alarm",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Alarm active (alert frame)"
+        },
+        {
+          "name": "_pb_auto",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: automatic mode"
+        },
+        {
+          "name": "_pb_locked",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: command locked"
+        },
+        {
+          "name": "_pb_duty",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: duty unit"
+        },
+        {
+          "name": "_pb_alarmOff",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: alarms suppressed"
+        },
+        {
+          "name": "_ps_tag",
+          "type": "str",
+          "default": "",
+          "write": false,
+          "description": "Numeric equipment ID shown as #NNNN, e.g. 101 (empty = hidden)"
+        },
+        {
+          "name": "_pb_command",
+          "type": "bool",
+          "default": "false",
+          "write": true,
+          "description": "Start/stop command, written on click as !running (1/0)"
+        }
+      ]
+    },
+    {
+      "widget": "ob-motor",
+      "file": "_widgets/openbridge/ob-motor.svg",
+      "title": "Motor",
+      "group": "device",
+      "element": "obc-motor",
+      "size": {
+        "width": 120,
+        "height": 120
+      },
+      "anchor": {
+        "x": 48,
+        "y": 48
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pb_running",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Running feedback"
+        },
+        {
+          "name": "_pn_speed",
+          "type": "num",
+          "default": "0",
+          "write": false,
+          "description": "Speed % (readout)"
+        },
+        {
+          "name": "_pb_vertical",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Vertical orientation (pipe runs top-bottom)"
+        },
+        {
+          "name": "_ps_labelDirection",
+          "type": "str",
+          "default": "down",
+          "write": false,
+          "description": "Readout side: up | down | left | right"
+        },
+        {
+          "name": "_pb_alarm",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Alarm active (alert frame)"
+        },
+        {
+          "name": "_pb_auto",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: automatic mode"
+        },
+        {
+          "name": "_pb_locked",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: command locked"
+        },
+        {
+          "name": "_pb_duty",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: duty unit"
+        },
+        {
+          "name": "_pb_alarmOff",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: alarms suppressed"
+        },
+        {
+          "name": "_ps_tag",
+          "type": "str",
+          "default": "",
+          "write": false,
+          "description": "Numeric equipment ID shown as #NNNN, e.g. 201 (empty = hidden)"
+        },
+        {
+          "name": "_pb_command",
+          "type": "bool",
+          "default": "false",
+          "write": true,
+          "description": "Start/stop command, written on click as !running (1/0)"
+        }
+      ]
+    },
+    {
+      "widget": "ob-fan",
+      "file": "_widgets/openbridge/ob-fan.svg",
+      "title": "Fan",
+      "group": "device",
+      "element": "obc-fan",
+      "size": {
+        "width": 120,
+        "height": 120
+      },
+      "anchor": {
+        "x": 48,
+        "y": 48
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pb_running",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Running feedback"
+        },
+        {
+          "name": "_pn_speed",
+          "type": "num",
+          "default": "0",
+          "write": false,
+          "description": "Speed % (readout)"
+        },
+        {
+          "name": "_pb_vertical",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Vertical orientation (pipe runs top-bottom)"
+        },
+        {
+          "name": "_ps_labelDirection",
+          "type": "str",
+          "default": "down",
+          "write": false,
+          "description": "Readout side: up | down | left | right"
+        },
+        {
+          "name": "_pb_alarm",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Alarm active (alert frame)"
+        },
+        {
+          "name": "_pb_auto",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: automatic mode"
+        },
+        {
+          "name": "_pb_locked",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: command locked"
+        },
+        {
+          "name": "_pb_duty",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: duty unit"
+        },
+        {
+          "name": "_pb_alarmOff",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: alarms suppressed"
+        },
+        {
+          "name": "_ps_tag",
+          "type": "str",
+          "default": "",
+          "write": false,
+          "description": "Numeric equipment ID shown as #NNNN, e.g. 301 (empty = hidden)"
+        },
+        {
+          "name": "_pb_command",
+          "type": "bool",
+          "default": "false",
+          "write": true,
+          "description": "Start/stop command, written on click as !running (1/0)"
+        }
+      ]
+    },
+    {
+      "widget": "ob-valve-digital",
+      "file": "_widgets/openbridge/ob-valve-digital.svg",
+      "title": "On/off valve",
+      "group": "device",
+      "element": "obc-digital-valve",
+      "size": {
+        "width": 120,
+        "height": 120
+      },
+      "anchor": {
+        "x": 48,
+        "y": 48
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pb_open",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Open feedback"
+        },
+        {
+          "name": "_pb_vertical",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Vertical orientation (pipe runs top-bottom)"
+        },
+        {
+          "name": "_ps_labelDirection",
+          "type": "str",
+          "default": "down",
+          "write": false,
+          "description": "Readout side: up | down | left | right"
+        },
+        {
+          "name": "_pb_alarm",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Alarm active (alert frame)"
+        },
+        {
+          "name": "_pb_auto",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: automatic mode"
+        },
+        {
+          "name": "_pb_locked",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: command locked"
+        },
+        {
+          "name": "_pb_duty",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: duty unit"
+        },
+        {
+          "name": "_pb_alarmOff",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: alarms suppressed"
+        },
+        {
+          "name": "_ps_tag",
+          "type": "str",
+          "default": "",
+          "write": false,
+          "description": "Numeric equipment ID shown as #NNNN, e.g. 401 (empty = hidden)"
+        },
+        {
+          "name": "_pb_command",
+          "type": "bool",
+          "default": "false",
+          "write": true,
+          "description": "Open/close command, written on click as !open (1/0)"
+        }
+      ]
+    },
+    {
+      "widget": "ob-valve-analog",
+      "file": "_widgets/openbridge/ob-valve-analog.svg",
+      "title": "Control valve",
+      "group": "device",
+      "element": "obc-analog-valve",
+      "size": {
+        "width": 120,
+        "height": 120
+      },
+      "anchor": {
+        "x": 48,
+        "y": 48
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_position",
+          "type": "num",
+          "default": "0",
+          "write": false,
+          "description": "Valve position 0-100 %"
+        },
+        {
+          "name": "_pb_open",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Open feedback"
+        },
+        {
+          "name": "_pb_vertical",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Vertical orientation (pipe runs top-bottom)"
+        },
+        {
+          "name": "_ps_labelDirection",
+          "type": "str",
+          "default": "down",
+          "write": false,
+          "description": "Readout side: up | down | left | right"
+        },
+        {
+          "name": "_pb_alarm",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Alarm active (alert frame)"
+        },
+        {
+          "name": "_pb_auto",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: automatic mode"
+        },
+        {
+          "name": "_pb_locked",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: command locked"
+        },
+        {
+          "name": "_pb_duty",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: duty unit"
+        },
+        {
+          "name": "_pb_alarmOff",
+          "type": "bool",
+          "default": "false",
+          "write": false,
+          "description": "Badge: alarms suppressed"
+        },
+        {
+          "name": "_ps_tag",
+          "type": "str",
+          "default": "",
+          "write": false,
+          "description": "Numeric equipment ID shown as #NNNN, e.g. 501 (empty = hidden)"
+        }
+      ]
+    },
+    {
+      "widget": "ob-tank",
+      "file": "_widgets/openbridge/ob-tank.svg",
+      "title": "Tank",
+      "group": "device",
+      "element": "obc-automation-tank",
+      "size": {
+        "width": 192,
+        "height": 216
+      },
+      "anchor": {
+        "x": 96,
+        "y": 24
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_level",
+          "type": "num",
+          "default": "50",
+          "write": false,
+          "description": "Level (same unit as max)"
+        },
+        {
+          "name": "_pn_max",
+          "type": "num",
+          "default": "100",
+          "write": false,
+          "description": "Maximum level / capacity"
+        },
+        {
+          "name": "_ps_trend",
+          "type": "str",
+          "default": "stable",
+          "write": false,
+          "description": "fast-rising | rising | stable | falling | fast-falling"
+        },
+        {
+          "name": "_ps_fluid",
+          "type": "str",
+          "default": "fresh-water",
+          "write": false,
+          "description": "Content colour (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas"
+        },
+        {
+          "name": "_ps_tag",
+          "type": "str",
+          "default": "T-101",
+          "write": false,
+          "description": "Tank label (free text)"
+        }
+      ]
+    },
+    {
+      "widget": "ob-readout",
+      "file": "_widgets/openbridge/ob-readout.svg",
+      "title": "Readout",
+      "group": "device",
+      "element": "obc-automation-readout",
+      "size": {
+        "width": 192,
+        "height": 120
+      },
+      "anchor": {
+        "x": 96,
+        "y": 48
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_value",
+          "type": "num",
+          "default": "0",
+          "write": false,
+          "description": "Process value"
+        },
+        {
+          "name": "_ps_unit",
+          "type": "str",
+          "default": "m3/h",
+          "write": false,
+          "description": "Engineering unit"
+        },
+        {
+          "name": "_pn_digits",
+          "type": "num",
+          "default": "3",
+          "write": false,
+          "description": "Integer digits shown"
+        },
+        {
+          "name": "_ps_position",
+          "type": "str",
+          "default": "top",
+          "write": false,
+          "description": "Where the readout sits relative to its anchor (tick end): top | bottom | left | right"
+        }
+      ]
+    },
+    {
+      "widget": "ob-line-horizontal",
+      "file": "_widgets/openbridge/ob-line-horizontal.svg",
+      "title": "Pipe horizontal",
+      "group": "pipe",
+      "element": "obc-horizontal-line",
+      "size": {
+        "width": 96,
+        "height": 48
+      },
+      "anchor": {
+        "x": 0,
+        "y": 24
+      },
+      "stretch": "x",
+      "properties": [
+        {
+          "name": "_ps_medium",
+          "type": "str",
+          "default": "normal",
+          "write": false,
+          "description": "Pipe content: normal | water | air | empty"
+        },
+        {
+          "name": "_ps_lineType",
+          "type": "str",
+          "default": "fluid",
+          "write": false,
+          "description": "Line type: fluid | electric | air | connector"
+        },
+        {
+          "name": "_ps_fluid",
+          "type": "str",
+          "default": "",
+          "write": false,
+          "description": "Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)"
+        }
+      ]
+    },
+    {
+      "widget": "ob-line-vertical",
+      "file": "_widgets/openbridge/ob-line-vertical.svg",
+      "title": "Pipe vertical",
+      "group": "pipe",
+      "element": "obc-vertical-line",
+      "size": {
+        "width": 48,
+        "height": 96
+      },
+      "anchor": {
+        "x": 24,
+        "y": 0
+      },
+      "stretch": "y",
+      "properties": [
+        {
+          "name": "_ps_medium",
+          "type": "str",
+          "default": "normal",
+          "write": false,
+          "description": "Pipe content: normal | water | air | empty"
+        },
+        {
+          "name": "_ps_lineType",
+          "type": "str",
+          "default": "fluid",
+          "write": false,
+          "description": "Line type: fluid | electric | air | connector"
+        },
+        {
+          "name": "_ps_fluid",
+          "type": "str",
+          "default": "",
+          "write": false,
+          "description": "Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)"
+        }
+      ]
+    },
+    {
+      "widget": "ob-line-elbow",
+      "file": "_widgets/openbridge/ob-line-elbow.svg",
+      "title": "Pipe elbow",
+      "group": "pipe",
+      "element": "obc-corner-line",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "anchor": {
+        "x": 24,
+        "y": 24
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_ps_direction",
+          "type": "str",
+          "default": "bottom-right",
+          "write": false,
+          "description": "Arms: top-right | top-left | bottom-right | bottom-left"
+        },
+        {
+          "name": "_ps_medium",
+          "type": "str",
+          "default": "normal",
+          "write": false,
+          "description": "Pipe content: normal | water | air | empty"
+        },
+        {
+          "name": "_ps_lineType",
+          "type": "str",
+          "default": "fluid",
+          "write": false,
+          "description": "Line type: fluid | electric | air | connector"
+        },
+        {
+          "name": "_ps_fluid",
+          "type": "str",
+          "default": "",
+          "write": false,
+          "description": "Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)"
+        }
+      ]
+    },
+    {
+      "widget": "ob-line-tee",
+      "file": "_widgets/openbridge/ob-line-tee.svg",
+      "title": "Pipe tee",
+      "group": "pipe",
+      "element": "obc-three-way-line",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "anchor": {
+        "x": 24,
+        "y": 24
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_ps_direction",
+          "type": "str",
+          "default": "bottom",
+          "write": false,
+          "description": "Branch side: top | right | bottom | left"
+        },
+        {
+          "name": "_ps_medium",
+          "type": "str",
+          "default": "normal",
+          "write": false,
+          "description": "Pipe content: normal | water | air | empty"
+        },
+        {
+          "name": "_ps_lineType",
+          "type": "str",
+          "default": "fluid",
+          "write": false,
+          "description": "Line type: fluid | electric | air | connector"
+        },
+        {
+          "name": "_ps_fluid",
+          "type": "str",
+          "default": "",
+          "write": false,
+          "description": "Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)"
+        }
+      ]
+    },
+    {
+      "widget": "ob-line-cross",
+      "file": "_widgets/openbridge/ob-line-cross.svg",
+      "title": "Pipe cross (junction)",
+      "group": "pipe",
+      "element": "obc-line-cross",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "anchor": {
+        "x": 24,
+        "y": 24
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_ps_medium",
+          "type": "str",
+          "default": "normal",
+          "write": false,
+          "description": "Pipe content: normal | water | air | empty"
+        },
+        {
+          "name": "_ps_lineType",
+          "type": "str",
+          "default": "fluid",
+          "write": false,
+          "description": "Line type: fluid | electric | air | connector"
+        },
+        {
+          "name": "_ps_fluid",
+          "type": "str",
+          "default": "",
+          "write": false,
+          "description": "Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)"
+        }
+      ]
+    },
+    {
+      "widget": "ob-line-overlap",
+      "file": "_widgets/openbridge/ob-line-overlap.svg",
+      "title": "Pipe crossover (no junction)",
+      "group": "pipe",
+      "element": "obc-line-overlap",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "anchor": {
+        "x": 24,
+        "y": 24
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_ps_medium",
+          "type": "str",
+          "default": "normal",
+          "write": false,
+          "description": "Pipe content: normal | water | air | empty"
+        },
+        {
+          "name": "_ps_lineType",
+          "type": "str",
+          "default": "fluid",
+          "write": false,
+          "description": "Line type: fluid | electric | air | connector"
+        },
+        {
+          "name": "_ps_fluid",
+          "type": "str",
+          "default": "",
+          "write": false,
+          "description": "Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)"
+        }
+      ]
+    },
+    {
+      "widget": "ob-line-end",
+      "file": "_widgets/openbridge/ob-line-end.svg",
+      "title": "Pipe end",
+      "group": "pipe",
+      "element": "obc-end-point-line",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "anchor": {
+        "x": 24,
+        "y": 24
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_ps_direction",
+          "type": "str",
+          "default": "right",
+          "write": false,
+          "description": "Side the closed end faces: top | right | bottom | left"
+        },
+        {
+          "name": "_ps_medium",
+          "type": "str",
+          "default": "normal",
+          "write": false,
+          "description": "Pipe content: normal | water | air | empty"
+        },
+        {
+          "name": "_ps_lineType",
+          "type": "str",
+          "default": "fluid",
+          "write": false,
+          "description": "Line type: fluid | electric | air | connector"
+        },
+        {
+          "name": "_ps_fluid",
+          "type": "str",
+          "default": "",
+          "write": false,
+          "description": "Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)"
+        }
+      ]
+    },
+    {
+      "widget": "ob-line-flow",
+      "file": "_widgets/openbridge/ob-line-flow.svg",
+      "title": "Flow arrow (1 cell)",
+      "group": "pipe",
+      "element": "obc-direction-line",
+      "size": {
+        "width": 24,
+        "height": 48
+      },
+      "anchor": {
+        "x": 0,
+        "y": 24
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_ps_medium",
+          "type": "str",
+          "default": "normal",
+          "write": false,
+          "description": "Pipe content: normal | water | air | empty"
+        },
+        {
+          "name": "_ps_lineType",
+          "type": "str",
+          "default": "fluid",
+          "write": false,
+          "description": "Line type: fluid | electric | air | connector"
+        },
+        {
+          "name": "_ps_fluid",
+          "type": "str",
+          "default": "",
+          "write": false,
+          "description": "Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)"
+        }
+      ]
+    }
+  ]
+}
