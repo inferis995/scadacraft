@@ -19,11 +19,15 @@
  *   SCADACRAFT_PASSWORD
  *   TRANSPORT            stdio (default) | http
  *   HOST, PORT           listen address when TRANSPORT=http (default 127.0.0.1:3001)
+ *   SCADACRAFT_MCP_TOKEN bearer token required by TRANSPORT=http (mandatory when HOST is not localhost)
+ *   MCP_ALLOWED_HOSTS    comma-separated Host header names accepted (DNS-rebinding protection)
  */
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import express from 'express';
+import { createMcpExpressApp } from '@modelcontextprotocol/sdk/server/express.js';
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -98,9 +102,41 @@ async function runStdio(): Promise<void> {
   console.error(`scadacraft-mcp-server ${VERSION} on stdio, ScadaCraft at ${client.baseUrl}`);
 }
 
+const LOOPBACK = new Set(['127.0.0.1', 'localhost', '::1']);
+
+/** Bearer-token check in constant time. */
+function tokenMatches(header: string | undefined, token: string): boolean {
+  const m = /^Bearer\s+(.+)$/i.exec(header ?? '');
+  if (!m) return false;
+  const a = createHash('sha256').update(m[1].trim()).digest();
+  const b = createHash('sha256').update(token).digest();
+  return timingSafeEqual(a, b);
+}
+
 async function runHttp(): Promise<void> {
-  const app = express();
+  const port = Number(process.env.PORT ?? 3001);
+  const host = process.env.HOST ?? '127.0.0.1';
+  const token = process.env.SCADACRAFT_MCP_TOKEN?.trim();
+  // The MCP server can write to field devices: on the network it must require a token.
+  if (!LOOPBACK.has(host) && !token) {
+    console.error(`Refusing to listen on ${host}: set SCADACRAFT_MCP_TOKEN (clients send "Authorization: Bearer <token>"), or listen on 127.0.0.1.`);
+    process.exit(1);
+  }
+  if (token && token.length < 24) {
+    console.error('SCADACRAFT_MCP_TOKEN is too short: use at least 24 random characters (e.g. openssl rand -hex 32).');
+    process.exit(1);
+  }
+  const allowedHosts = process.env.MCP_ALLOWED_HOSTS?.split(',').map((h) => h.trim()).filter(Boolean);
+  // localhost binding: DNS-rebinding protection (Host header must be localhost)
+  const app = createMcpExpressApp({ host, ...(allowedHosts?.length ? { allowedHosts } : {}) });
   app.use(express.json({ limit: '5mb' }));
+  if (token) {
+    app.use('/mcp', (req, res, next) => {
+      if (tokenMatches(req.headers.authorization, token)) return next();
+      res.setHeader('WWW-Authenticate', 'Bearer realm="scadacraft-mcp"');
+      res.status(401).json({ jsonrpc: '2.0', error: { code: -32001, message: 'Unauthorized: missing or wrong bearer token' }, id: null });
+    });
+  }
   app.post('/mcp', async (req, res) => {
     // stateless: a fresh server and transport per request
     const server = createServer();
@@ -109,9 +145,9 @@ async function runHttp(): Promise<void> {
     await server.connect(transport);
     await transport.handleRequest(req, res, req.body);
   });
-  const port = Number(process.env.PORT ?? 3001);
-  const host = process.env.HOST ?? '127.0.0.1';
-  app.listen(port, host, () => console.error(`scadacraft-mcp-server ${VERSION} on http://${host}:${port}/mcp, ScadaCraft at ${client.baseUrl}`));
+  app.all('/mcp', (_req, res) => { res.status(405).set('Allow', 'POST').json({ jsonrpc: '2.0', error: { code: -32000, message: 'Method not allowed' }, id: null }); });
+  app.listen(port, host, () => console.error(
+    `scadacraft-mcp-server ${VERSION} on http://${host}:${port}/mcp (${token ? 'bearer token required' : 'localhost only'}), ScadaCraft at ${client.baseUrl}`));
 }
 
 const mode = process.env.TRANSPORT ?? 'stdio';
