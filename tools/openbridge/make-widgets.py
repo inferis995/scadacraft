@@ -218,7 +218,11 @@ function sampleTick() {
     var every = Math.max(0.2, toNum(_pn_interval) || 1) * 1000;
     if (Date.now() - __lastSample >= every) { pushPoint(_pn_value); apply(); }
 }
-setInterval(sampleTick, 200);
+// stop when the widget leaves the page (page change, editor), as the FUXA widget guide requires
+var __sampler = setInterval(function () {
+    if (!document.getElementById('ob_root')) { clearInterval(__sampler); return; }
+    sampleTick();
+}, 200);
 '''
 BUFFER_PUT = {'_pn_value': 'if (!__hasValue) { __hasValue = true; pushPoint(_pn_value); }',
               '__series': ''}
@@ -484,7 +488,13 @@ ALERTS = [
                 p('_pb_date', 'false', 'showDate', 'bool', 'Show the date')],
          apply_extra=['    el.timeZoneOffsetHours = -new Date().getTimezoneOffset() / 60;',
                       '    el.date = new Date().toISOString();'],
-         extra_js='\nsetInterval(apply, 1000);\n'),
+         extra_js='''
+// stop when the widget leaves the page (page change, editor), as the FUXA widget guide requires
+var __ticker = setInterval(function () {
+    if (!document.getElementById('ob_root')) { clearInterval(__ticker); return; }
+    apply();
+}, 1000);
+'''),
 ]
 
 WIDGETS = AUTOMATION + INSTRUMENTS + CHARTS + CONTROLS + ALERTS

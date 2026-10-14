@@ -74,7 +74,11 @@ function fitBox() {
     }
 })();
 
-setInterval(apply, 1000);
+// stop when the widget leaves the page (page change, editor), as the FUXA widget guide requires
+var __ticker = setInterval(function () {
+    if (!document.getElementById('ob_root')) { clearInterval(__ticker); return; }
+    apply();
+}, 1000);
 
 apply();
 ]]></script>

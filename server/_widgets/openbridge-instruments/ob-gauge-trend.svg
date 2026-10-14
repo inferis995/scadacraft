@@ -63,7 +63,11 @@ function sampleTick() {
     var every = Math.max(0.2, toNum(_pn_interval) || 1) * 1000;
     if (Date.now() - __lastSample >= every) { pushPoint(_pn_value); apply(); }
 }
-setInterval(sampleTick, 200);
+// stop when the widget leaves the page (page change, editor), as the FUXA widget guide requires
+var __sampler = setInterval(function () {
+    if (!document.getElementById('ob_root')) { clearInterval(__sampler); return; }
+    sampleTick();
+}, 200);
 
 function apply() {
     var preview = document.getElementById('ob_preview');
