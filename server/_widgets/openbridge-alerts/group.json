@@ -1,0 +1,35 @@
+{
+  "label": "OpenBridge · Alerts and status",
+  "order": 4,
+  "description": "Alert icon, alert button, alert frame, status indicator, badge, tag label and clock.",
+  "items": [
+    {
+      "file": "ob-alert-icon.svg",
+      "label": "Alert icon"
+    },
+    {
+      "file": "ob-alert-button.svg",
+      "label": "Alert button (counter)"
+    },
+    {
+      "file": "ob-alert-frame.svg",
+      "label": "Alert frame"
+    },
+    {
+      "file": "ob-status-indicator.svg",
+      "label": "Status indicator"
+    },
+    {
+      "file": "ob-badge.svg",
+      "label": "Badge (count)"
+    },
+    {
+      "file": "ob-tag.svg",
+      "label": "Tag label"
+    },
+    {
+      "file": "ob-clock.svg",
+      "label": "Clock"
+    }
+  ]
+}

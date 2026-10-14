@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="ob_root" width="48" height="48" viewBox="0 0 48 48" overflow="visible">
   <desc>ScadaCraft OpenBridge widget: Pipe cross (junction) (obc-line-cross, OpenBridge 1.0.0, Apache-2.0).
-Box 48x48 px, anchor at (24,24).
+Library: OpenBridge · Automation (P&amp;ID). Box 48x48 px, anchor at (24,24).
 Bindable properties:
-  _ps_medium (default 'normal'): Pipe content: normal | water | air | empty
-  _ps_lineType (default 'fluid'): Line type: fluid | electric | air | connector
-  _ps_fluid (default ''): Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)</desc>
+  _ps_medium (default 'normal', read): Pipe content: normal | water | air | empty
+  _ps_lineType (default 'fluid', read): Line type: fluid | electric | air | connector
+  _ps_fluid (default '', read): Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)</desc>
   <rect id="ob_bg" x="0" y="0" width="48" height="48" fill="none" />
   <image id="ob_preview" x="0" y="0" width="48" height="48" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAD7UlEQVR4nOzcW4iMYRzH8f/MyyKydsc6rsgh7YgUlnJhnQqFPZRICUUUiRtJciGXJKdIiqi92PbgAkk5FMrpgjLrzLBWmM2yu/bUzPg/y7jc3Wln+v1Xv0/pfWfbGbzf95n33ecZ+ghB9RGCYgAwBgBjADAGAGMAMAYAYwAwBgBjADAGAGMAMAYAYwAwBgBjADAGAGMAMAYAYwAwBgBjADAGAOs1AUpKSuJuG9x1uNPvCx3e1bEtLy/3SS/AEQDGAGAMAMYAYAwAxgBgDADGAGAMAMYAYOYDFBQU9A8EAhskScXFxUc9z9tdVlbWLIb5xbCioqIF2dnZYd096R57AwZ2+ZzE9/h8vu3RaPS9hlghhpmdsNLJt226Oeb2M7JyJDBzvmRNndOt59aHHkvdo5vSGqlNfGmzTs6dEYNMBtCzdruewUfdfuaUfBm1eJX4/MkN1ng0KjVXLkjDq6d/HsfjWyoqKk6LMZ4Yowd/kR78UrefM3epjJi30r2dSLJcsMzJ08Wf0U8aP7yM6yssy8vLu1VdXR0WQ0xdA/SC624Kzrv9zOAsyZm9WHoqMKNAcvIXuYLe39c29Xc29YfRu53VeraPysgaJqOXrJFUGZq/UC/Og9xIGqcX9hIxJO3XgMRKVjJyl6+XwZOmSSrVP3sotddKJVnpXlkzdxuaMWRoyg++M2TKLOk7OFusSfsI2Hc3nPQIsOTA3LFpPUacigBjADAGAGMAMAYAYwAwBgBLe4DEZzW7y009T9ywR9Lh1dmD0v6jTiwx95Nw2/dv0vA2JKn2880zcwffMbUeoPNGO3RzpP/wMTJ+7U5JpbcXD0nL109ud5vO75wQI2xNzfr9x3XzouXLRwmXn3aLKJIKNZcvdBx8fb2X+nucEkNMLciEQqG4Lprc02njjfp24fk8TwbmTpCecLOgkfvX3W67/lqqZ3+tGGJuRUxXrD4Hg8EPulv46+Nraa2PyICR48TTla1ktDf+lLrHt+TL7UtuGPlisdimysrKq2KMuQCORniiI+GHjoQlrZHP8v3JXbeo263REGtvk8jDG/JJ14Obwi/cl9x1brOuB58Vg0z/M57CwsJ8fc8u1RDj3WP3kZPJWw90+pznJ/ZKrPXfR4He6Zm/Ts/8O2KU6R/EqqqqHuhmgt4dbdHt/mhz04iunuMOvl5sa3R3n57158Q40x/MStALp7tz6fLgJ+iIye0NB9/hVAQYA4AxABgDgDEAGAOAMQAYA4AxABgDgPWK/1Pnf8YRAMYAYAwAxgBgDADGAGAMAMYAYAwAxgBgDADGAGAMAMYAYAwAxgBgDADGAGAMAMYAYAwAxgBgDAD2GwAA//9qJZKfAAAABklEQVQDADLb9csI4Y9VAAAAAElFTkSuQmCC" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAD7UlEQVR4nOzcW4iMYRzH8f/MyyKydsc6rsgh7YgUlnJhnQqFPZRICUUUiRtJciGXJKdIiqi92PbgAkk5FMrpgjLrzLBWmM2yu/bUzPg/y7jc3Wln+v1Xv0/pfWfbGbzf95n33ecZ+ghB9RGCYgAwBgBjADAGAGMAMAYAYwAwBgBjADAGAGMAMAYAYwAwBgBjADAGAGMAMAYAYwAwBgBjADAGAOs1AUpKSuJuG9x1uNPvCx3e1bEtLy/3SS/AEQDGAGAMAMYAYAwAxgBgDADGAGAMAMYAYOYDFBQU9A8EAhskScXFxUc9z9tdVlbWLIb5xbCioqIF2dnZYd096R57AwZ2+ZzE9/h8vu3RaPS9hlghhpmdsNLJt226Oeb2M7JyJDBzvmRNndOt59aHHkvdo5vSGqlNfGmzTs6dEYNMBtCzdruewUfdfuaUfBm1eJX4/MkN1ng0KjVXLkjDq6d/HsfjWyoqKk6LMZ4Yowd/kR78UrefM3epjJi30r2dSLJcsMzJ08Wf0U8aP7yM6yssy8vLu1VdXR0WQ0xdA/SC624Kzrv9zOAsyZm9WHoqMKNAcvIXuYLe39c29Xc29YfRu53VeraPysgaJqOXrJFUGZq/UC/Og9xIGqcX9hIxJO3XgMRKVjJyl6+XwZOmSSrVP3sotddKJVnpXlkzdxuaMWRoyg++M2TKLOk7OFusSfsI2Hc3nPQIsOTA3LFpPUacigBjADAGAGMAMAYAYwAwBgBLe4DEZzW7y009T9ywR9Lh1dmD0v6jTiwx95Nw2/dv0vA2JKn2880zcwffMbUeoPNGO3RzpP/wMTJ+7U5JpbcXD0nL109ud5vO75wQI2xNzfr9x3XzouXLRwmXn3aLKJIKNZcvdBx8fb2X+nucEkNMLciEQqG4Lprc02njjfp24fk8TwbmTpCecLOgkfvX3W67/lqqZ3+tGGJuRUxXrD4Hg8EPulv46+Nraa2PyICR48TTla1ktDf+lLrHt+TL7UtuGPlisdimysrKq2KMuQCORniiI+GHjoQlrZHP8v3JXbeo263REGtvk8jDG/JJ14Obwi/cl9x1brOuB58Vg0z/M57CwsJ8fc8u1RDj3WP3kZPJWw90+pznJ/ZKrPXfR4He6Zm/Ts/8O2KU6R/EqqqqHuhmgt4dbdHt/mhz04iunuMOvl5sa3R3n57158Q40x/MStALp7tz6fLgJ+iIye0NB9/hVAQYA4AxABgDgDEAGAOAMQAYA4AxABgDgPWK/1Pnf8YRAMYAYAwAxgBgDADGAGAMAMYAYAwAxgBgDADGAGAMAMYAYAwAxgBgDADGAGAMAMYAYAwAxgBgDAD2GwAA//9qJZKfAAAABklEQVQDADLb9csI4Y9VAAAAAElFTkSuQmCC" />
   <foreignObject id="ob_fo" x="0" y="0" width="48" height="48" overflow="visible">
@@ -18,6 +18,8 @@ let _ps_medium = 'normal';
 let _ps_lineType = 'fluid';
 let _ps_fluid = '';
 //!export-end
+
+var __busyUntil = 0;
 
 function toBool(v) {
     if (v === true || v === 1) return true;

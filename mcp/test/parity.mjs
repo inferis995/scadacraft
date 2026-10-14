@@ -19,10 +19,12 @@ await build({
 });
 const { SvgUtils } = await import(pathToFileURL(join(tmp, 'svg-utils.mjs')).href);
 
-const dir = join(REPO, 'server/_widgets/openbridge');
+const root = join(REPO, 'server/_widgets');
+const files = readdirSync(root).filter((d) => d.startsWith('openbridge'))
+  .flatMap((d) => readdirSync(join(root, d)).filter((f) => f.endsWith('.svg')).map((f) => join(d, f)));
 let n = 0;
-for (const file of readdirSync(dir).filter((f) => f.endsWith('.svg'))) {
-  const svg = readFileSync(join(dir, file), 'utf8');
+for (const file of files) {
+  const svg = readFileSync(join(root, file), 'utf8');
   const script = svg.match(/<!\[CDATA\[([\s\S]*?)\]\]>/)[1];
   const ids = [...svg.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
   const idMap = Object.fromEntries(ids.map((id) => [id, `${id}_abc123`]));

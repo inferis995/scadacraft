@@ -1,4 +1,4 @@
-// OpenBridge automation components bundled for ScadaCraft widgets.
+// OpenBridge components bundled for ScadaCraft widgets (automation, instruments, charts, controls, alerts).
 // Add more components here, then run build-bundle.sh.
 import '@oicl/openbridge-webcomponents/dist/automation/pump/pump.js';
 import '@oicl/openbridge-webcomponents/dist/automation/motor/motor.js';
@@ -15,3 +15,44 @@ import '@oicl/openbridge-webcomponents/dist/automation/line-cross/line-cross.js'
 import '@oicl/openbridge-webcomponents/dist/automation/end-point-line/end-point-line.js';
 import '@oicl/openbridge-webcomponents/dist/automation/direction-line/direction-line.js';
 import '@oicl/openbridge-webcomponents/dist/automation/line-overlap/line-overlap.js';
+// automation: more P&ID equipment
+import '@oicl/openbridge-webcomponents/dist/automation/damper/damper.js';
+import '@oicl/openbridge-webcomponents/dist/automation/filter/filter.js';
+import '@oicl/openbridge-webcomponents/dist/automation/converter/converter.js';
+import '@oicl/openbridge-webcomponents/dist/automation/transformer/transformer.js';
+import '@oicl/openbridge-webcomponents/dist/automation/switch/switch.js';
+import '@oicl/openbridge-webcomponents/dist/automation/source/source.js';
+import '@oicl/openbridge-webcomponents/dist/automation/ground/ground.js';
+// instruments
+import '@oicl/openbridge-webcomponents/dist/navigation-instruments/gauge-radial/gauge-radial.js';
+import '@oicl/openbridge-webcomponents/dist/navigation-instruments/gauge-vertical/gauge-vertical.js';
+import '@oicl/openbridge-webcomponents/dist/navigation-instruments/gauge-horizontal/gauge-horizontal.js';
+import '@oicl/openbridge-webcomponents/dist/navigation-instruments/gauge-trend/gauge-trend.js';
+import '@oicl/openbridge-webcomponents/dist/navigation-instruments/instrument-field/instrument-field.js';
+import '@oicl/openbridge-webcomponents/dist/building-blocks/circular-progress/circular-progress.js';
+// charts
+import '@oicl/openbridge-webcomponents/dist/bars-graphs/line-graph/line-graph.js';
+import '@oicl/openbridge-webcomponents/dist/bars-graphs/area-graph/area-graph.js';
+import '@oicl/openbridge-webcomponents/dist/bars-graphs/pie-chart/pie-chart.js';
+import '@oicl/openbridge-webcomponents/dist/bars-graphs/donut-chart/donut-chart.js';
+import '@oicl/openbridge-webcomponents/dist/bars-graphs/radial-bar-chart/radial-bar-chart.js';
+// controls
+import '@oicl/openbridge-webcomponents/dist/components/button/button.js';
+import '@oicl/openbridge-webcomponents/dist/components/start-stop-switch/start-stop-switch.js';
+import '@oicl/openbridge-webcomponents/dist/components/toggle-switch/toggle-switch.js';
+import '@oicl/openbridge-webcomponents/dist/components/slider/slider.js';
+import '@oicl/openbridge-webcomponents/dist/components/number-input-field/number-input-field.js';
+import '@oicl/openbridge-webcomponents/dist/components/toggle-button-group/toggle-button-group.js';
+import '@oicl/openbridge-webcomponents/dist/components/toggle-button-option/toggle-button-option.js';
+import '@oicl/openbridge-webcomponents/dist/components/check-button/check-button.js';
+import '@oicl/openbridge-webcomponents/dist/components/toggle-button-three-state/toggle-button-three-state.js';
+import '@oicl/openbridge-webcomponents/dist/components/command-button/command-button.js';
+// alerts and status
+import '@oicl/openbridge-webcomponents/dist/components/alert-icon/alert-icon.js';
+import '@oicl/openbridge-webcomponents/dist/components/alert-button/alert-button.js';
+import '@oicl/openbridge-webcomponents/dist/components/alert-frame/alert-frame.js';
+import '@oicl/openbridge-webcomponents/dist/components/status-indicator/status-indicator.js';
+import '@oicl/openbridge-webcomponents/dist/components/badge/badge.js';
+import '@oicl/openbridge-webcomponents/dist/components/progress-bar/progress-bar.js';
+import '@oicl/openbridge-webcomponents/dist/components/tag/tag.js';
+import '@oicl/openbridge-webcomponents/dist/components/clock/clock.js';

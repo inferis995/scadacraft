@@ -55,10 +55,10 @@ pages created through MCP appear, run and can be edited by hand like any other.
 
 | Tool | What it does |
 | --- | --- |
-| `scadacraft_list_widgets` | OpenBridge widgets, anchors, properties; explains the placement model |
+| `scadacraft_list_widgets` | OpenBridge widget libraries (automation P&ID, instruments, charts, controls, alerts), anchors, properties; explains the placement model |
 | `scadacraft_list_views`, `scadacraft_get_view` | Pages and their items |
 | `scadacraft_create_view`, `scadacraft_update_view`, `scadacraft_duplicate_view`, `scadacraft_delete_view` | Page management |
-| `scadacraft_place_widgets` | Widgets by grid node, with properties and tag bindings |
+| `scadacraft_place_widgets` | Widgets by grid node, with properties and tag bindings; `size` in cells for instruments, charts, controls and alerts |
 | `scadacraft_draw_pipe` | Pipe along a path of nodes, elbows at bends |
 | `scadacraft_set_properties` | Change values or bindings of a placed widget |
 | `scadacraft_remove_items` | Remove items from a page |
@@ -157,6 +157,8 @@ npm test
 
 - `test/parity.mjs`: widget script processing matches the editor's code for every widget.
 - `test/e2e.mjs`: page building with server memory tags (tank, pump, valve, readout, pipes).
+- `test/e2e-widgets.mjs`: the five OpenBridge libraries; builds the page "OpenBridge showcase" with
+  every instrument, chart, control and alert bound to server tags (sizes in cells, top-left anchor).
 - `test/e2e-plant.mjs`: full plant against a simulated Modbus TCP PLC (`test/modbus-sim.mjs`):
   driver install, device, tags with scaling and history, live read, write to the PLC,
   connection status, alarm raise/acknowledge/history, tag history with CSV, page bound to

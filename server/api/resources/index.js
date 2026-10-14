@@ -277,16 +277,30 @@ module.exports = {
                         var group = { name: resourcesDirs[i], items: [] };
                         var dirPath = path.resolve(runtime.settings.widgetsFileDir, resourcesDirs[i]);
                         var wwwSubDir = path.join('_widgets', resourcesDirs[i]);
+                        // optional group.json: { label, order, items: [{ file, label }] } (library title and order)
+                        var meta = readGroupMeta(dirPath);
+                        if (meta.label) group.label = meta.label;
+                        group.order = Number.isFinite(meta.order) ? meta.order : 1000;
+                        var itemMeta = Array.isArray(meta.items) ? meta.items : [];
                         var files = getFilesRecursive(dirPath, ['.svg']);
                         for (var x = 0; x < files.length; x++) {
                             var filename = files[x];
-                            group.items.push({
+                            var rel = filename.split(path.sep).join(path.posix.sep);
+                            var im = itemMeta.findIndex(m => m && m.file === rel);
+                            var item = {
                                 path: path.join(wwwSubDir, files[x]).split(path.sep).join(path.posix.sep),
                                 name: filename
-                            });
+                            };
+                            if (im >= 0 && itemMeta[im].label) item.label = itemMeta[im].label;
+                            item.order = im >= 0 ? im : itemMeta.length + x;
+                            group.items.push(item);
                         }
+                        group.items.sort((a, b) => a.order - b.order);
+                        group.items.forEach(it => delete it.order);
                         result.groups.push(group);
                     }
+                    result.groups.sort((a, b) => (a.order - b.order) || a.name.localeCompare(b.name));
+                    result.groups.forEach(g => delete g.order);
                     res.json(result);
                 } catch (err) {
                     if (err.code) {
@@ -349,6 +363,18 @@ module.exports = {
 
         return resourcesApp;
     }
+}
+
+function readGroupMeta(dirPath) {
+    try {
+        var file = path.join(dirPath, 'group.json');
+        if (fs.existsSync(file)) {
+            return JSON.parse(fs.readFileSync(file, 'utf8')) || {};
+        }
+    } catch (err) {
+        runtime.logger.warn('widgets group.json in ' + dirPath + ': ' + err.message);
+    }
+    return {};
 }
 
 function getDirectories(pathDir) {

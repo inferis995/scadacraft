@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="ob_root" width="48" height="48" viewBox="0 0 48 48" overflow="visible">
+  <desc>ScadaCraft OpenBridge widget: Alert icon (obc-alert-icon, OpenBridge 1.0.0, Apache-2.0).
+Library: OpenBridge · Alerts and status. Box 48x48 px, anchor at (0,0).
+Bindable properties:
+  _pb_active (default false, read): Alert active (icon shown in colour; hidden when inactive and _pb_hideInactive)
+  _pb_acknowledged (default false, read): Acknowledged
+  _ps_type (default 'alarm', read): Type: alarm | warning | caution
+  _pb_hideInactive (default false, read): Hide the icon while the alert is not active</desc>
+  <rect id="ob_bg" x="0" y="0" width="48" height="48" fill="none" />
+  <image id="ob_preview" x="0" y="0" width="48" height="48" href="data:image/png;base64,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" xlink:href="data:image/png;base64,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" />
+  <foreignObject id="ob_fo" x="0" y="0" width="48" height="48" overflow="visible">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;width:100%;height:100%;overflow:visible;display:flex;align-items:center;justify-content:center;">
+      <obc-alert-icon id="ob_el" style="display:block;width:32px;height:32px;"></obc-alert-icon>
+    </div>
+  </foreignObject>
+  <script type="text/javascript"><![CDATA[
+//!export-start
+let _pb_active = false;
+let _pb_acknowledged = false;
+let _ps_type = 'alarm';
+let _pb_hideInactive = false;
+//!export-end
+
+var __busyUntil = 0;
+
+function toBool(v) {
+    if (v === true || v === 1) return true;
+    var s = String(v).toLowerCase();
+    return s === 'true' || s === '1' || s === 'on';
+}
+
+function toNum(v) {
+    var n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+}
+
+function apply() {
+    var preview = document.getElementById('ob_preview');
+    if (preview && preview.parentNode) { preview.parentNode.removeChild(preview); }
+    var el = document.getElementById('ob_el');
+    if (!el) return;
+    el.acknowledged = toBool(_pb_acknowledged);
+    el.type = String(_ps_type);
+    el.active = toBool(_pb_active);
+    el.style.visibility = (!toBool(_pb_active) && toBool(_pb_hideInactive)) ? 'hidden' : 'visible';
+}
+
+function putValue(id, value) {
+    if (id === '_pb_active') { _pb_active = toBool(value); }
+    if (id === '_pb_acknowledged') { _pb_acknowledged = toBool(value); }
+    if (id === '_ps_type') { _ps_type = String(value); }
+    if (id === '_pb_hideInactive') { _pb_hideInactive = toBool(value); }
+    apply();
+}
+
+function postValue(id, value) {
+    // replaced at runtime: writes value to the tag bound to "id"
+}
+
+function fitBox() {
+    var root = document.getElementById('ob_root');
+    var fo = document.getElementById('ob_fo');
+    var el = document.getElementById('ob_el');
+    if (!root || !fo || !el) return;
+    var w = parseFloat(root.getAttribute('width')) || 48;
+    var h = parseFloat(root.getAttribute('height')) || 48;
+    if (root.getAttribute('viewBox') !== '0 0 ' + w + ' ' + h) {
+        root.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    }
+    fo.setAttribute('width', w);
+    fo.setAttribute('height', h);
+
+}
+
+(function () {
+    var root = document.getElementById('ob_root');
+    fitBox();
+    if (root && window.MutationObserver) {
+        new MutationObserver(fitBox).observe(root, { attributes: true, attributeFilter: ['width', 'height'] });
+    }
+})();
+
+apply();
+]]></script>
+</svg>

@@ -1,13 +1,47 @@
 {
   "grid": 24,
   "openbridge": "1.0.0",
+  "categories": [
+    {
+      "key": "automation",
+      "folder": "openbridge",
+      "title": "OpenBridge · Automation (P&ID)",
+      "description": "Process equipment and pipes, placed on the 24 px P&ID grid by their anchor point."
+    },
+    {
+      "key": "instruments",
+      "folder": "openbridge-instruments",
+      "title": "OpenBridge · Instruments",
+      "description": "Gauges, instrument fields and trends showing a process value."
+    },
+    {
+      "key": "charts",
+      "folder": "openbridge-charts",
+      "title": "OpenBridge · Charts",
+      "description": "Live charts: rolling line/area trends of a tag, pie/donut/radial bars of several tags."
+    },
+    {
+      "key": "controls",
+      "folder": "openbridge-controls",
+      "title": "OpenBridge · Controls",
+      "description": "Operator commands: buttons, start/stop and toggle switches, slider, number input, mode selector."
+    },
+    {
+      "key": "alerts",
+      "folder": "openbridge-alerts",
+      "title": "OpenBridge · Alerts and status",
+      "description": "Alert icon, alert button, alert frame, status indicator, badge, tag label and clock."
+    }
+  ],
   "widgets": [
     {
       "widget": "ob-pump",
       "file": "_widgets/openbridge/ob-pump.svg",
       "title": "Pump",
+      "category": "automation",
       "group": "device",
       "element": "obc-pump",
+      "layout": "anchor",
       "size": {
         "width": 120,
         "height": 120
@@ -22,6 +56,7 @@
           "name": "_pb_running",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Running feedback"
         },
@@ -29,6 +64,7 @@
           "name": "_pn_speed",
           "type": "num",
           "default": "0",
+          "dir": "read",
           "write": false,
           "description": "Speed % (readout)"
         },
@@ -36,6 +72,7 @@
           "name": "_pb_vertical",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Vertical orientation (pipe runs top-bottom)"
         },
@@ -43,6 +80,7 @@
           "name": "_ps_labelDirection",
           "type": "str",
           "default": "down",
+          "dir": "read",
           "write": false,
           "description": "Readout side: up | down | left | right"
         },
@@ -50,6 +88,7 @@
           "name": "_pb_alarm",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Alarm active (alert frame)"
         },
@@ -57,6 +96,7 @@
           "name": "_pb_auto",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: automatic mode"
         },
@@ -64,6 +104,7 @@
           "name": "_pb_locked",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: command locked"
         },
@@ -71,6 +112,7 @@
           "name": "_pb_duty",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: duty unit"
         },
@@ -78,6 +120,7 @@
           "name": "_pb_alarmOff",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: alarms suppressed"
         },
@@ -85,6 +128,7 @@
           "name": "_ps_tag",
           "type": "str",
           "default": "",
+          "dir": "read",
           "write": false,
           "description": "Numeric equipment ID shown as #NNNN, e.g. 101 (empty = hidden)"
         },
@@ -92,17 +136,26 @@
           "name": "_pb_command",
           "type": "bool",
           "default": "false",
+          "dir": "write",
           "write": true,
           "description": "Start/stop command, written on click as !running (1/0)"
         }
+      ],
+      "preview": [
+        [
+          "_pb_running",
+          1
+        ]
       ]
     },
     {
       "widget": "ob-motor",
       "file": "_widgets/openbridge/ob-motor.svg",
       "title": "Motor",
+      "category": "automation",
       "group": "device",
       "element": "obc-motor",
+      "layout": "anchor",
       "size": {
         "width": 120,
         "height": 120
@@ -117,6 +170,7 @@
           "name": "_pb_running",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Running feedback"
         },
@@ -124,6 +178,7 @@
           "name": "_pn_speed",
           "type": "num",
           "default": "0",
+          "dir": "read",
           "write": false,
           "description": "Speed % (readout)"
         },
@@ -131,6 +186,7 @@
           "name": "_pb_vertical",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Vertical orientation (pipe runs top-bottom)"
         },
@@ -138,6 +194,7 @@
           "name": "_ps_labelDirection",
           "type": "str",
           "default": "down",
+          "dir": "read",
           "write": false,
           "description": "Readout side: up | down | left | right"
         },
@@ -145,6 +202,7 @@
           "name": "_pb_alarm",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Alarm active (alert frame)"
         },
@@ -152,6 +210,7 @@
           "name": "_pb_auto",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: automatic mode"
         },
@@ -159,6 +218,7 @@
           "name": "_pb_locked",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: command locked"
         },
@@ -166,6 +226,7 @@
           "name": "_pb_duty",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: duty unit"
         },
@@ -173,6 +234,7 @@
           "name": "_pb_alarmOff",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: alarms suppressed"
         },
@@ -180,6 +242,7 @@
           "name": "_ps_tag",
           "type": "str",
           "default": "",
+          "dir": "read",
           "write": false,
           "description": "Numeric equipment ID shown as #NNNN, e.g. 201 (empty = hidden)"
         },
@@ -187,17 +250,26 @@
           "name": "_pb_command",
           "type": "bool",
           "default": "false",
+          "dir": "write",
           "write": true,
           "description": "Start/stop command, written on click as !running (1/0)"
         }
+      ],
+      "preview": [
+        [
+          "_pb_running",
+          1
+        ]
       ]
     },
     {
       "widget": "ob-fan",
       "file": "_widgets/openbridge/ob-fan.svg",
       "title": "Fan",
+      "category": "automation",
       "group": "device",
       "element": "obc-fan",
+      "layout": "anchor",
       "size": {
         "width": 120,
         "height": 120
@@ -212,6 +284,7 @@
           "name": "_pb_running",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Running feedback"
         },
@@ -219,6 +292,7 @@
           "name": "_pn_speed",
           "type": "num",
           "default": "0",
+          "dir": "read",
           "write": false,
           "description": "Speed % (readout)"
         },
@@ -226,6 +300,7 @@
           "name": "_pb_vertical",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Vertical orientation (pipe runs top-bottom)"
         },
@@ -233,6 +308,7 @@
           "name": "_ps_labelDirection",
           "type": "str",
           "default": "down",
+          "dir": "read",
           "write": false,
           "description": "Readout side: up | down | left | right"
         },
@@ -240,6 +316,7 @@
           "name": "_pb_alarm",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Alarm active (alert frame)"
         },
@@ -247,6 +324,7 @@
           "name": "_pb_auto",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: automatic mode"
         },
@@ -254,6 +332,7 @@
           "name": "_pb_locked",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: command locked"
         },
@@ -261,6 +340,7 @@
           "name": "_pb_duty",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: duty unit"
         },
@@ -268,6 +348,7 @@
           "name": "_pb_alarmOff",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: alarms suppressed"
         },
@@ -275,6 +356,7 @@
           "name": "_ps_tag",
           "type": "str",
           "default": "",
+          "dir": "read",
           "write": false,
           "description": "Numeric equipment ID shown as #NNNN, e.g. 301 (empty = hidden)"
         },
@@ -282,17 +364,26 @@
           "name": "_pb_command",
           "type": "bool",
           "default": "false",
+          "dir": "write",
           "write": true,
           "description": "Start/stop command, written on click as !running (1/0)"
         }
+      ],
+      "preview": [
+        [
+          "_pb_running",
+          1
+        ]
       ]
     },
     {
       "widget": "ob-valve-digital",
       "file": "_widgets/openbridge/ob-valve-digital.svg",
       "title": "On/off valve",
+      "category": "automation",
       "group": "device",
       "element": "obc-digital-valve",
+      "layout": "anchor",
       "size": {
         "width": 120,
         "height": 120
@@ -307,6 +398,7 @@
           "name": "_pb_open",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Open feedback"
         },
@@ -314,6 +406,7 @@
           "name": "_pb_vertical",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Vertical orientation (pipe runs top-bottom)"
         },
@@ -321,6 +414,7 @@
           "name": "_ps_labelDirection",
           "type": "str",
           "default": "down",
+          "dir": "read",
           "write": false,
           "description": "Readout side: up | down | left | right"
         },
@@ -328,6 +422,7 @@
           "name": "_pb_alarm",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Alarm active (alert frame)"
         },
@@ -335,6 +430,7 @@
           "name": "_pb_auto",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: automatic mode"
         },
@@ -342,6 +438,7 @@
           "name": "_pb_locked",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: command locked"
         },
@@ -349,6 +446,7 @@
           "name": "_pb_duty",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: duty unit"
         },
@@ -356,6 +454,7 @@
           "name": "_pb_alarmOff",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: alarms suppressed"
         },
@@ -363,6 +462,7 @@
           "name": "_ps_tag",
           "type": "str",
           "default": "",
+          "dir": "read",
           "write": false,
           "description": "Numeric equipment ID shown as #NNNN, e.g. 401 (empty = hidden)"
         },
@@ -370,17 +470,26 @@
           "name": "_pb_command",
           "type": "bool",
           "default": "false",
+          "dir": "write",
           "write": true,
           "description": "Open/close command, written on click as !open (1/0)"
         }
+      ],
+      "preview": [
+        [
+          "_pb_open",
+          1
+        ]
       ]
     },
     {
       "widget": "ob-valve-analog",
       "file": "_widgets/openbridge/ob-valve-analog.svg",
       "title": "Control valve",
+      "category": "automation",
       "group": "device",
       "element": "obc-analog-valve",
+      "layout": "anchor",
       "size": {
         "width": 120,
         "height": 120
@@ -395,6 +504,7 @@
           "name": "_pn_position",
           "type": "num",
           "default": "0",
+          "dir": "read",
           "write": false,
           "description": "Valve position 0-100 %"
         },
@@ -402,6 +512,7 @@
           "name": "_pb_open",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Open feedback"
         },
@@ -409,6 +520,7 @@
           "name": "_pb_vertical",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Vertical orientation (pipe runs top-bottom)"
         },
@@ -416,6 +528,7 @@
           "name": "_ps_labelDirection",
           "type": "str",
           "default": "down",
+          "dir": "read",
           "write": false,
           "description": "Readout side: up | down | left | right"
         },
@@ -423,6 +536,7 @@
           "name": "_pb_alarm",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Alarm active (alert frame)"
         },
@@ -430,6 +544,7 @@
           "name": "_pb_auto",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: automatic mode"
         },
@@ -437,6 +552,7 @@
           "name": "_pb_locked",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: command locked"
         },
@@ -444,6 +560,7 @@
           "name": "_pb_duty",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: duty unit"
         },
@@ -451,6 +568,7 @@
           "name": "_pb_alarmOff",
           "type": "bool",
           "default": "false",
+          "dir": "read",
           "write": false,
           "description": "Badge: alarms suppressed"
         },
@@ -458,17 +576,684 @@
           "name": "_ps_tag",
           "type": "str",
           "default": "",
+          "dir": "read",
           "write": false,
           "description": "Numeric equipment ID shown as #NNNN, e.g. 501 (empty = hidden)"
         }
+      ],
+      "preview": [
+        [
+          "_pn_position",
+          60
+        ],
+        [
+          "_pb_open",
+          1
+        ]
+      ]
+    },
+    {
+      "widget": "ob-damper",
+      "file": "_widgets/openbridge/ob-damper.svg",
+      "title": "Damper",
+      "category": "automation",
+      "group": "device",
+      "element": "obc-damper",
+      "layout": "anchor",
+      "size": {
+        "width": 120,
+        "height": 120
+      },
+      "anchor": {
+        "x": 48,
+        "y": 48
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pb_on",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Open feedback"
+        },
+        {
+          "name": "_ps_readout",
+          "type": "str",
+          "default": "bottom",
+          "dir": "read",
+          "write": false,
+          "description": "Readout side: top | bottom | left | right"
+        },
+        {
+          "name": "_pb_alarm",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Alarm active (alert frame)"
+        },
+        {
+          "name": "_pb_auto",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: automatic mode"
+        },
+        {
+          "name": "_pb_locked",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: command locked"
+        },
+        {
+          "name": "_pb_duty",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: duty unit"
+        },
+        {
+          "name": "_pb_alarmOff",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: alarms suppressed"
+        },
+        {
+          "name": "_ps_tag",
+          "type": "str",
+          "default": "",
+          "dir": "read",
+          "write": false,
+          "description": "Numeric equipment ID shown as #NNNN, e.g. 601 (empty = hidden)"
+        },
+        {
+          "name": "_pb_command",
+          "type": "bool",
+          "default": "false",
+          "dir": "write",
+          "write": true,
+          "description": "Open/close command, written on click as !open (1/0)"
+        }
+      ],
+      "preview": [
+        [
+          "_pb_on",
+          1
+        ]
+      ]
+    },
+    {
+      "widget": "ob-filter",
+      "file": "_widgets/openbridge/ob-filter.svg",
+      "title": "Filter",
+      "category": "automation",
+      "group": "device",
+      "element": "obc-filter",
+      "layout": "anchor",
+      "size": {
+        "width": 120,
+        "height": 120
+      },
+      "anchor": {
+        "x": 48,
+        "y": 48
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pb_on",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "In service"
+        },
+        {
+          "name": "_ps_readout",
+          "type": "str",
+          "default": "bottom",
+          "dir": "read",
+          "write": false,
+          "description": "Readout side: top | bottom | left | right"
+        },
+        {
+          "name": "_pb_alarm",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Alarm active (alert frame)"
+        },
+        {
+          "name": "_pb_auto",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: automatic mode"
+        },
+        {
+          "name": "_pb_locked",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: command locked"
+        },
+        {
+          "name": "_pb_duty",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: duty unit"
+        },
+        {
+          "name": "_pb_alarmOff",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: alarms suppressed"
+        },
+        {
+          "name": "_ps_tag",
+          "type": "str",
+          "default": "",
+          "dir": "read",
+          "write": false,
+          "description": "Numeric equipment ID shown as #NNNN, e.g. 701 (empty = hidden)"
+        }
+      ],
+      "preview": [
+        [
+          "_pb_on",
+          1
+        ]
+      ]
+    },
+    {
+      "widget": "ob-converter",
+      "file": "_widgets/openbridge/ob-converter.svg",
+      "title": "Converter / drive",
+      "category": "automation",
+      "group": "device",
+      "element": "obc-converter",
+      "layout": "anchor",
+      "size": {
+        "width": 120,
+        "height": 120
+      },
+      "anchor": {
+        "x": 48,
+        "y": 48
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pb_on",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Running feedback"
+        },
+        {
+          "name": "_ps_readout",
+          "type": "str",
+          "default": "bottom",
+          "dir": "read",
+          "write": false,
+          "description": "Readout side: top | bottom | left | right"
+        },
+        {
+          "name": "_pb_alarm",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Alarm active (alert frame)"
+        },
+        {
+          "name": "_pb_auto",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: automatic mode"
+        },
+        {
+          "name": "_pb_locked",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: command locked"
+        },
+        {
+          "name": "_pb_duty",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: duty unit"
+        },
+        {
+          "name": "_pb_alarmOff",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: alarms suppressed"
+        },
+        {
+          "name": "_ps_tag",
+          "type": "str",
+          "default": "",
+          "dir": "read",
+          "write": false,
+          "description": "Numeric equipment ID shown as #NNNN, e.g. 801 (empty = hidden)"
+        },
+        {
+          "name": "_pb_command",
+          "type": "bool",
+          "default": "false",
+          "dir": "write",
+          "write": true,
+          "description": "Start/stop command, written on click as !on (1/0)"
+        }
+      ],
+      "preview": [
+        [
+          "_pb_on",
+          1
+        ]
+      ]
+    },
+    {
+      "widget": "ob-transformer",
+      "file": "_widgets/openbridge/ob-transformer.svg",
+      "title": "Transformer",
+      "category": "automation",
+      "group": "device",
+      "element": "obc-transformer",
+      "layout": "anchor",
+      "size": {
+        "width": 120,
+        "height": 120
+      },
+      "anchor": {
+        "x": 48,
+        "y": 48
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pb_on",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Energised"
+        },
+        {
+          "name": "_ps_readout",
+          "type": "str",
+          "default": "bottom",
+          "dir": "read",
+          "write": false,
+          "description": "Readout side: top | bottom | left | right"
+        },
+        {
+          "name": "_pb_alarm",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Alarm active (alert frame)"
+        },
+        {
+          "name": "_pb_auto",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: automatic mode"
+        },
+        {
+          "name": "_pb_locked",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: command locked"
+        },
+        {
+          "name": "_pb_duty",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: duty unit"
+        },
+        {
+          "name": "_pb_alarmOff",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: alarms suppressed"
+        },
+        {
+          "name": "_ps_tag",
+          "type": "str",
+          "default": "",
+          "dir": "read",
+          "write": false,
+          "description": "Numeric equipment ID shown as #NNNN, e.g. 901 (empty = hidden)"
+        }
+      ],
+      "preview": [
+        [
+          "_pb_on",
+          1
+        ]
+      ]
+    },
+    {
+      "widget": "ob-breaker",
+      "file": "_widgets/openbridge/ob-breaker.svg",
+      "title": "Breaker / switch",
+      "category": "automation",
+      "group": "device",
+      "element": "obc-switch",
+      "layout": "anchor",
+      "size": {
+        "width": 120,
+        "height": 120
+      },
+      "anchor": {
+        "x": 48,
+        "y": 48
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pb_on",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Closed feedback"
+        },
+        {
+          "name": "_ps_readout",
+          "type": "str",
+          "default": "bottom",
+          "dir": "read",
+          "write": false,
+          "description": "Readout side: top | bottom | left | right"
+        },
+        {
+          "name": "_pb_alarm",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Alarm active (alert frame)"
+        },
+        {
+          "name": "_pb_auto",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: automatic mode"
+        },
+        {
+          "name": "_pb_locked",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: command locked"
+        },
+        {
+          "name": "_pb_duty",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: duty unit"
+        },
+        {
+          "name": "_pb_alarmOff",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: alarms suppressed"
+        },
+        {
+          "name": "_ps_tag",
+          "type": "str",
+          "default": "",
+          "dir": "read",
+          "write": false,
+          "description": "Numeric equipment ID shown as #NNNN, e.g. 1001 (empty = hidden)"
+        },
+        {
+          "name": "_pb_command",
+          "type": "bool",
+          "default": "false",
+          "dir": "write",
+          "write": true,
+          "description": "Close/open command, written on click as !closed (1/0)"
+        }
+      ],
+      "preview": [
+        [
+          "_pb_on",
+          1
+        ]
+      ]
+    },
+    {
+      "widget": "ob-source",
+      "file": "_widgets/openbridge/ob-source.svg",
+      "title": "Power source",
+      "category": "automation",
+      "group": "device",
+      "element": "obc-source",
+      "layout": "anchor",
+      "size": {
+        "width": 120,
+        "height": 120
+      },
+      "anchor": {
+        "x": 48,
+        "y": 48
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pb_on",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Available"
+        },
+        {
+          "name": "_ps_readout",
+          "type": "str",
+          "default": "bottom",
+          "dir": "read",
+          "write": false,
+          "description": "Readout side: top | bottom | left | right"
+        },
+        {
+          "name": "_pb_alarm",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Alarm active (alert frame)"
+        },
+        {
+          "name": "_pb_auto",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: automatic mode"
+        },
+        {
+          "name": "_pb_locked",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: command locked"
+        },
+        {
+          "name": "_pb_duty",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: duty unit"
+        },
+        {
+          "name": "_pb_alarmOff",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: alarms suppressed"
+        },
+        {
+          "name": "_ps_tag",
+          "type": "str",
+          "default": "",
+          "dir": "read",
+          "write": false,
+          "description": "Numeric equipment ID shown as #NNNN, e.g. 1101 (empty = hidden)"
+        }
+      ],
+      "preview": [
+        [
+          "_pb_on",
+          1
+        ]
+      ]
+    },
+    {
+      "widget": "ob-ground",
+      "file": "_widgets/openbridge/ob-ground.svg",
+      "title": "Ground / earth",
+      "category": "automation",
+      "group": "device",
+      "element": "obc-ground",
+      "layout": "anchor",
+      "size": {
+        "width": 120,
+        "height": 120
+      },
+      "anchor": {
+        "x": 48,
+        "y": 48
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pb_on",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Connected"
+        },
+        {
+          "name": "_ps_readout",
+          "type": "str",
+          "default": "bottom",
+          "dir": "read",
+          "write": false,
+          "description": "Readout side: top | bottom | left | right"
+        },
+        {
+          "name": "_pb_alarm",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Alarm active (alert frame)"
+        },
+        {
+          "name": "_pb_auto",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: automatic mode"
+        },
+        {
+          "name": "_pb_locked",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: command locked"
+        },
+        {
+          "name": "_pb_duty",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: duty unit"
+        },
+        {
+          "name": "_pb_alarmOff",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Badge: alarms suppressed"
+        },
+        {
+          "name": "_ps_tag",
+          "type": "str",
+          "default": "",
+          "dir": "read",
+          "write": false,
+          "description": "Numeric equipment ID shown as #NNNN, e.g. 1201 (empty = hidden)"
+        }
+      ],
+      "preview": [
+        [
+          "_pb_on",
+          1
+        ]
       ]
     },
     {
       "widget": "ob-tank",
       "file": "_widgets/openbridge/ob-tank.svg",
       "title": "Tank",
+      "category": "automation",
       "group": "device",
       "element": "obc-automation-tank",
+      "layout": "anchor",
       "size": {
         "width": 192,
         "height": 216
@@ -483,6 +1268,7 @@
           "name": "_pn_level",
           "type": "num",
           "default": "50",
+          "dir": "read",
           "write": false,
           "description": "Level (same unit as max)"
         },
@@ -490,6 +1276,7 @@
           "name": "_pn_max",
           "type": "num",
           "default": "100",
+          "dir": "read",
           "write": false,
           "description": "Maximum level / capacity"
         },
@@ -497,6 +1284,7 @@
           "name": "_ps_trend",
           "type": "str",
           "default": "stable",
+          "dir": "read",
           "write": false,
           "description": "fast-rising | rising | stable | falling | fast-falling"
         },
@@ -504,6 +1292,7 @@
           "name": "_ps_fluid",
           "type": "str",
           "default": "fresh-water",
+          "dir": "read",
           "write": false,
           "description": "Content colour (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas"
         },
@@ -511,17 +1300,26 @@
           "name": "_ps_tag",
           "type": "str",
           "default": "T-101",
+          "dir": "read",
           "write": false,
           "description": "Tank label (free text)"
         }
+      ],
+      "preview": [
+        [
+          "_pn_level",
+          60
+        ]
       ]
     },
     {
       "widget": "ob-readout",
       "file": "_widgets/openbridge/ob-readout.svg",
       "title": "Readout",
+      "category": "automation",
       "group": "device",
       "element": "obc-automation-readout",
+      "layout": "anchor",
       "size": {
         "width": 192,
         "height": 120
@@ -536,6 +1334,7 @@
           "name": "_pn_value",
           "type": "num",
           "default": "0",
+          "dir": "read",
           "write": false,
           "description": "Process value"
         },
@@ -543,6 +1342,7 @@
           "name": "_ps_unit",
           "type": "str",
           "default": "m3/h",
+          "dir": "read",
           "write": false,
           "description": "Engineering unit"
         },
@@ -550,6 +1350,7 @@
           "name": "_pn_digits",
           "type": "num",
           "default": "3",
+          "dir": "read",
           "write": false,
           "description": "Integer digits shown"
         },
@@ -557,17 +1358,26 @@
           "name": "_ps_position",
           "type": "str",
           "default": "top",
+          "dir": "read",
           "write": false,
           "description": "Where the readout sits relative to its anchor (tick end): top | bottom | left | right"
         }
+      ],
+      "preview": [
+        [
+          "_pn_value",
+          123
+        ]
       ]
     },
     {
       "widget": "ob-line-horizontal",
       "file": "_widgets/openbridge/ob-line-horizontal.svg",
       "title": "Pipe horizontal",
+      "category": "automation",
       "group": "pipe",
       "element": "obc-horizontal-line",
+      "layout": "anchor",
       "size": {
         "width": 96,
         "height": 48
@@ -582,6 +1392,7 @@
           "name": "_ps_medium",
           "type": "str",
           "default": "normal",
+          "dir": "read",
           "write": false,
           "description": "Pipe content: normal | water | air | empty"
         },
@@ -589,6 +1400,7 @@
           "name": "_ps_lineType",
           "type": "str",
           "default": "fluid",
+          "dir": "read",
           "write": false,
           "description": "Line type: fluid | electric | air | connector"
         },
@@ -596,17 +1408,26 @@
           "name": "_ps_fluid",
           "type": "str",
           "default": "",
+          "dir": "read",
           "write": false,
           "description": "Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)"
         }
+      ],
+      "preview": [
+        [
+          "_ps_medium",
+          "water"
+        ]
       ]
     },
     {
       "widget": "ob-line-vertical",
       "file": "_widgets/openbridge/ob-line-vertical.svg",
       "title": "Pipe vertical",
+      "category": "automation",
       "group": "pipe",
       "element": "obc-vertical-line",
+      "layout": "anchor",
       "size": {
         "width": 48,
         "height": 96
@@ -621,6 +1442,7 @@
           "name": "_ps_medium",
           "type": "str",
           "default": "normal",
+          "dir": "read",
           "write": false,
           "description": "Pipe content: normal | water | air | empty"
         },
@@ -628,6 +1450,7 @@
           "name": "_ps_lineType",
           "type": "str",
           "default": "fluid",
+          "dir": "read",
           "write": false,
           "description": "Line type: fluid | electric | air | connector"
         },
@@ -635,17 +1458,26 @@
           "name": "_ps_fluid",
           "type": "str",
           "default": "",
+          "dir": "read",
           "write": false,
           "description": "Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)"
         }
+      ],
+      "preview": [
+        [
+          "_ps_medium",
+          "water"
+        ]
       ]
     },
     {
       "widget": "ob-line-elbow",
       "file": "_widgets/openbridge/ob-line-elbow.svg",
       "title": "Pipe elbow",
+      "category": "automation",
       "group": "pipe",
       "element": "obc-corner-line",
+      "layout": "anchor",
       "size": {
         "width": 48,
         "height": 48
@@ -660,6 +1492,7 @@
           "name": "_ps_direction",
           "type": "str",
           "default": "bottom-right",
+          "dir": "read",
           "write": false,
           "description": "Arms: top-right | top-left | bottom-right | bottom-left"
         },
@@ -667,6 +1500,7 @@
           "name": "_ps_medium",
           "type": "str",
           "default": "normal",
+          "dir": "read",
           "write": false,
           "description": "Pipe content: normal | water | air | empty"
         },
@@ -674,6 +1508,7 @@
           "name": "_ps_lineType",
           "type": "str",
           "default": "fluid",
+          "dir": "read",
           "write": false,
           "description": "Line type: fluid | electric | air | connector"
         },
@@ -681,17 +1516,26 @@
           "name": "_ps_fluid",
           "type": "str",
           "default": "",
+          "dir": "read",
           "write": false,
           "description": "Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)"
         }
+      ],
+      "preview": [
+        [
+          "_ps_medium",
+          "water"
+        ]
       ]
     },
     {
       "widget": "ob-line-tee",
       "file": "_widgets/openbridge/ob-line-tee.svg",
       "title": "Pipe tee",
+      "category": "automation",
       "group": "pipe",
       "element": "obc-three-way-line",
+      "layout": "anchor",
       "size": {
         "width": 48,
         "height": 48
@@ -706,6 +1550,7 @@
           "name": "_ps_direction",
           "type": "str",
           "default": "bottom",
+          "dir": "read",
           "write": false,
           "description": "Branch side: top | right | bottom | left"
         },
@@ -713,6 +1558,7 @@
           "name": "_ps_medium",
           "type": "str",
           "default": "normal",
+          "dir": "read",
           "write": false,
           "description": "Pipe content: normal | water | air | empty"
         },
@@ -720,6 +1566,7 @@
           "name": "_ps_lineType",
           "type": "str",
           "default": "fluid",
+          "dir": "read",
           "write": false,
           "description": "Line type: fluid | electric | air | connector"
         },
@@ -727,17 +1574,26 @@
           "name": "_ps_fluid",
           "type": "str",
           "default": "",
+          "dir": "read",
           "write": false,
           "description": "Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)"
         }
+      ],
+      "preview": [
+        [
+          "_ps_medium",
+          "water"
+        ]
       ]
     },
     {
       "widget": "ob-line-cross",
       "file": "_widgets/openbridge/ob-line-cross.svg",
       "title": "Pipe cross (junction)",
+      "category": "automation",
       "group": "pipe",
       "element": "obc-line-cross",
+      "layout": "anchor",
       "size": {
         "width": 48,
         "height": 48
@@ -752,6 +1608,7 @@
           "name": "_ps_medium",
           "type": "str",
           "default": "normal",
+          "dir": "read",
           "write": false,
           "description": "Pipe content: normal | water | air | empty"
         },
@@ -759,6 +1616,7 @@
           "name": "_ps_lineType",
           "type": "str",
           "default": "fluid",
+          "dir": "read",
           "write": false,
           "description": "Line type: fluid | electric | air | connector"
         },
@@ -766,17 +1624,26 @@
           "name": "_ps_fluid",
           "type": "str",
           "default": "",
+          "dir": "read",
           "write": false,
           "description": "Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)"
         }
+      ],
+      "preview": [
+        [
+          "_ps_medium",
+          "water"
+        ]
       ]
     },
     {
       "widget": "ob-line-overlap",
       "file": "_widgets/openbridge/ob-line-overlap.svg",
       "title": "Pipe crossover (no junction)",
+      "category": "automation",
       "group": "pipe",
       "element": "obc-line-overlap",
+      "layout": "anchor",
       "size": {
         "width": 48,
         "height": 48
@@ -791,6 +1658,7 @@
           "name": "_ps_medium",
           "type": "str",
           "default": "normal",
+          "dir": "read",
           "write": false,
           "description": "Pipe content: normal | water | air | empty"
         },
@@ -798,6 +1666,7 @@
           "name": "_ps_lineType",
           "type": "str",
           "default": "fluid",
+          "dir": "read",
           "write": false,
           "description": "Line type: fluid | electric | air | connector"
         },
@@ -805,17 +1674,26 @@
           "name": "_ps_fluid",
           "type": "str",
           "default": "",
+          "dir": "read",
           "write": false,
           "description": "Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)"
         }
+      ],
+      "preview": [
+        [
+          "_ps_medium",
+          "water"
+        ]
       ]
     },
     {
       "widget": "ob-line-end",
       "file": "_widgets/openbridge/ob-line-end.svg",
       "title": "Pipe end",
+      "category": "automation",
       "group": "pipe",
       "element": "obc-end-point-line",
+      "layout": "anchor",
       "size": {
         "width": 48,
         "height": 48
@@ -830,6 +1708,7 @@
           "name": "_ps_direction",
           "type": "str",
           "default": "right",
+          "dir": "read",
           "write": false,
           "description": "Side the closed end faces: top | right | bottom | left"
         },
@@ -837,6 +1716,7 @@
           "name": "_ps_medium",
           "type": "str",
           "default": "normal",
+          "dir": "read",
           "write": false,
           "description": "Pipe content: normal | water | air | empty"
         },
@@ -844,6 +1724,7 @@
           "name": "_ps_lineType",
           "type": "str",
           "default": "fluid",
+          "dir": "read",
           "write": false,
           "description": "Line type: fluid | electric | air | connector"
         },
@@ -851,17 +1732,26 @@
           "name": "_ps_fluid",
           "type": "str",
           "default": "",
+          "dir": "read",
           "write": false,
           "description": "Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)"
         }
+      ],
+      "preview": [
+        [
+          "_ps_medium",
+          "water"
+        ]
       ]
     },
     {
       "widget": "ob-line-flow",
       "file": "_widgets/openbridge/ob-line-flow.svg",
       "title": "Flow arrow (1 cell)",
+      "category": "automation",
       "group": "pipe",
       "element": "obc-direction-line",
+      "layout": "anchor",
       "size": {
         "width": 24,
         "height": 48
@@ -876,6 +1766,7 @@
           "name": "_ps_medium",
           "type": "str",
           "default": "normal",
+          "dir": "read",
           "write": false,
           "description": "Pipe content: normal | water | air | empty"
         },
@@ -883,6 +1774,7 @@
           "name": "_ps_lineType",
           "type": "str",
           "default": "fluid",
+          "dir": "read",
           "write": false,
           "description": "Line type: fluid | electric | air | connector"
         },
@@ -890,10 +1782,1908 @@
           "name": "_ps_fluid",
           "type": "str",
           "default": "",
+          "dir": "read",
           "write": false,
           "description": "Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)"
         }
+      ],
+      "preview": [
+        [
+          "_ps_medium",
+          "water"
+        ]
       ]
+    },
+    {
+      "widget": "ob-gauge-radial",
+      "file": "_widgets/openbridge-instruments/ob-gauge-radial.svg",
+      "title": "Radial gauge",
+      "category": "instruments",
+      "group": "instruments",
+      "element": "obc-gauge-radial",
+      "layout": "fill",
+      "size": {
+        "width": 192,
+        "height": 192
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_value",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Process value"
+        },
+        {
+          "name": "_pn_min",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Scale minimum"
+        },
+        {
+          "name": "_pn_max",
+          "type": "num",
+          "default": "100",
+          "dir": "read",
+          "write": false,
+          "description": "Scale maximum"
+        },
+        {
+          "name": "_pb_hasSetpoint",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Show the setpoint marker"
+        },
+        {
+          "name": "_pn_setpoint",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Setpoint (shown when _pb_hasSetpoint is true)"
+        },
+        {
+          "name": "_ps_type",
+          "type": "str",
+          "default": "filled",
+          "dir": "read",
+          "write": false,
+          "description": "Style: filled | bar | needle"
+        },
+        {
+          "name": "_pb_labels",
+          "type": "bool",
+          "default": "true",
+          "dir": "read",
+          "write": false,
+          "description": "Show scale labels"
+        },
+        {
+          "name": "_ps_priority",
+          "type": "str",
+          "default": "regular",
+          "dir": "read",
+          "write": false,
+          "description": "Colour priority: regular | enhanced"
+        },
+        {
+          "name": "_pb_off",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Instrument off (greyed out)"
+        }
+      ],
+      "preview": [
+        [
+          "_pn_value",
+          60
+        ]
+      ]
+    },
+    {
+      "widget": "ob-gauge-vertical",
+      "file": "_widgets/openbridge-instruments/ob-gauge-vertical.svg",
+      "title": "Vertical gauge (bar)",
+      "category": "instruments",
+      "group": "instruments",
+      "element": "obc-gauge-vertical",
+      "layout": "fill",
+      "size": {
+        "width": 96,
+        "height": 288
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_value",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Process value"
+        },
+        {
+          "name": "_pn_min",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Scale minimum"
+        },
+        {
+          "name": "_pn_max",
+          "type": "num",
+          "default": "100",
+          "dir": "read",
+          "write": false,
+          "description": "Scale maximum"
+        },
+        {
+          "name": "_pb_hasSetpoint",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Show the setpoint marker"
+        },
+        {
+          "name": "_pn_setpoint",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Setpoint (shown when _pb_hasSetpoint is true)"
+        },
+        {
+          "name": "_ps_fillMode",
+          "type": "str",
+          "default": "fill",
+          "dir": "read",
+          "write": false,
+          "description": "Bar fill: fill | tint"
+        },
+        {
+          "name": "_pb_labels",
+          "type": "bool",
+          "default": "true",
+          "dir": "read",
+          "write": false,
+          "description": "Show scale labels"
+        },
+        {
+          "name": "_ps_priority",
+          "type": "str",
+          "default": "regular",
+          "dir": "read",
+          "write": false,
+          "description": "Colour priority: regular | enhanced"
+        },
+        {
+          "name": "_pb_off",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Instrument off (greyed out)"
+        }
+      ],
+      "preview": [
+        [
+          "_pn_value",
+          60
+        ]
+      ]
+    },
+    {
+      "widget": "ob-gauge-horizontal",
+      "file": "_widgets/openbridge-instruments/ob-gauge-horizontal.svg",
+      "title": "Horizontal gauge (bar)",
+      "category": "instruments",
+      "group": "instruments",
+      "element": "obc-gauge-horizontal",
+      "layout": "fill",
+      "size": {
+        "width": 384,
+        "height": 72
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_value",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Process value"
+        },
+        {
+          "name": "_pn_min",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Scale minimum"
+        },
+        {
+          "name": "_pn_max",
+          "type": "num",
+          "default": "100",
+          "dir": "read",
+          "write": false,
+          "description": "Scale maximum"
+        },
+        {
+          "name": "_pb_hasSetpoint",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Show the setpoint marker"
+        },
+        {
+          "name": "_pn_setpoint",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Setpoint (shown when _pb_hasSetpoint is true)"
+        },
+        {
+          "name": "_ps_fillMode",
+          "type": "str",
+          "default": "fill",
+          "dir": "read",
+          "write": false,
+          "description": "Bar fill: fill | tint"
+        },
+        {
+          "name": "_pb_labels",
+          "type": "bool",
+          "default": "true",
+          "dir": "read",
+          "write": false,
+          "description": "Show scale labels"
+        },
+        {
+          "name": "_ps_priority",
+          "type": "str",
+          "default": "regular",
+          "dir": "read",
+          "write": false,
+          "description": "Colour priority: regular | enhanced"
+        },
+        {
+          "name": "_pb_off",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Instrument off (greyed out)"
+        }
+      ],
+      "preview": [
+        [
+          "_pn_value",
+          60
+        ]
+      ]
+    },
+    {
+      "widget": "ob-gauge-trend",
+      "file": "_widgets/openbridge-instruments/ob-gauge-trend.svg",
+      "title": "Trend gauge (live)",
+      "category": "instruments",
+      "group": "instruments",
+      "element": "obc-gauge-trend",
+      "layout": "fill",
+      "size": {
+        "width": 288,
+        "height": 192
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_value",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Process value"
+        },
+        {
+          "name": "_pn_min",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Scale minimum"
+        },
+        {
+          "name": "_pn_max",
+          "type": "num",
+          "default": "100",
+          "dir": "read",
+          "write": false,
+          "description": "Scale maximum"
+        },
+        {
+          "name": "_ps_unit",
+          "type": "str",
+          "default": "",
+          "dir": "read",
+          "write": false,
+          "description": "Engineering unit"
+        },
+        {
+          "name": "_pn_points",
+          "type": "num",
+          "default": "60",
+          "dir": "read",
+          "write": false,
+          "description": "Points kept in the live buffer (60 points at 1 s = last minute)"
+        },
+        {
+          "name": "_pn_interval",
+          "type": "num",
+          "default": "1",
+          "dir": "read",
+          "write": false,
+          "description": "Sampling interval of the live buffer, seconds"
+        },
+        {
+          "name": "_pb_hasSetpoint",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Show the setpoint marker"
+        },
+        {
+          "name": "_pn_setpoint",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Setpoint (shown when _pb_hasSetpoint is true)"
+        },
+        {
+          "name": "_pb_off",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Instrument off (greyed out)"
+        }
+      ],
+      "preview": [
+        [
+          "__series",
+          [
+            40,
+            46,
+            52,
+            55,
+            61,
+            58,
+            63,
+            66,
+            64,
+            70
+          ]
+        ],
+        [
+          "_pn_value",
+          70
+        ]
+      ]
+    },
+    {
+      "widget": "ob-instrument-field",
+      "file": "_widgets/openbridge-instruments/ob-instrument-field.svg",
+      "title": "Instrument field",
+      "category": "instruments",
+      "group": "instruments",
+      "element": "obc-instrument-field",
+      "layout": "start",
+      "size": {
+        "width": 144,
+        "height": 72
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_value",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Process value"
+        },
+        {
+          "name": "_pb_hasSetpoint",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Show the setpoint marker"
+        },
+        {
+          "name": "_pn_setpoint",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Setpoint (shown when _pb_hasSetpoint is true)"
+        },
+        {
+          "name": "_ps_unit",
+          "type": "str",
+          "default": "",
+          "dir": "read",
+          "write": false,
+          "description": "Engineering unit"
+        },
+        {
+          "name": "_ps_tag",
+          "type": "str",
+          "default": "PT-101",
+          "dir": "read",
+          "write": false,
+          "description": "Instrument tag / label"
+        },
+        {
+          "name": "_pn_digits",
+          "type": "num",
+          "default": "3",
+          "dir": "read",
+          "write": false,
+          "description": "Integer digits"
+        },
+        {
+          "name": "_pn_decimals",
+          "type": "num",
+          "default": "1",
+          "dir": "read",
+          "write": false,
+          "description": "Decimal digits"
+        },
+        {
+          "name": "_ps_size",
+          "type": "str",
+          "default": "enhanced",
+          "dir": "read",
+          "write": false,
+          "description": "Size: regular | enhanced"
+        },
+        {
+          "name": "_pb_off",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Instrument off (shows dashes)"
+        }
+      ],
+      "preview": [
+        [
+          "_pn_value",
+          42.5
+        ],
+        [
+          "_ps_unit",
+          "bar"
+        ]
+      ]
+    },
+    {
+      "widget": "ob-circular-progress",
+      "file": "_widgets/openbridge-instruments/ob-circular-progress.svg",
+      "title": "Circular progress",
+      "category": "instruments",
+      "group": "instruments",
+      "element": "obc-circular-progress",
+      "layout": "fill",
+      "size": {
+        "width": 96,
+        "height": 96
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_value",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Progress 0-100 %"
+        }
+      ],
+      "preview": [
+        [
+          "_pn_value",
+          65
+        ]
+      ]
+    },
+    {
+      "widget": "ob-progress-bar",
+      "file": "_widgets/openbridge-instruments/ob-progress-bar.svg",
+      "title": "Progress bar",
+      "category": "instruments",
+      "group": "instruments",
+      "element": "obc-progress-bar",
+      "layout": "hfill",
+      "size": {
+        "width": 240,
+        "height": 48
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_value",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Progress 0-100 %"
+        },
+        {
+          "name": "_pb_showValue",
+          "type": "bool",
+          "default": "true",
+          "dir": "read",
+          "write": false,
+          "description": "Show the value"
+        },
+        {
+          "name": "_pb_showUnit",
+          "type": "bool",
+          "default": "true",
+          "dir": "read",
+          "write": false,
+          "description": "Show the % unit"
+        }
+      ],
+      "preview": [
+        [
+          "_pn_value",
+          65
+        ]
+      ]
+    },
+    {
+      "widget": "ob-line-graph",
+      "file": "_widgets/openbridge-charts/ob-line-graph.svg",
+      "title": "Line graph (live)",
+      "category": "charts",
+      "group": "charts",
+      "element": "obc-line-graph",
+      "layout": "fill",
+      "size": {
+        "width": 384,
+        "height": 240
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_value",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Process value"
+        },
+        {
+          "name": "_ps_unit",
+          "type": "str",
+          "default": "",
+          "dir": "read",
+          "write": false,
+          "description": "Engineering unit"
+        },
+        {
+          "name": "_pn_points",
+          "type": "num",
+          "default": "60",
+          "dir": "read",
+          "write": false,
+          "description": "Points kept in the live buffer (60 points at 1 s = last minute)"
+        },
+        {
+          "name": "_pn_interval",
+          "type": "num",
+          "default": "1",
+          "dir": "read",
+          "write": false,
+          "description": "Sampling interval of the live buffer, seconds"
+        },
+        {
+          "name": "_ps_lineMode",
+          "type": "str",
+          "default": "smooth",
+          "dir": "read",
+          "write": false,
+          "description": "Line: smooth | straight | stepped"
+        },
+        {
+          "name": "_pb_grid",
+          "type": "bool",
+          "default": "true",
+          "dir": "read",
+          "write": false,
+          "description": "Show grid"
+        }
+      ],
+      "preview": [
+        [
+          "__series",
+          [
+            12,
+            18,
+            15,
+            22,
+            30,
+            27,
+            35,
+            31,
+            38,
+            42,
+            40,
+            47
+          ]
+        ],
+        [
+          "_pn_value",
+          47
+        ]
+      ]
+    },
+    {
+      "widget": "ob-area-graph",
+      "file": "_widgets/openbridge-charts/ob-area-graph.svg",
+      "title": "Area graph (live)",
+      "category": "charts",
+      "group": "charts",
+      "element": "obc-area-graph",
+      "layout": "fill",
+      "size": {
+        "width": 384,
+        "height": 240
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_value",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Process value"
+        },
+        {
+          "name": "_ps_unit",
+          "type": "str",
+          "default": "",
+          "dir": "read",
+          "write": false,
+          "description": "Engineering unit"
+        },
+        {
+          "name": "_pn_points",
+          "type": "num",
+          "default": "60",
+          "dir": "read",
+          "write": false,
+          "description": "Points kept in the live buffer (60 points at 1 s = last minute)"
+        },
+        {
+          "name": "_pn_interval",
+          "type": "num",
+          "default": "1",
+          "dir": "read",
+          "write": false,
+          "description": "Sampling interval of the live buffer, seconds"
+        },
+        {
+          "name": "_ps_lineMode",
+          "type": "str",
+          "default": "smooth",
+          "dir": "read",
+          "write": false,
+          "description": "Line: smooth | straight | stepped"
+        },
+        {
+          "name": "_pb_grid",
+          "type": "bool",
+          "default": "true",
+          "dir": "read",
+          "write": false,
+          "description": "Show grid"
+        }
+      ],
+      "preview": [
+        [
+          "__series",
+          [
+            12,
+            18,
+            15,
+            22,
+            30,
+            27,
+            35,
+            31,
+            38,
+            42,
+            40,
+            47
+          ]
+        ],
+        [
+          "_pn_value",
+          47
+        ]
+      ]
+    },
+    {
+      "widget": "ob-pie-chart",
+      "file": "_widgets/openbridge-charts/ob-pie-chart.svg",
+      "title": "Pie chart",
+      "category": "charts",
+      "group": "charts",
+      "element": "obc-pie-chart",
+      "layout": "fill",
+      "size": {
+        "width": 240,
+        "height": 240
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_value1",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Slice 1 value"
+        },
+        {
+          "name": "_ps_label1",
+          "type": "str",
+          "default": "A",
+          "dir": "read",
+          "write": false,
+          "description": "Slice 1 label (empty = slice hidden)"
+        },
+        {
+          "name": "_pn_value2",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Slice 2 value"
+        },
+        {
+          "name": "_ps_label2",
+          "type": "str",
+          "default": "B",
+          "dir": "read",
+          "write": false,
+          "description": "Slice 2 label (empty = slice hidden)"
+        },
+        {
+          "name": "_pn_value3",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Slice 3 value"
+        },
+        {
+          "name": "_ps_label3",
+          "type": "str",
+          "default": "C",
+          "dir": "read",
+          "write": false,
+          "description": "Slice 3 label (empty = slice hidden)"
+        },
+        {
+          "name": "_pn_value4",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Slice 4 value"
+        },
+        {
+          "name": "_ps_label4",
+          "type": "str",
+          "default": "",
+          "dir": "read",
+          "write": false,
+          "description": "Slice 4 label (empty = slice hidden)"
+        },
+        {
+          "name": "_pb_legend",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Show legend"
+        }
+      ],
+      "preview": [
+        [
+          "_pn_value1",
+          40
+        ],
+        [
+          "_pn_value2",
+          30
+        ],
+        [
+          "_pn_value3",
+          20
+        ]
+      ]
+    },
+    {
+      "widget": "ob-donut-chart",
+      "file": "_widgets/openbridge-charts/ob-donut-chart.svg",
+      "title": "Donut chart",
+      "category": "charts",
+      "group": "charts",
+      "element": "obc-donut-chart",
+      "layout": "fill",
+      "size": {
+        "width": 240,
+        "height": 240
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_value1",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Slice 1 value"
+        },
+        {
+          "name": "_ps_label1",
+          "type": "str",
+          "default": "A",
+          "dir": "read",
+          "write": false,
+          "description": "Slice 1 label (empty = slice hidden)"
+        },
+        {
+          "name": "_pn_value2",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Slice 2 value"
+        },
+        {
+          "name": "_ps_label2",
+          "type": "str",
+          "default": "B",
+          "dir": "read",
+          "write": false,
+          "description": "Slice 2 label (empty = slice hidden)"
+        },
+        {
+          "name": "_pn_value3",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Slice 3 value"
+        },
+        {
+          "name": "_ps_label3",
+          "type": "str",
+          "default": "C",
+          "dir": "read",
+          "write": false,
+          "description": "Slice 3 label (empty = slice hidden)"
+        },
+        {
+          "name": "_pn_value4",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Slice 4 value"
+        },
+        {
+          "name": "_ps_label4",
+          "type": "str",
+          "default": "",
+          "dir": "read",
+          "write": false,
+          "description": "Slice 4 label (empty = slice hidden)"
+        },
+        {
+          "name": "_pn_max",
+          "type": "num",
+          "default": "100",
+          "dir": "read",
+          "write": false,
+          "description": "Total of the ring (slices are drawn against it)"
+        },
+        {
+          "name": "_ps_centerLabel",
+          "type": "str",
+          "default": "Total",
+          "dir": "read",
+          "write": false,
+          "description": "Label under the centre value"
+        },
+        {
+          "name": "_ps_unit",
+          "type": "str",
+          "default": "%",
+          "dir": "read",
+          "write": false,
+          "description": "Unit of the centre value"
+        },
+        {
+          "name": "_pb_legend",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Show legend"
+        }
+      ],
+      "preview": [
+        [
+          "_pn_value1",
+          40
+        ],
+        [
+          "_pn_value2",
+          30
+        ],
+        [
+          "_pn_value3",
+          20
+        ]
+      ]
+    },
+    {
+      "widget": "ob-radial-bar-chart",
+      "file": "_widgets/openbridge-charts/ob-radial-bar-chart.svg",
+      "title": "Radial bar chart",
+      "category": "charts",
+      "group": "charts",
+      "element": "obc-radial-bar-chart",
+      "layout": "fill",
+      "size": {
+        "width": 240,
+        "height": 240
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_value1",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Ring 1 value"
+        },
+        {
+          "name": "_pn_value2",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Ring 2 value"
+        },
+        {
+          "name": "_pn_value3",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Ring 3 value"
+        },
+        {
+          "name": "_pn_rings",
+          "type": "num",
+          "default": "3",
+          "dir": "read",
+          "write": false,
+          "description": "Rings shown (1-3)"
+        },
+        {
+          "name": "_pn_max",
+          "type": "num",
+          "default": "100",
+          "dir": "read",
+          "write": false,
+          "description": "Full-scale value of every ring"
+        }
+      ],
+      "preview": [
+        [
+          "_pn_value1",
+          80
+        ],
+        [
+          "_pn_value2",
+          55
+        ],
+        [
+          "_pn_value3",
+          30
+        ]
+      ]
+    },
+    {
+      "widget": "ob-button",
+      "file": "_widgets/openbridge-controls/ob-button.svg",
+      "title": "Command button",
+      "category": "controls",
+      "group": "controls",
+      "element": "obc-button",
+      "layout": "hfill",
+      "size": {
+        "width": 144,
+        "height": 48
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_command",
+          "type": "num",
+          "default": "0",
+          "dir": "write",
+          "write": true,
+          "description": "Written on click with the value of _pn_pressValue"
+        },
+        {
+          "name": "_pn_pressValue",
+          "type": "num",
+          "default": "1",
+          "dir": "read",
+          "write": false,
+          "description": "Value written to _pn_command on click"
+        },
+        {
+          "name": "_ps_label",
+          "type": "str",
+          "default": "Start",
+          "dir": "read",
+          "write": false,
+          "description": "Button text"
+        },
+        {
+          "name": "_ps_variant",
+          "type": "str",
+          "default": "normal",
+          "dir": "read",
+          "write": false,
+          "description": "Style: normal | raised | flat"
+        },
+        {
+          "name": "_pb_disabled",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Disabled (operator cannot act)"
+        }
+      ],
+      "preview": []
+    },
+    {
+      "widget": "ob-start-stop",
+      "file": "_widgets/openbridge-controls/ob-start-stop.svg",
+      "title": "Start/stop switch",
+      "category": "controls",
+      "group": "controls",
+      "element": "obc-start-stop-switch",
+      "layout": "hfill",
+      "size": {
+        "width": 240,
+        "height": 48
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pb_running",
+          "type": "bool",
+          "default": "false",
+          "dir": "rw",
+          "write": true,
+          "description": "Running state; slide to start/stop writes it (1/0)"
+        },
+        {
+          "name": "_ps_size",
+          "type": "str",
+          "default": "regular",
+          "dir": "read",
+          "write": false,
+          "description": "Size: regular | large"
+        },
+        {
+          "name": "_pb_alarm",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Alarm state"
+        },
+        {
+          "name": "_pb_disabled",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Disabled (operator cannot act)"
+        }
+      ],
+      "preview": [
+        [
+          "_pb_running",
+          1
+        ]
+      ]
+    },
+    {
+      "widget": "ob-toggle-switch",
+      "file": "_widgets/openbridge-controls/ob-toggle-switch.svg",
+      "title": "Toggle switch",
+      "category": "controls",
+      "group": "controls",
+      "element": "obc-toggle-switch",
+      "layout": "hfill",
+      "size": {
+        "width": 240,
+        "height": 48
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pb_value",
+          "type": "bool",
+          "default": "false",
+          "dir": "rw",
+          "write": true,
+          "description": "On/off state, written (1/0) when toggled"
+        },
+        {
+          "name": "_ps_label",
+          "type": "str",
+          "default": "Auto",
+          "dir": "read",
+          "write": false,
+          "description": "Label"
+        },
+        {
+          "name": "_pb_disabled",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Disabled (operator cannot act)"
+        }
+      ],
+      "preview": [
+        [
+          "_pb_value",
+          1
+        ]
+      ]
+    },
+    {
+      "widget": "ob-slider",
+      "file": "_widgets/openbridge-controls/ob-slider.svg",
+      "title": "Setpoint slider",
+      "category": "controls",
+      "group": "controls",
+      "element": "obc-slider",
+      "layout": "hfill",
+      "size": {
+        "width": 288,
+        "height": 48
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_value",
+          "type": "num",
+          "default": "50",
+          "dir": "rw",
+          "write": true,
+          "description": "Setpoint, written while dragging (debounced)"
+        },
+        {
+          "name": "_pn_min",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Minimum"
+        },
+        {
+          "name": "_pn_max",
+          "type": "num",
+          "default": "100",
+          "dir": "read",
+          "write": false,
+          "description": "Maximum"
+        },
+        {
+          "name": "_pn_step",
+          "type": "num",
+          "default": "1",
+          "dir": "read",
+          "write": false,
+          "description": "Step"
+        },
+        {
+          "name": "_pn_stepClick",
+          "type": "num",
+          "default": "10",
+          "dir": "read",
+          "write": false,
+          "description": "Step of the -/+ buttons (enhanced variant)"
+        },
+        {
+          "name": "_ps_variant",
+          "type": "str",
+          "default": "normal",
+          "dir": "read",
+          "write": false,
+          "description": "Style: normal | enhanced (with -/+ buttons) | no-input (read only)"
+        },
+        {
+          "name": "_pb_disabled",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Disabled (operator cannot act)"
+        }
+      ],
+      "preview": [
+        [
+          "_pn_value",
+          40
+        ]
+      ]
+    },
+    {
+      "widget": "ob-number-input",
+      "file": "_widgets/openbridge-controls/ob-number-input.svg",
+      "title": "Number input",
+      "category": "controls",
+      "group": "controls",
+      "element": "obc-number-input-field",
+      "layout": "hfill",
+      "size": {
+        "width": 192,
+        "height": 48
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_value",
+          "type": "num",
+          "default": "0",
+          "dir": "rw",
+          "write": true,
+          "description": "Value, written on Enter or when the field loses focus"
+        },
+        {
+          "name": "_pn_decimals",
+          "type": "num",
+          "default": "1",
+          "dir": "read",
+          "write": false,
+          "description": "Decimals shown"
+        },
+        {
+          "name": "_ps_unit",
+          "type": "str",
+          "default": "",
+          "dir": "read",
+          "write": false,
+          "description": "Engineering unit"
+        },
+        {
+          "name": "_pb_disabled",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Disabled (operator cannot act)"
+        }
+      ],
+      "preview": [
+        [
+          "_pn_value",
+          12.5
+        ],
+        [
+          "_ps_unit",
+          "bar"
+        ]
+      ]
+    },
+    {
+      "widget": "ob-mode-selector",
+      "file": "_widgets/openbridge-controls/ob-mode-selector.svg",
+      "title": "Mode selector (3 options)",
+      "category": "controls",
+      "group": "controls",
+      "element": "obc-toggle-button-group",
+      "layout": "hfill",
+      "size": {
+        "width": 288,
+        "height": 48
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_value",
+          "type": "num",
+          "default": "0",
+          "dir": "rw",
+          "write": true,
+          "description": "Selected option index 0, 1, 2 (written on selection)"
+        },
+        {
+          "name": "_ps_option1",
+          "type": "str",
+          "default": "Man",
+          "dir": "read",
+          "write": false,
+          "description": "Option 0 text"
+        },
+        {
+          "name": "_ps_option2",
+          "type": "str",
+          "default": "Auto",
+          "dir": "read",
+          "write": false,
+          "description": "Option 1 text"
+        },
+        {
+          "name": "_ps_option3",
+          "type": "str",
+          "default": "Off",
+          "dir": "read",
+          "write": false,
+          "description": "Option 2 text (empty = only two options)"
+        },
+        {
+          "name": "_pb_disabled",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Disabled (operator cannot act)"
+        }
+      ],
+      "preview": [
+        [
+          "_pn_value",
+          1
+        ]
+      ]
+    },
+    {
+      "widget": "ob-check-button",
+      "file": "_widgets/openbridge-controls/ob-check-button.svg",
+      "title": "Check button",
+      "category": "controls",
+      "group": "controls",
+      "element": "obc-check-button",
+      "layout": "hfill",
+      "size": {
+        "width": 144,
+        "height": 48
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pb_value",
+          "type": "bool",
+          "default": "false",
+          "dir": "rw",
+          "write": true,
+          "description": "Checked state, written (1/0) on click"
+        },
+        {
+          "name": "_ps_label",
+          "type": "str",
+          "default": "Bypass",
+          "dir": "read",
+          "write": false,
+          "description": "Button text"
+        },
+        {
+          "name": "_ps_type",
+          "type": "str",
+          "default": "regular",
+          "dir": "read",
+          "write": false,
+          "description": "Style: regular | checkbox"
+        },
+        {
+          "name": "_pb_disabled",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Disabled (operator cannot act)"
+        }
+      ],
+      "preview": []
+    },
+    {
+      "widget": "ob-ok-nok",
+      "file": "_widgets/openbridge-controls/ob-ok-nok.svg",
+      "title": "OK / NOK selector",
+      "category": "controls",
+      "group": "controls",
+      "element": "obc-toggle-button-three-state",
+      "layout": "start",
+      "size": {
+        "width": 144,
+        "height": 48
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_value",
+          "type": "num",
+          "default": "0",
+          "dir": "rw",
+          "write": true,
+          "description": "State 0 = none, 1 = OK, 2 = NOK (written on selection)"
+        },
+        {
+          "name": "_pb_disabled",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Disabled (operator cannot act)"
+        }
+      ],
+      "preview": [
+        [
+          "_pn_value",
+          1
+        ]
+      ]
+    },
+    {
+      "widget": "ob-alert-icon",
+      "file": "_widgets/openbridge-alerts/ob-alert-icon.svg",
+      "title": "Alert icon",
+      "category": "alerts",
+      "group": "alerts",
+      "element": "obc-alert-icon",
+      "layout": "center",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pb_active",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Alert active (icon shown in colour; hidden when inactive and _pb_hideInactive)"
+        },
+        {
+          "name": "_pb_acknowledged",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Acknowledged"
+        },
+        {
+          "name": "_ps_type",
+          "type": "str",
+          "default": "alarm",
+          "dir": "read",
+          "write": false,
+          "description": "Type: alarm | warning | caution"
+        },
+        {
+          "name": "_pb_hideInactive",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Hide the icon while the alert is not active"
+        }
+      ],
+      "preview": [
+        [
+          "_pb_active",
+          1
+        ]
+      ]
+    },
+    {
+      "widget": "ob-alert-button",
+      "file": "_widgets/openbridge-alerts/ob-alert-button.svg",
+      "title": "Alert button (counter)",
+      "category": "alerts",
+      "group": "alerts",
+      "element": "obc-alert-button",
+      "layout": "start",
+      "size": {
+        "width": 144,
+        "height": 48
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_count",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Number of active alerts"
+        },
+        {
+          "name": "_ps_type",
+          "type": "str",
+          "default": "alarm",
+          "dir": "read",
+          "write": false,
+          "description": "Highest alert type: alarm | warning | caution (idle when count is 0)"
+        },
+        {
+          "name": "_pb_blinking",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Blink (unacknowledged alerts)"
+        },
+        {
+          "name": "_pb_command",
+          "type": "bool",
+          "default": "false",
+          "dir": "write",
+          "write": true,
+          "description": "Written 1 on click (e.g. acknowledge / silence request)"
+        }
+      ],
+      "preview": [
+        [
+          "_pn_count",
+          3
+        ]
+      ]
+    },
+    {
+      "widget": "ob-alert-frame",
+      "file": "_widgets/openbridge-alerts/ob-alert-frame.svg",
+      "title": "Alert frame",
+      "category": "alerts",
+      "group": "alerts",
+      "element": "obc-alert-frame",
+      "layout": "fill",
+      "size": {
+        "width": 192,
+        "height": 120
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pb_active",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Frame visible (alert active); place it around the equipment"
+        },
+        {
+          "name": "_ps_status",
+          "type": "str",
+          "default": "alarm",
+          "dir": "read",
+          "write": false,
+          "description": "Type: alarm | warning | caution"
+        },
+        {
+          "name": "_ps_thickness",
+          "type": "str",
+          "default": "regular",
+          "dir": "read",
+          "write": false,
+          "description": "Border: regular | thick"
+        }
+      ],
+      "preview": [
+        [
+          "_pb_active",
+          1
+        ]
+      ]
+    },
+    {
+      "widget": "ob-status-indicator",
+      "file": "_widgets/openbridge-alerts/ob-status-indicator.svg",
+      "title": "Status indicator",
+      "category": "alerts",
+      "group": "alerts",
+      "element": "obc-status-indicator",
+      "layout": "center",
+      "size": {
+        "width": 48,
+        "height": 24
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_state",
+          "type": "num",
+          "default": "1",
+          "dir": "read",
+          "write": false,
+          "description": "State: 0 inactive, 1 active, 2 running, 3 caution, 4 warning, 5 alarm"
+        }
+      ],
+      "preview": [
+        [
+          "_pn_state",
+          2
+        ]
+      ]
+    },
+    {
+      "widget": "ob-badge",
+      "file": "_widgets/openbridge-alerts/ob-badge.svg",
+      "title": "Badge (count)",
+      "category": "alerts",
+      "group": "alerts",
+      "element": "obc-badge",
+      "layout": "center",
+      "size": {
+        "width": 48,
+        "height": 48
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pn_number",
+          "type": "num",
+          "default": "0",
+          "dir": "read",
+          "write": false,
+          "description": "Number shown"
+        },
+        {
+          "name": "_ps_type",
+          "type": "str",
+          "default": "alarm",
+          "dir": "read",
+          "write": false,
+          "description": "Type: alarm | warning | caution | running | notification | regular | automation"
+        },
+        {
+          "name": "_ps_size",
+          "type": "str",
+          "default": "large",
+          "dir": "read",
+          "write": false,
+          "description": "Size: regular | large"
+        },
+        {
+          "name": "_pb_hideZero",
+          "type": "bool",
+          "default": "true",
+          "dir": "read",
+          "write": false,
+          "description": "Hide the badge when the number is 0"
+        }
+      ],
+      "preview": [
+        [
+          "_pn_number",
+          5
+        ]
+      ]
+    },
+    {
+      "widget": "ob-tag",
+      "file": "_widgets/openbridge-alerts/ob-tag.svg",
+      "title": "Tag label",
+      "category": "alerts",
+      "group": "alerts",
+      "element": "obc-tag",
+      "layout": "start",
+      "size": {
+        "width": 96,
+        "height": 48
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_ps_label",
+          "type": "str",
+          "default": "AUTO",
+          "dir": "read",
+          "write": false,
+          "description": "Text (bind a string tag for live state text)"
+        },
+        {
+          "name": "_ps_color",
+          "type": "str",
+          "default": "blue",
+          "dir": "read",
+          "write": false,
+          "description": "Colour: gray | blue | cyan | teal | green | yellow | orange | red | magenta | purple"
+        }
+      ],
+      "preview": []
+    },
+    {
+      "widget": "ob-clock",
+      "file": "_widgets/openbridge-alerts/ob-clock.svg",
+      "title": "Clock",
+      "category": "alerts",
+      "group": "alerts",
+      "element": "obc-clock",
+      "layout": "start",
+      "size": {
+        "width": 144,
+        "height": 48
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "stretch": null,
+      "properties": [
+        {
+          "name": "_pb_seconds",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Show seconds"
+        },
+        {
+          "name": "_pb_date",
+          "type": "bool",
+          "default": "false",
+          "dir": "read",
+          "write": false,
+          "description": "Show the date"
+        }
+      ],
+      "preview": []
     }
   ]
 }

@@ -8,7 +8,7 @@ Web-based SCADA/HMI platform for industrial automation, with AI-assisted page bu
 
 ScadaCraft is a fork of [FUXA](https://github.com/frangoteam/FUXA) by frangoteam, extended with:
 
-- **OpenBridge process graphics** — pumps, valves, tanks, readouts and pipes from the OpenBridge design system, on a 24 px P&ID grid ([guide](docs/openbridge.md), [widget reference](docs/openbridge-widgets.md))
+- **OpenBridge widget libraries** — 49 widgets from the OpenBridge design system in five editor libraries: P&ID equipment and pipes on a 24 px grid, instruments, live charts, operator controls and alerts, all bindable to tags ([guide](docs/openbridge.md), [widget reference](docs/openbridge-widgets.md))
 - **HTML widgets with custom properties** — import custom HTML pages (AVEVA-style custom properties) and bind them to tags *(planned)*
 - **MCP server** — an AI assistant manages the whole project: devices and tags (Modbus, S7, OPC UA, MQTT, …), alarms, P&ID pages, live and historical data, export/import ([mcp/](mcp/README.md))
 

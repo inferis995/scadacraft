@@ -2,6 +2,8 @@
  * ScadaCraft page-building operations on top of the REST client.
  * Placement follows the OpenBridge P&ID anchor model (docs/openbridge.md):
  * a widget is placed so that its anchor lies on grid node (x, y) = pixel (x*24, y*24).
+ * Non-P&ID widgets (instruments, charts, controls, alerts) are anchored at their top-left corner
+ * and can be given any box size in whole cells.
  */
 import { ScadaCraftClient } from '../fuxa/client.js';
 import { allTags, resolveTag } from '../fuxa/tags.js';
@@ -10,6 +12,7 @@ import {
 } from '../fuxa/view.js';
 import type { Catalog, CatalogWidget, GaugeSettings, Project, View, WidgetProperty } from '../fuxa/types.js';
 
+/** folder of the catalog (widgets.json); the widgets themselves live in one folder per library */
 export const WIDGET_GROUP_PATH = '/_widgets/openbridge';
 
 export interface Node { x: number; y: number }
@@ -21,6 +24,8 @@ export interface PlaceSpec {
   widget: string;
   node: Node;
   length?: number;
+  /** box size in grid cells, for resizable (non-P&ID) widgets */
+  size?: { width: number; height: number };
   name?: string;
   properties?: Record<string, PropertyValue>;
 }
@@ -191,6 +196,14 @@ export class PagesService {
         } else if (w.stretch === 'x') width = spec.length * g;
         else height = spec.length * g;
       }
+      if (spec.size !== undefined) {
+        if (w.layout === 'anchor') {
+          warnings.push(`${w.widget}: "size" ignored (P&ID symbols keep their OpenBridge size; use "length" for straight pipes).`);
+        } else {
+          width = spec.size.width * g;
+          height = spec.size.height * g;
+        }
+      }
       const x = spec.node.x * g - w.anchor.x;
       const y = spec.node.y * g - w.anchor.y;
       const ax = spec.node.x * g;
@@ -204,7 +217,7 @@ export class PagesService {
         warnings.push(`${w.widget} at node (${spec.node.x}, ${spec.node.y}): part of its box is outside the view and may be clipped.`);
       }
       const { id, item } = buildWidgetItem({
-        widget: w, svgSource: await this.widgetSvg(w), address: `${WIDGET_GROUP_PATH.slice(1)}/${w.widget}.svg`,
+        widget: w, svgSource: await this.widgetSvg(w), address: w.file,
         x, y, width, height, name: spec.name,
       });
       if (spec.properties) this.applyProperties(project, item, w, spec.properties);

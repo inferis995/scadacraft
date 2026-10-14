@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="ob_root" width="24" height="48" viewBox="0 0 24 48" overflow="visible">
   <desc>ScadaCraft OpenBridge widget: Flow arrow (1 cell) (obc-direction-line, OpenBridge 1.0.0, Apache-2.0).
-Box 24x48 px, anchor at (0,24).
+Library: OpenBridge · Automation (P&amp;ID). Box 24x48 px, anchor at (0,24).
 Bindable properties:
-  _ps_medium (default 'normal'): Pipe content: normal | water | air | empty
-  _ps_lineType (default 'fluid'): Line type: fluid | electric | air | connector
-  _ps_fluid (default ''): Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)</desc>
+  _ps_medium (default 'normal', read): Pipe content: normal | water | air | empty
+  _ps_lineType (default 'fluid', read): Line type: fluid | electric | air | connector
+  _ps_fluid (default '', read): Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)</desc>
   <rect id="ob_bg" x="0" y="0" width="24" height="48" fill="none" />
   <image id="ob_preview" x="0" y="0" width="24" height="48" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAABgCAYAAABbjPFwAAAB90lEQVR4nOyYz0pCQRTGZ26FBG18gWptbxAZvYJ/NvkcBW0iy02gz+FOQWjXJpB6gQi3uQ5y1UKSbueImphg3M7cD+H7bWY4A5fvx7kz98+mW3M23ZpDATQUQEMBNBRAQwE0FEBDATQUQEMBNBRAQwE0FEBDATQUQEMBNBRAQwE0JgLFYrHqvb+ar8VxPJBavtVqvbiAbDgDer3eQy6X25Hp4bQm4bdF4lTqd7L+5gJhIqBIyHuEhJmAgpAwFVDSljAXUNKU8KVSKXaGSMhqu92+1rlcuy7D2cL67HSqVCrZ4XDYlfKBS0jkjJFw1XK5PA4tIc9laCysZ0WiK3IHzWZzkMlk8lJOfNT6y8e+aQd+rhyf1w73x+FXdeKi289uRS5RJ8w7MCP29cun1z914ja/N/j8cok6EU5ASUEirIASWCK8gNPt4Hemcwn78Wvd+3g0GiXKEv5tNPaNm6Pdqk6XvfQJ7xL+pNPpPCfZzGEFJHztaFdvmyDhlXACKYRXzJ/EExqTDbsy/H+fxiE6kFp4xbtArArvjAhyjBYKhbNln5gyHFuGV8xvIQ0fRVF9vhby+9hUIO3wipkAIrxiIoAKrwQ7hdKCf+bQUAANBdBQAA0F0FAADQXQUAANBdBQAA0F0FAADQXQUAANBdBQAA0F0Ky9wDcAAAD//yxbHZcAAAAGSURBVAMAMoU/pILbz+IAAAAASUVORK5CYII=" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAABgCAYAAABbjPFwAAAB90lEQVR4nOyYz0pCQRTGZ26FBG18gWptbxAZvYJ/NvkcBW0iy02gz+FOQWjXJpB6gQi3uQ5y1UKSbueImphg3M7cD+H7bWY4A5fvx7kz98+mW3M23ZpDATQUQEMBNBRAQwE0FEBDATQUQEMBNBRAQwE0FEBDATQUQEMBNBRAQwE0JgLFYrHqvb+ar8VxPJBavtVqvbiAbDgDer3eQy6X25Hp4bQm4bdF4lTqd7L+5gJhIqBIyHuEhJmAgpAwFVDSljAXUNKU8KVSKXaGSMhqu92+1rlcuy7D2cL67HSqVCrZ4XDYlfKBS0jkjJFw1XK5PA4tIc9laCysZ0WiK3IHzWZzkMlk8lJOfNT6y8e+aQd+rhyf1w73x+FXdeKi289uRS5RJ8w7MCP29cun1z914ja/N/j8cok6EU5ASUEirIASWCK8gNPt4Hemcwn78Wvd+3g0GiXKEv5tNPaNm6Pdqk6XvfQJ7xL+pNPpPCfZzGEFJHztaFdvmyDhlXACKYRXzJ/EExqTDbsy/H+fxiE6kFp4xbtArArvjAhyjBYKhbNln5gyHFuGV8xvIQ0fRVF9vhby+9hUIO3wipkAIrxiIoAKrwQ7hdKCf+bQUAANBdBQAA0F0FAADQXQUAANBdBQAA0F0FAADQXQUAANBdBQAA0F0Ky9wDcAAAD//yxbHZcAAAAGSURBVAMAMoU/pILbz+IAAAAASUVORK5CYII=" />
   <foreignObject id="ob_fo" x="0" y="0" width="24" height="48" overflow="visible">
@@ -18,6 +18,8 @@ let _ps_medium = 'normal';
 let _ps_lineType = 'fluid';
 let _ps_fluid = '';
 //!export-end
+
+var __busyUntil = 0;
 
 function toBool(v) {
     if (v === true || v === 1) return true;

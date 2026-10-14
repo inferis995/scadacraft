@@ -1,7 +1,8 @@
 # OpenBridge in ScadaCraft — design and usage guide
 
-ScadaCraft uses the [OpenBridge](https://www.openbridge.no) design system for process
-graphics: pumps, valves, tanks, readouts and pipes drawn to a common industrial HMI standard.
+ScadaCraft uses the [OpenBridge](https://www.openbridge.no) design system for its HMI
+widgets: process graphics (pumps, valves, tanks, readouts, pipes), instruments, charts,
+operator controls and alerts, drawn to a common industrial HMI standard.
 This guide explains how the components are placed, connected, bound to tags and themed.
 The full list of widgets and properties is in the generated
 [widget reference](openbridge-widgets.md).
@@ -10,14 +11,28 @@ The full list of widgets and properties is in the generated
 
 | Item | Location |
 | --- | --- |
-| OpenBridge web components, automation subset (version in `VERSION`) | `client/src/assets/lib/openbridge/` |
+| OpenBridge web components used by the widgets (version in `VERSION`) | `client/src/assets/lib/openbridge/` |
 | ScadaCraft fixes on top of OpenBridge | `client/src/assets/lib/openbridge/scadacraft-openbridge.css` |
-| Editor widgets (library group **openbridge**) | `server/_widgets/openbridge/*.svg` |
+| Editor widgets, one library group per OpenBridge category | `server/_widgets/openbridge*/*.svg` |
+| Library title, order and item names (read by the editor) | `server/_widgets/openbridge*/group.json` |
 | Machine-readable catalog (used by tooling and the MCP server) | `server/_widgets/openbridge/widgets.json` |
 | Build and generation tools | `tools/openbridge/` |
 
-**Components:** pump, motor, fan, on/off valve, control valve, tank, readout; horizontal and
-vertical pipe, elbow, tee, cross (junction), crossover (no junction), pipe end, flow arrow.
+The editor's **Widgets** panel shows five libraries, split the way OpenBridge splits its
+components:
+
+| Library | Folder | Widgets |
+| --- | --- | --- |
+| **OpenBridge · Automation (P&ID)** | `openbridge` | pump, motor, fan, on/off valve, control valve, damper, filter, converter/drive, transformer, breaker/switch, power source, ground, tank, readout; horizontal and vertical pipe, elbow, tee, cross (junction), crossover (no junction), pipe end, flow arrow |
+| **OpenBridge · Instruments** | `openbridge-instruments` | radial gauge, vertical and horizontal bar gauge, trend gauge, instrument field, circular progress, progress bar |
+| **OpenBridge · Charts** | `openbridge-charts` | live line graph, live area graph, pie chart, donut chart, radial bar chart |
+| **OpenBridge · Controls** | `openbridge-controls` | command button, start/stop switch, toggle switch, setpoint slider, number input, mode selector (3 options), check button, OK/NOK selector |
+| **OpenBridge · Alerts and status** | `openbridge-alerts` | alert icon, alert button with counter, alert frame, status indicator, badge, tag label, clock |
+
+![Widget libraries in the editor](images/openbridge-libraries.png)
+
+Not included: augmented-reality components and maritime navigation instruments (compass,
+rudder, thrusters, wind…), which have no use in plant automation.
 
 ## 2. Licensing
 
@@ -32,7 +47,10 @@ commercial license is in place. The license text and notice are in
 
 ## 3. The placement model
 
-OpenBridge defines a *P&ID anchor point model*. ScadaCraft follows it exactly.
+OpenBridge defines a *P&ID anchor point model* for process graphics. ScadaCraft follows it
+exactly for the Automation library. Widgets of the other libraries are not part of the pipe
+network: they are placed by their **top-left corner** on a grid node and **fill their box**,
+so they can be resized freely (keep the box on whole cells for a tidy layout).
 
 ### 3.1 Grid
 
@@ -51,7 +69,7 @@ Each component has an anchor: the point that must sit on a grid node.
 
 | Component | Anchor |
 | --- | --- |
-| Pump, motor, fan, on/off valve, control valve | Centre of the icon |
+| Pump, motor, fan, on/off valve, control valve, damper, filter, converter, transformer, breaker, source, ground | Centre of the icon |
 | Tank | Top-centre of the tank body |
 | Readout | End of the connection tick |
 | Horizontal / vertical pipe, flow arrow | Start of the pipe axis (left end / top end) |
@@ -72,7 +90,7 @@ The anchor of every widget is listed in the [reference](openbridge-widgets.md) a
 
 ### 3.3 Sizes
 
-- Devices (pump, motor, fan, valves) have an icon of **one cell radius**: the icon covers
+- Devices (pump, motor, fan, valves and the other equipment) have an icon of **one cell radius**: the icon covers
   the node and half of each neighbouring cell. Readouts, badges and the ID tag are drawn
   around it inside the 120 × 120 box.
 - The tank body is 168 px wide (7 cells), centred on its anchor.
@@ -118,7 +136,9 @@ A tank feeding a pump, a control valve and a discharge line (nodes in grid units
 
 Straight pipes follow their widget size: resizing a horizontal pipe in the editor changes
 its length in whole cells (`round(width / 24)`), it does not scale the drawing. Keep pipe
-boxes at multiples of 24 px. Other widgets have a fixed size and should not be resized.
+boxes at multiples of 24 px. The other P&ID symbols have a fixed size and should not be
+resized. Instruments, charts, controls and alerts re-lay out to any box size (charts and
+gauges redraw at the new size, buttons and switches take the box width).
 
 ## 5. Binding to tags
 
@@ -135,6 +155,34 @@ and set a fixed value.
 the symbol writes `1` (start/open) or `0` (stop/close) to the bound tag, computed as the
 opposite of the current feedback (`_pb_running` or `_pb_open`). The symbol only changes
 when the feedback tag changes, so the operator always sees the real state of the equipment.
+
+Pumps, motors, fans, on/off valves, dampers, converters and breakers work this way.
+
+**Operator controls** (Controls library) are read/write: the same property shows the tag and
+is written when the operator acts, so a setpoint or a mode needs a single binding.
+
+| Widget | Property (read/write) | Written when |
+| --- | --- | --- |
+| Command button | `_pn_command` (write only) | click: writes `_pn_pressValue` (default 1) |
+| Start/stop switch | `_pb_running` | the handle is slid to the other end (1/0) |
+| Toggle switch | `_pb_value` | toggled (1/0) |
+| Setpoint slider | `_pn_value` | dragged (debounced, 250 ms) |
+| Number input | `_pn_value` | Enter or leaving the field; Esc cancels |
+| Mode selector | `_pn_value` | an option is selected (0, 1, 2) |
+| Check button | `_pb_value` | clicked (1/0) |
+| OK/NOK selector | `_pn_value` | a state is selected (0 none, 1 OK, 2 NOK) |
+
+While the operator acts, values coming from the tag are ignored for about one second, so the
+control does not jump back before the PLC confirms the new value. The alert button writes
+`_pb_command` = 1 on click (e.g. a silence or acknowledge request in the PLC).
+
+**Live charts.** The line graph, area graph and trend gauge keep a rolling buffer of the
+bound value in the browser: the value is sampled every `_pn_interval` seconds (default 1)
+and the last `_pn_points` samples are drawn (default 60, the last minute). The buffer starts
+empty when the page opens; for historical trends use the ScadaCraft chart control with DAQ.
+
+**Status codes.** The status indicator takes a number (`0` inactive, `1` active, `2` running,
+`3` caution, `4` warning, `5` alarm), easy to map from a PLC integer.
 
 **Typical binding for a pump:**
 
@@ -175,13 +223,18 @@ Use `night` in control rooms with low lighting.
 | Pipes read `--automation-fresh-water`, which the palette does not define (also in 2.x) | Defined in `scadacraft-openbridge.css` from the palette's fresh-water colours |
 | Tank ignores `medium` and always uses the fuel colour | Widget sets the fill from `_ps_fluid` |
 | Badges are booleans (`badgeAuto`, …); 2.x uses enums | Widgets expose booleans |
+| Bar gauges draw no scale labels in 1.0.0 | Use an instrument field or readout next to the gauge for the value |
+| Horizontal bar gauge reserves space for a scale below the bar | Widget draws it at its native 384 × 72 and scales it to the box |
+| The slider does not jump to a clicked position (no seeking) | Drag the thumb; the enhanced variant adds −/+ buttons |
+| The radial gauge logs a harmless `<path> … NaN` console error at first render | None needed, the gauge renders correctly |
 
 ## 9. Editor library previews
 
 The editor shows library items as images, where scripts and web components do not run.
 Each widget therefore embeds a static preview rendered from the real component
-(`tools/openbridge/make-previews.mjs`). The preview is removed as soon as the widget runs on
-a page.
+(`tools/openbridge/make-previews.mjs`), in the state listed under `preview` in the catalog.
+Non-P&ID widgets are rendered on the OpenBridge panel colour so they stay readable on the
+dark library panel. The preview is removed as soon as the widget runs on a page.
 
 ## 10. Maintenance
 
@@ -201,9 +254,14 @@ re-run the visual check. Rebuild the client afterwards (`client/dist` is version
 
 ## 11. For the MCP server and other tools
 
-`server/_widgets/openbridge/widgets.json` describes every widget: file, OpenBridge element,
-box size, anchor, stretch axis and properties (name, type, default, read/write). A tool that
-places a widget on node `(x, y)` computes the position with the formula in §3.2, sets the
-box size (stretch widgets: `cells × 24` on the stretch axis) and binds properties by name.
-The ScadaCraft MCP server ([mcp/](../mcp/README.md)) implements this: `scadacraft_place_widgets`
-places widgets by node and `scadacraft_draw_pipe` turns a path of nodes into pipes and elbows.
+`server/_widgets/openbridge/widgets.json` describes the libraries (`categories`) and every
+widget: file, library, layout (`anchor` for P&ID symbols, otherwise top-left anchored and
+resizable), OpenBridge element, box size, anchor, stretch axis and properties (name, type,
+default, direction `read`/`write`/`rw`). A tool that places a widget on node `(x, y)` computes
+the position with the formula in §3.2, sets the box size (stretch widgets: `cells × 24` on the
+stretch axis; resizable widgets: any whole number of cells) and binds properties by name.
+The ScadaCraft MCP server ([mcp/](../mcp/README.md)) implements this: `scadacraft_list_widgets`
+lists the libraries, `scadacraft_place_widgets` places widgets by node (with `size` in cells
+for resizable widgets) and `scadacraft_draw_pipe` turns a path of nodes into pipes and elbows.
+
+![A page built by the MCP server with instruments, charts, controls and alerts](images/openbridge-showcase.png)

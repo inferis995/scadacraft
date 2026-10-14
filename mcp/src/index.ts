@@ -3,7 +3,8 @@
  * scadacraft-mcp-server
  *
  * MCP server for ScadaCraft: the whole project from an AI assistant.
- *   - pages: P&ID process graphics with OpenBridge widgets on the 24 px grid, bound to tags
+ *   - pages: OpenBridge widgets bound to tags: P&ID process graphics on the 24 px grid, instruments,
+ *     live charts, operator controls (buttons, switches, slider, inputs) and alerts/status
  *   - devices and tags: Modbus TCP/RTU, Siemens S7, OPC UA, MQTT and the other drivers; server memory tags
  *   - alarms: definitions, active alarms, acknowledge, history
  *   - data: live read/write, history (DAQ) with statistics and CSV export
@@ -39,7 +40,7 @@ import { registerDeviceTools } from './tools/devices.js';
 import { registerPageTools } from './tools/pages.js';
 import { registerProjectTools } from './tools/project.js';
 
-const VERSION = '0.3.0';
+const VERSION = '0.4.0';
 const HERE = dirname(fileURLToPath(import.meta.url));
 
 const client = new ScadaCraftClient({
@@ -60,6 +61,9 @@ const INSTRUCTIONS = `ScadaCraft is a web SCADA/HMI. This server edits the proje
 Typical flow for a new plant: scadacraft_get_project_summary → scadacraft_create_device → scadacraft_add_tags → scadacraft_update_device {enabled:true}
 → scadacraft_read_tags to check communication → scadacraft_create_view → scadacraft_list_widgets (read the placement model once)
 → scadacraft_place_widgets / scadacraft_draw_pipe with tag bindings → scadacraft_set_alarm → scadacraft_get_view to verify.
+Widgets come in five OpenBridge libraries: automation (P&ID symbols, anchor on a node), instruments, charts, controls, alerts
+(top-left on a node, "size" in cells). Controls are read/write: bind the setpoint/state tag once.
+App setup: scadacraft_set_layout (menu, header, logo, colours, start page), users/roles, settings, scripts, reports, backups.
 Safety: scadacraft_write_tags and enabling devices act on real equipment; scadacraft_import_project mode "replace" and the delete tools
 change or remove project data. Do these only when the user asked for them. Export the project before large changes.`;
 

@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="ob_root" width="48" height="48" viewBox="0 0 48 48" overflow="visible">
   <desc>ScadaCraft OpenBridge widget: Pipe end (obc-end-point-line, OpenBridge 1.0.0, Apache-2.0).
-Box 48x48 px, anchor at (24,24).
+Library: OpenBridge · Automation (P&amp;ID). Box 48x48 px, anchor at (24,24).
 Bindable properties:
-  _ps_direction (default 'right'): Side the closed end faces: top | right | bottom | left
-  _ps_medium (default 'normal'): Pipe content: normal | water | air | empty
-  _ps_lineType (default 'fluid'): Line type: fluid | electric | air | connector
-  _ps_fluid (default ''): Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)</desc>
+  _ps_direction (default 'right', read): Side the closed end faces: top | right | bottom | left
+  _ps_medium (default 'normal', read): Pipe content: normal | water | air | empty
+  _ps_lineType (default 'fluid', read): Line type: fluid | electric | air | connector
+  _ps_fluid (default '', read): Fluid colour for water/air pipes (OpenBridge palette): fresh-water | sea-water | waste | masses | fuel | oil | steam | hot | cold | air-ventilation | acid-alkalis | fire-fighting | flammable-gas | non-flammable-gas (empty = default)</desc>
   <rect id="ob_bg" x="0" y="0" width="48" height="48" fill="none" />
   <image id="ob_preview" x="0" y="0" width="48" height="48" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAABKUlEQVR4nOzasQnCUBhG0Sc4jetkEwfJJlnHdVSwEAuVQMglcE6bdJev+EnOg9R5kBIgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiAsQ2CzBN033N+8uynAYWUNs8wOU6/3x+m6+DNwuICRATICZATICYADEBYlmAtZfzN0e/qC0gtnuAf5fyWs8FjCOzgJgAMQFiAsQEiAkQEyC2ewBfxD5ZQCwL4K+IFwuICRATICZATICYADEBYpsHcOmuYwEx12jMAmICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATIDYAwAA//8BmSEQAAAABklEQVQDAPX+FWNbjgXXAAAAAElFTkSuQmCC" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAABKUlEQVR4nOzasQnCUBhG0Sc4jetkEwfJJlnHdVSwEAuVQMglcE6bdJev+EnOg9R5kBIgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiAsQ2CzBN033N+8uynAYWUNs8wOU6/3x+m6+DNwuICRATICZATICYADEBYlmAtZfzN0e/qC0gtnuAf5fyWs8FjCOzgJgAMQFiAsQEiAkQEyC2ewBfxD5ZQCwL4K+IFwuICRATICZATICYADEBYpsHcOmuYwEx12jMAmICxASICRATICZATICYADEBYgLEBIgJEBMgJkBMgJgAMQFiAsQEiAkQEyAmQEyAmAAxAWICxASICRATICZATIDYAwAA//8BmSEQAAAABklEQVQDAPX+FWNbjgXXAAAAAElFTkSuQmCC" />
   <foreignObject id="ob_fo" x="0" y="0" width="48" height="48" overflow="visible">
@@ -20,6 +20,8 @@ let _ps_medium = 'normal';
 let _ps_lineType = 'fluid';
 let _ps_fluid = '';
 //!export-end
+
+var __busyUntil = 0;
 
 function toBool(v) {
     if (v === true || v === 1) return true;

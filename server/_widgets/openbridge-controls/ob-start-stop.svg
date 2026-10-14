@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="ob_root" width="240" height="48" viewBox="0 0 240 48" overflow="visible">
+  <desc>ScadaCraft OpenBridge widget: Start/stop switch (obc-start-stop-switch, OpenBridge 1.0.0, Apache-2.0).
+Library: OpenBridge · Controls. Box 240x48 px, anchor at (0,0).
+Bindable properties:
+  _pb_running (default false, rw): Running state; slide to start/stop writes it (1/0)
+  _ps_size (default 'regular', read): Size: regular | large
+  _pb_alarm (default false, read): Alarm state
+  _pb_disabled (default false, read): Disabled (operator cannot act)</desc>
+  <rect id="ob_bg" x="0" y="0" width="240" height="48" fill="none" />
+  <image id="ob_preview" x="0" y="0" width="240" height="48" href="data:image/png;base64,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" xlink:href="data:image/png;base64,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" />
+  <foreignObject id="ob_fo" x="0" y="0" width="240" height="48" overflow="visible">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;width:100%;height:100%;overflow:visible;display:flex;align-items:center;">
+      <obc-start-stop-switch id="ob_el" style="display:block;width:100%;"></obc-start-stop-switch>
+    </div>
+  </foreignObject>
+  <script type="text/javascript"><![CDATA[
+//!export-start
+let _pb_running = false;
+let _ps_size = 'regular';
+let _pb_alarm = false;
+let _pb_disabled = false;
+//!export-end
+
+var __busyUntil = 0;
+
+function toBool(v) {
+    if (v === true || v === 1) return true;
+    var s = String(v).toLowerCase();
+    return s === 'true' || s === '1' || s === 'on';
+}
+
+function toNum(v) {
+    var n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+}
+
+function apply() {
+    var preview = document.getElementById('ob_preview');
+    if (preview && preview.parentNode) { preview.parentNode.removeChild(preview); }
+    var el = document.getElementById('ob_el');
+    if (!el) return;
+    el.checked = toBool(_pb_running);
+    el.size = String(_ps_size);
+    el.hasAlert = toBool(_pb_alarm);
+    el.disabled = toBool(_pb_disabled);
+    el.variant = toBool(_pb_running) ? 'running' : 'normal';
+}
+
+function putValue(id, value) {
+    if (Date.now() < __busyUntil && ["_pb_running"].indexOf(id) >= 0) return;
+    if (id === '_pb_running') { _pb_running = toBool(value); }
+    if (id === '_ps_size') { _ps_size = String(value); }
+    if (id === '_pb_alarm') { _pb_alarm = toBool(value); }
+    if (id === '_pb_disabled') { _pb_disabled = toBool(value); }
+    apply();
+}
+
+function postValue(id, value) {
+    // replaced at runtime: writes value to the tag bound to "id"
+}
+
+(function () {
+    var el = document.getElementById('ob_el');
+    if (!el) return;
+    var timer = null;
+    el.addEventListener('change', function (ev) {
+        if (!(true)) return;
+        _pb_running = !!(ev.detail && ev.detail.checked);
+        __busyUntil = Date.now() + 1000;
+        if (timer) { clearTimeout(timer); }
+        timer = setTimeout(function () { timer = null; postValue('_pb_running', (_pb_running ? 1 : 0)); }, 0);
+    });
+})();
+
+function fitBox() {
+    var root = document.getElementById('ob_root');
+    var fo = document.getElementById('ob_fo');
+    var el = document.getElementById('ob_el');
+    if (!root || !fo || !el) return;
+    var w = parseFloat(root.getAttribute('width')) || 240;
+    var h = parseFloat(root.getAttribute('height')) || 48;
+    if (root.getAttribute('viewBox') !== '0 0 ' + w + ' ' + h) {
+        root.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    }
+    fo.setAttribute('width', w);
+    fo.setAttribute('height', h);
+
+}
+
+(function () {
+    var root = document.getElementById('ob_root');
+    fitBox();
+    if (root && window.MutationObserver) {
+        new MutationObserver(fitBox).observe(root, { attributes: true, attributeFilter: ['width', 'height'] });
+    }
+})();
+
+apply();
+]]></script>
+</svg>

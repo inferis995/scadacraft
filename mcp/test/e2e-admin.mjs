@@ -64,7 +64,7 @@ try {
     menu: { mode: 'fix', type: 'block', background: '#0B1F33', color: '#FFFFFF', logo: logoUrl,
       items: [{ text: 'Overview', view: 'Admin overview', icon: 'home' }, { text: 'Allarmi', alarms: true, icon: 'warning' },
         { text: 'Docs', link: 'https://www.openbridge.no', icon: 'menu_book' }] },
-    header: { title: 'Impianto test', background: '#0B1F33', color: '#FFFFFF', alarms: 'fix', infos: 'float', date_time: 'DD/MM/YYYY HH:mm', login_info: 'fullname' },
+    header: { title: 'Impianto test', background: '#0B1F33', color: '#FFFFFF', alarms: 'fix', infos: 'float', date_time: 'dd/MM/yyyy HH:mm', login_info: 'fullname' },
     zoom: 'autoresize',
   });
   const l = (await call('scadacraft_get_layout')).structuredContent.layout;

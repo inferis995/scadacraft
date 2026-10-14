@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="ob_root" width="48" height="48" viewBox="0 0 48 48" overflow="visible">
+  <desc>ScadaCraft OpenBridge widget: Badge (count) (obc-badge, OpenBridge 1.0.0, Apache-2.0).
+Library: OpenBridge · Alerts and status. Box 48x48 px, anchor at (0,0).
+Bindable properties:
+  _pn_number (default 0, read): Number shown
+  _ps_type (default 'alarm', read): Type: alarm | warning | caution | running | notification | regular | automation
+  _ps_size (default 'large', read): Size: regular | large
+  _pb_hideZero (default true, read): Hide the badge when the number is 0</desc>
+  <rect id="ob_bg" x="0" y="0" width="48" height="48" fill="none" />
+  <image id="ob_preview" x="0" y="0" width="48" height="48" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAIAAABt+uBvAAADgUlEQVR4nOzbTUgUYRzH8f+6s+ra6rYWmRD0LklEQS+u9AISoUXWobdbERRB3Yq8RYS3DtmtqFNQRJAYVHaq6BAYQQQZlr2XZZqp6067us7sNLqwiZk/qgeeQX4fZJjdWfDxy4wz++yOkUwmhf7MEJoUAwEMBDAQwEAAAwEMBDAQwEAAAwEMBDAQwEAAAwEMBDAQwEAAAwEMBDAQwEAAAwEMBKgM9PXmzTdnzsTb2qxYTHQwwuHC8vJFdXUlmzeLIj5VHxx2NTc/3rFDvGFNU9OsmhpRQVmgh1VVfS0txZI/R0IFEhAdEjLcIWavDEai0bX374sKOaLIQGuru9RYx+X+ancA7orZ3i6KKPsfZJumjA5RtMoMYLi3VxThWQxgIICBAAYCGAhgIEBzoJl3ruTXVE3ygu+7Diav3xZ9uAcBDAR4IpB57pIMpSbcZL16J1p5ItBAfUO6s1s8iYcYwEAAAwGeCJQTCQeWlQcWz/fPKbU+frba36YeP3UGTPEATwSa/fzB+KdsO3G5MXbitP3pi2ilOZD18nWqeHrq0RP3dG53fTMWzgvWbsqtXCV+f8G+3cFdtT21e4fuPRR9lM1J3woG3WVUSuW/zbh2Prh7W2bdevO+a/lG58dfDLJFOt3lVkV/l7I5aYVi9Q3ZdXefCh3ZL/p4MZDV+tLp//XJWmDFUtHHi4Fc9pgL60DZQtFHZ6DQ4X2Fxw5NvC3Hl11N9/WLPjoD5W+vLjp1XAz/75v8pSXZ9eG2V6KP1kNscMg3rSA3unLc03kb1/mKCrMPh5+9EH10BnIGh9xl3vqKsU/6gvnh+rrsQ+vF68TVJtFH54Wikxi5VAmfPJq3ITrYfNf+3GksmBvcsz131fLMC9LdPT07DzhmQvTRGch6+8GJm77CkDstPW5m2okNxM9ejDdccGJx0Ur/lbRRtsBYssiXM3KwO6mU3d2T7v5ud3yRtCP/RO2VtP43q+57d/dHvIrzQQADAQwEMBDAQAADAQwEMBDAQAADAcqmOwLFxTL6XXfRKjOAzGCUUBYoVFbmLjvETIolmmRuRcgORokpejPLjRuzqqtFBWV7UMmWLasbG6dXVBhFRaJJIBKJVFaO3OqjqI4o3IOmKp7FAAYCGAhgIICBAAYCGAhgIICBAAYCGAhgIICBAAYCGAhgIICBAAYCGAhgIICBAAYCGAj4CQAA//9Li7qEAAAABklEQVQDAKMiAJbLGXl6AAAAAElFTkSuQmCC" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAIAAABt+uBvAAADgUlEQVR4nOzbTUgUYRzH8f+6s+ra6rYWmRD0LklEQS+u9AISoUXWobdbERRB3Yq8RYS3DtmtqFNQRJAYVHaq6BAYQQQZlr2XZZqp6067us7sNLqwiZk/qgeeQX4fZJjdWfDxy4wz++yOkUwmhf7MEJoUAwEMBDAQwEAAAwEMBDAQwEAAAwEMBDAQwEAAAwEMBDAQwEAAAwEMBDAQwEAAAwEMBKgM9PXmzTdnzsTb2qxYTHQwwuHC8vJFdXUlmzeLIj5VHxx2NTc/3rFDvGFNU9OsmhpRQVmgh1VVfS0txZI/R0IFEhAdEjLcIWavDEai0bX374sKOaLIQGuru9RYx+X+ancA7orZ3i6KKPsfZJumjA5RtMoMYLi3VxThWQxgIICBAAYCGAhgIEBzoJl3ruTXVE3ygu+7Diav3xZ9uAcBDAR4IpB57pIMpSbcZL16J1p5ItBAfUO6s1s8iYcYwEAAAwGeCJQTCQeWlQcWz/fPKbU+frba36YeP3UGTPEATwSa/fzB+KdsO3G5MXbitP3pi2ilOZD18nWqeHrq0RP3dG53fTMWzgvWbsqtXCV+f8G+3cFdtT21e4fuPRR9lM1J3woG3WVUSuW/zbh2Prh7W2bdevO+a/lG58dfDLJFOt3lVkV/l7I5aYVi9Q3ZdXefCh3ZL/p4MZDV+tLp//XJWmDFUtHHi4Fc9pgL60DZQtFHZ6DQ4X2Fxw5NvC3Hl11N9/WLPjoD5W+vLjp1XAz/75v8pSXZ9eG2V6KP1kNscMg3rSA3unLc03kb1/mKCrMPh5+9EH10BnIGh9xl3vqKsU/6gvnh+rrsQ+vF68TVJtFH54Wikxi5VAmfPJq3ITrYfNf+3GksmBvcsz131fLMC9LdPT07DzhmQvTRGch6+8GJm77CkDstPW5m2okNxM9ejDdccGJx0Ur/lbRRtsBYssiXM3KwO6mU3d2T7v5ud3yRtCP/RO2VtP43q+57d/dHvIrzQQADAQwEMBDAQAADAQwEMBDAQAADAcqmOwLFxTL6XXfRKjOAzGCUUBYoVFbmLjvETIolmmRuRcgORokpejPLjRuzqqtFBWV7UMmWLasbG6dXVBhFRaJJIBKJVFaO3OqjqI4o3IOmKp7FAAYCGAhgIICBAAYCGAhgIICBAAYCGAhgIICBAAYCGAhgIICBAAYCGAhgIICBAAYCGAj4CQAA//9Li7qEAAAABklEQVQDAKMiAJbLGXl6AAAAAElFTkSuQmCC" />
+  <foreignObject id="ob_fo" x="0" y="0" width="48" height="48" overflow="visible">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;width:100%;height:100%;overflow:visible;display:flex;align-items:center;justify-content:center;">
+      <obc-badge id="ob_el" style=""></obc-badge>
+    </div>
+  </foreignObject>
+  <script type="text/javascript"><![CDATA[
+//!export-start
+let _pn_number = 0;
+let _ps_type = 'alarm';
+let _ps_size = 'large';
+let _pb_hideZero = true;
+//!export-end
+
+var __busyUntil = 0;
+
+function toBool(v) {
+    if (v === true || v === 1) return true;
+    var s = String(v).toLowerCase();
+    return s === 'true' || s === '1' || s === 'on';
+}
+
+function toNum(v) {
+    var n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+}
+
+function apply() {
+    var preview = document.getElementById('ob_preview');
+    if (preview && preview.parentNode) { preview.parentNode.removeChild(preview); }
+    var el = document.getElementById('ob_el');
+    if (!el) return;
+    el.number = toNum(_pn_number);
+    el.type = String(_ps_type);
+    el.size = String(_ps_size);
+    el.style.visibility = (toBool(_pb_hideZero) && toNum(_pn_number) === 0) ? 'hidden' : 'visible';
+}
+
+function putValue(id, value) {
+    if (id === '_pn_number') { _pn_number = toNum(value); }
+    if (id === '_ps_type') { _ps_type = String(value); }
+    if (id === '_ps_size') { _ps_size = String(value); }
+    if (id === '_pb_hideZero') { _pb_hideZero = toBool(value); }
+    apply();
+}
+
+function postValue(id, value) {
+    // replaced at runtime: writes value to the tag bound to "id"
+}
+
+function fitBox() {
+    var root = document.getElementById('ob_root');
+    var fo = document.getElementById('ob_fo');
+    var el = document.getElementById('ob_el');
+    if (!root || !fo || !el) return;
+    var w = parseFloat(root.getAttribute('width')) || 48;
+    var h = parseFloat(root.getAttribute('height')) || 48;
+    if (root.getAttribute('viewBox') !== '0 0 ' + w + ' ' + h) {
+        root.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    }
+    fo.setAttribute('width', w);
+    fo.setAttribute('height', h);
+
+}
+
+(function () {
+    var root = document.getElementById('ob_root');
+    fitBox();
+    if (root && window.MutationObserver) {
+        new MutationObserver(fitBox).observe(root, { attributes: true, attributeFilter: ['width', 'height'] });
+    }
+})();
+
+apply();
+]]></script>
+</svg>

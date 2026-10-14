@@ -1,7 +1,7 @@
 /** Page (view) tools: OpenBridge widgets on the P&ID grid. */
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
-import type { PropertyValue } from '../services/pages.js';
+import type { PlaceSpec, PropertyValue } from '../services/pages.js';
 import { itemLine, ok, RELOAD_NOTE, run, ViewRef, type Ctx } from './common.js';
 
 const NodeSchema = z.object({
@@ -22,35 +22,54 @@ const PropertiesSchema = z.record(z.string(), PropertyValueSchema).describe(
 export function registerPageTools(server: McpServer, ctx: Ctx): void {
   server.registerTool('scadacraft_list_widgets', {
     title: 'List OpenBridge widgets',
-    description: `List the OpenBridge process-graphic widgets available in ScadaCraft, with their anchor, size and bindable properties.
+    description: `List the OpenBridge widgets available in ScadaCraft, grouped in libraries like the OpenBridge design system:
+  automation (P&ID equipment and pipes), instruments (gauges, instrument field, trend), charts (live line/area, pie, donut, radial bars),
+  controls (command button, start/stop and toggle switches, setpoint slider, number input, mode selector, check button, OK/NOK),
+  alerts (alert icon, alert button with counter, alert frame, status indicator, badge, tag label, clock).
 
-  Placement model (read once before placing widgets): the page uses a 24 px grid; every pipe connection is a grid node (x, y).
-  Each widget has an anchor that is put on a node: devices (pump, motor, fan, valves) = centre of the icon; tank = top-centre of the body;
-  readout = end of its tick; straight pipes and flow arrow = start of the axis (left/top); elbow/tee/cross/end = centre of the fitting.
-  Device icons are one cell in radius: a pipe that reaches a device stops one node before its anchor, the next pipe starts one node after.
+  Placement model (read once before placing widgets): the page uses a 24 px grid of nodes (x, y).
+  - automation widgets (layout "anchor") put their anchor on a node: devices = centre of the icon; tank = top-centre of the body;
+    readout = end of its tick; straight pipes and flow arrow = start of the axis (left/top); elbow/tee/cross/end = centre of the fitting.
+    Device icons are one cell in radius: a pipe that reaches a device stops one node before its anchor, the next pipe starts one node after.
+  - every other widget is anchored at its top-left corner and can be given any size in cells (scadacraft_place_widgets "size").
+  Property direction: read = tag -> widget; write = command written by the widget; rw = shown and written by the operator
+  (bind the setpoint/state tag once, e.g. slider _pn_value, toggle switch _pb_value).
 
   Args:
     - widget (string, optional): return only this widget (e.g. "ob-pump")
+    - category (string, optional): automation | instruments | charts | controls | alerts
     - response_format ('markdown' | 'json'): default markdown
 
-  Returns: grid size, OpenBridge version and, per widget: name, title, group (device|pipe), anchor {x,y} px, size {width,height} px,
-  stretch axis (pipes), properties [{name, type, default, write, description}]. Properties with write=true are commands written by the widget.`,
+  Returns: grid size, OpenBridge version, libraries and, per widget: name, title, category, layout, anchor {x,y} px,
+  default size {width,height} px, stretch axis (pipes), properties [{name, type, default, dir, description}].`,
     inputSchema: {
       widget: z.string().optional().describe('Widget name, e.g. "ob-pump"'),
+      category: z.enum(['automation', 'instruments', 'charts', 'controls', 'alerts']).optional().describe('Only widgets of this library'),
       response_format: z.enum(['markdown', 'json']).default('markdown'),
     },
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
-  }, async ({ widget, response_format }) => run(async () => {
+  }, async ({ widget, category, response_format }) => run(async () => {
     const cat = await ctx.pages.getCatalog();
-    const widgets = widget ? [await ctx.pages.getWidget(widget)] : cat.widgets;
-    const structured = { grid: cat.grid, openbridge: cat.openbridge, widgets };
+    let widgets = widget ? [await ctx.pages.getWidget(widget)] : cat.widgets;
+    if (category) widgets = widgets.filter((w) => w.category === category);
+    const structured = { grid: cat.grid, openbridge: cat.openbridge, categories: cat.categories, widgets };
     if (response_format === 'json') return ok(JSON.stringify(structured, null, 2), structured);
     const lines = [`# OpenBridge widgets (grid ${cat.grid} px, OpenBridge ${cat.openbridge})`, ''];
-    for (const w of widgets) {
-      lines.push(`## ${w.widget} — ${w.title} (${w.group})`);
-      lines.push(`anchor (${w.anchor.x}, ${w.anchor.y}) px, box ${w.size.width}x${w.size.height} px${w.stretch ? `, length along ${w.stretch} in cells` : ''}`);
-      for (const p of w.properties) lines.push(`- \`${p.name}\` ${p.type}${p.write ? ' (write)' : ''}, default ${p.default || '—'}: ${p.description}`);
-      lines.push('');
+    for (const c of cat.categories ?? []) {
+      const ws = widgets.filter((w) => w.category === c.key);
+      if (!ws.length) continue;
+      lines.push(`# ${c.title}`, c.description, '');
+      for (const w of ws) {
+        lines.push(`## ${w.widget} — ${w.title}${w.category === 'automation' ? ` (${w.group})` : ''}`);
+        lines.push(w.layout === 'anchor'
+          ? `anchor (${w.anchor.x}, ${w.anchor.y}) px, box ${w.size.width}x${w.size.height} px${w.stretch ? `, length along ${w.stretch} in cells` : ''}`
+          : `top-left anchored, default box ${w.size.width / cat.grid}x${w.size.height / cat.grid} cells (${w.size.width}x${w.size.height} px), resizable`);
+        for (const p of w.properties) {
+          const dir = p.dir === 'rw' ? ' (read/write)' : p.dir === 'write' || (!p.dir && p.write) ? ' (write)' : '';
+          lines.push(`- \`${p.name}\` ${p.type}${dir}, default ${p.default || '—'}: ${p.description}`);
+        }
+        lines.push('');
+      }
     }
     return ok(lines.join('\n'), structured);
   }));
@@ -125,14 +144,17 @@ export function registerPageTools(server: McpServer, ctx: Ctx): void {
     - view (string): view name or id
     - widgets (array, 1-200): each item
         - widget (string): catalog name, e.g. "ob-pump", "ob-tank", "ob-valve-analog", "ob-line-tee"
-        - node {x, y}: grid node for the widget's anchor
+        - node {x, y}: grid node for the widget's anchor (top-left corner for non-P&ID widgets)
         - length (number, optional): straight pipes only, length in cells
+        - size {width, height} (optional): box in cells, for instruments/charts/controls/alerts
         - name (string, optional): item name shown in the editor
         - properties (object, optional): fixed values or {"tag": "Device.Tag"} bindings
 
   Example: pump P-101 on node (12,6), running feedback and command bound to tags, readout below:
     {"widget":"ob-pump","node":{"x":12,"y":6},"name":"P-101",
      "properties":{"running":{"tag":"P101.Run"},"command":{"tag":"P101.Cmd"},"tag":"101","labelDirection":"down"}}
+  Example: setpoint slider 12x2 cells at node (2,20) writing the speed setpoint:
+    {"widget":"ob-slider","node":{"x":2,"y":20},"size":{"width":12,"height":2},"properties":{"value":{"tag":"P101.SpeedSP"},"max":1500}}
 
   Returns: the created items (id, node, box, bindings) and warnings (e.g. box partly outside the view).
   ${RELOAD_NOTE}`,
@@ -142,13 +164,15 @@ export function registerPageTools(server: McpServer, ctx: Ctx): void {
         widget: z.string().min(1),
         node: NodeSchema,
         length: z.number().int().min(1).max(200).optional(),
+        size: z.object({ width: z.number().int().min(1).max(200), height: z.number().int().min(1).max(200) }).strict().optional()
+          .describe('Box size in grid cells (non-P&ID widgets only)'),
         name: z.string().max(100).optional(),
         properties: PropertiesSchema.optional(),
       }).strict()).min(1).max(200),
     },
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   }, async ({ view, widgets }) => run(async () => {
-    const res = await ctx.pages.placeWidgets(view, widgets as { widget: string; node: { x: number; y: number }; length?: number; name?: string; properties?: Record<string, PropertyValue> }[]);
+    const res = await ctx.pages.placeWidgets(view, widgets as PlaceSpec[]);
     const lines = [`Placed ${res.placed.length} widget(s) on **${res.view.name}**:`, ...res.placed.map(itemLine)];
     if (res.warnings.length) lines.push('', 'Warnings:', ...res.warnings.map((w) => `- ${w}`));
     lines.push('', RELOAD_NOTE);

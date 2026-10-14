@@ -103,18 +103,27 @@ export interface Project {
 /** One entry of server/_widgets/openbridge/widgets.json */
 export interface CatalogWidget {
   widget: string;
+  /** path served by ScadaCraft, also the widget address, e.g. "_widgets/openbridge/ob-pump.svg" */
   file: string;
   title: string;
-  group: 'device' | 'pipe';
+  /** library: automation | instruments | charts | controls | alerts */
+  category: string;
+  /** automation: device | pipe; other libraries: the category */
+  group: string;
   element: string;
+  /** anchor: P&ID anchor model; fill/hfill/center/start: anchored top-left, resizable box */
+  layout: 'anchor' | 'fill' | 'hfill' | 'center' | 'start';
   size: { width: number; height: number };
   anchor: { x: number; y: number };
   stretch: 'x' | 'y' | null;
-  properties: { name: string; type: string; default: string; write: boolean; description: string }[];
+  properties: { name: string; type: string; default: string; dir: 'read' | 'write' | 'rw'; write: boolean; description: string }[];
 }
+
+export interface CatalogCategory { key: string; folder: string; title: string; description: string }
 
 export interface Catalog {
   grid: number;
   openbridge: string;
+  categories: CatalogCategory[];
   widgets: CatalogWidget[];
 }

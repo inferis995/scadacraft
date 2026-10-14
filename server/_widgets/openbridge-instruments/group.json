@@ -1,0 +1,35 @@
+{
+  "label": "OpenBridge · Instruments",
+  "order": 1,
+  "description": "Gauges, instrument fields and trends showing a process value.",
+  "items": [
+    {
+      "file": "ob-gauge-radial.svg",
+      "label": "Radial gauge"
+    },
+    {
+      "file": "ob-gauge-vertical.svg",
+      "label": "Vertical gauge (bar)"
+    },
+    {
+      "file": "ob-gauge-horizontal.svg",
+      "label": "Horizontal gauge (bar)"
+    },
+    {
+      "file": "ob-gauge-trend.svg",
+      "label": "Trend gauge (live)"
+    },
+    {
+      "file": "ob-instrument-field.svg",
+      "label": "Instrument field"
+    },
+    {
+      "file": "ob-circular-progress.svg",
+      "label": "Circular progress"
+    },
+    {
+      "file": "ob-progress-bar.svg",
+      "label": "Progress bar"
+    }
+  ]
+}

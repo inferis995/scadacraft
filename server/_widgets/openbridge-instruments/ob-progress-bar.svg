@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="ob_root" width="240" height="48" viewBox="0 0 240 48" overflow="visible">
+  <desc>ScadaCraft OpenBridge widget: Progress bar (obc-progress-bar, OpenBridge 1.0.0, Apache-2.0).
+Library: OpenBridge · Instruments. Box 240x48 px, anchor at (0,0).
+Bindable properties:
+  _pn_value (default 0, read): Progress 0-100 %
+  _pb_showValue (default true, read): Show the value
+  _pb_showUnit (default true, read): Show the % unit</desc>
+  <rect id="ob_bg" x="0" y="0" width="240" height="48" fill="none" />
+  <image id="ob_preview" x="0" y="0" width="240" height="48" href="data:image/png;base64,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" xlink:href="data:image/png;base64,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" />
+  <foreignObject id="ob_fo" x="0" y="0" width="240" height="48" overflow="visible">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;width:100%;height:100%;overflow:visible;display:flex;align-items:center;">
+      <obc-progress-bar id="ob_el" style="display:block;width:100%;"></obc-progress-bar>
+    </div>
+  </foreignObject>
+  <script type="text/javascript"><![CDATA[
+//!export-start
+let _pn_value = 0;
+let _pb_showValue = true;
+let _pb_showUnit = true;
+//!export-end
+
+var __busyUntil = 0;
+
+function toBool(v) {
+    if (v === true || v === 1) return true;
+    var s = String(v).toLowerCase();
+    return s === 'true' || s === '1' || s === 'on';
+}
+
+function toNum(v) {
+    var n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+}
+
+function apply() {
+    var preview = document.getElementById('ob_preview');
+    if (preview && preview.parentNode) { preview.parentNode.removeChild(preview); }
+    var el = document.getElementById('ob_el');
+    if (!el) return;
+    el.value = toNum(_pn_value);
+    el.showValue = toBool(_pb_showValue);
+    el.showUnit = toBool(_pb_showUnit);
+}
+
+function putValue(id, value) {
+    if (id === '_pn_value') { _pn_value = toNum(value); }
+    if (id === '_pb_showValue') { _pb_showValue = toBool(value); }
+    if (id === '_pb_showUnit') { _pb_showUnit = toBool(value); }
+    apply();
+}
+
+function postValue(id, value) {
+    // replaced at runtime: writes value to the tag bound to "id"
+}
+
+function fitBox() {
+    var root = document.getElementById('ob_root');
+    var fo = document.getElementById('ob_fo');
+    var el = document.getElementById('ob_el');
+    if (!root || !fo || !el) return;
+    var w = parseFloat(root.getAttribute('width')) || 240;
+    var h = parseFloat(root.getAttribute('height')) || 48;
+    if (root.getAttribute('viewBox') !== '0 0 ' + w + ' ' + h) {
+        root.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    }
+    fo.setAttribute('width', w);
+    fo.setAttribute('height', h);
+
+}
+
+(function () {
+    var root = document.getElementById('ob_root');
+    fitBox();
+    if (root && window.MutationObserver) {
+        new MutationObserver(fitBox).observe(root, { attributes: true, attributeFilter: ['width', 'height'] });
+    }
+})();
+
+apply();
+]]></script>
+</svg>

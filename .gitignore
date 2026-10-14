@@ -91,6 +91,10 @@ server/_appdata
 server/_widgets/*
 !server/_widgets/README.md
 !server/_widgets/openbridge/
+!server/_widgets/openbridge-instruments/
+!server/_widgets/openbridge-charts/
+!server/_widgets/openbridge-controls/
+!server/_widgets/openbridge-alerts/
 
 .agents/
 AGENTS.md

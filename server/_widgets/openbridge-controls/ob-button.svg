@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="ob_root" width="144" height="48" viewBox="0 0 144 48" overflow="visible">
+  <desc>ScadaCraft OpenBridge widget: Command button (obc-button, OpenBridge 1.0.0, Apache-2.0).
+Library: OpenBridge · Controls. Box 144x48 px, anchor at (0,0).
+Bindable properties:
+  _pn_command (default 0, write): Written on click with the value of _pn_pressValue
+  _pn_pressValue (default 1, read): Value written to _pn_command on click
+  _ps_label (default 'Start', read): Button text
+  _ps_variant (default 'normal', read): Style: normal | raised | flat
+  _pb_disabled (default false, read): Disabled (operator cannot act)</desc>
+  <rect id="ob_bg" x="0" y="0" width="144" height="48" fill="none" />
+  <image id="ob_preview" x="0" y="0" width="144" height="48" href="data:image/png;base64,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" xlink:href="data:image/png;base64,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" />
+  <foreignObject id="ob_fo" x="0" y="0" width="144" height="48" overflow="visible">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;width:100%;height:100%;overflow:visible;display:flex;align-items:center;">
+      <obc-button id="ob_el" style="display:block;width:100%;"></obc-button>
+    </div>
+  </foreignObject>
+  <script type="text/javascript"><![CDATA[
+//!export-start
+let _pn_command = 0;
+let _pn_pressValue = 1;
+let _ps_label = 'Start';
+let _ps_variant = 'normal';
+let _pb_disabled = false;
+//!export-end
+
+var __busyUntil = 0;
+
+function toBool(v) {
+    if (v === true || v === 1) return true;
+    var s = String(v).toLowerCase();
+    return s === 'true' || s === '1' || s === 'on';
+}
+
+function toNum(v) {
+    var n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+}
+
+function apply() {
+    var preview = document.getElementById('ob_preview');
+    if (preview && preview.parentNode) { preview.parentNode.removeChild(preview); }
+    var el = document.getElementById('ob_el');
+    if (!el) return;
+    el.variant = String(_ps_variant);
+    el.disabled = toBool(_pb_disabled);
+    el.textContent = String(_ps_label);
+    el.fullWidth = true;
+}
+
+function putValue(id, value) {
+    if (id === '_pn_command') { _pn_command = toNum(value); }
+    if (id === '_pn_pressValue') { _pn_pressValue = toNum(value); }
+    if (id === '_ps_label') { _ps_label = String(value); }
+    if (id === '_ps_variant') { _ps_variant = String(value); }
+    if (id === '_pb_disabled') { _pb_disabled = toBool(value); }
+    apply();
+}
+
+function postValue(id, value) {
+    // replaced at runtime: writes value to the tag bound to "id"
+}
+
+(function () {
+    var el = document.getElementById('ob_el');
+    if (!el) return;
+    var timer = null;
+    el.addEventListener('click', function (ev) {
+        if (!(!toBool(_pb_disabled))) return;
+        _pn_command = toNum(_pn_pressValue);
+        __busyUntil = Date.now() + 1000;
+        if (timer) { clearTimeout(timer); }
+        timer = setTimeout(function () { timer = null; postValue('_pn_command', _pn_command); }, 0);
+    });
+})();
+
+function fitBox() {
+    var root = document.getElementById('ob_root');
+    var fo = document.getElementById('ob_fo');
+    var el = document.getElementById('ob_el');
+    if (!root || !fo || !el) return;
+    var w = parseFloat(root.getAttribute('width')) || 144;
+    var h = parseFloat(root.getAttribute('height')) || 48;
+    if (root.getAttribute('viewBox') !== '0 0 ' + w + ' ' + h) {
+        root.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    }
+    fo.setAttribute('width', w);
+    fo.setAttribute('height', h);
+
+}
+
+(function () {
+    var root = document.getElementById('ob_root');
+    fitBox();
+    if (root && window.MutationObserver) {
+        new MutationObserver(fitBox).observe(root, { attributes: true, attributeFilter: ['width', 'height'] });
+    }
+})();
+
+apply();
+]]></script>
+</svg>

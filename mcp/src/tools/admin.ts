@@ -48,13 +48,13 @@ Args (all optional):
   - menu: {mode: ${NAV_MODES.join('|')} (void = no menu, fix = always open), type: ${NAV_TYPES.join('|')} (item style),
            background, color, logo (URL from scadacraft_upload_image, or null), items: [{text, view | link | alarms: true, icon, children}]}
   - header: {title, background, color, height, font_family, font_size, alarms: ${NOTIFY_MODES.join('|')}, infos: ${NOTIFY_MODES.join('|')},
-             login_info: nothing|username|fullname|both, date_time (format, e.g. "DD/MM/YYYY HH:mm:ss"), language: nothing|simple|key|fullname}
+             login_info: nothing|username|fullname|both, date_time (Angular date format, e.g. "dd/MM/yyyy HH:mm:ss"), language: nothing|simple|key|fullname}
   - zoom: ${ZOOM_MODES.join('|')}; input_dialog: ${INPUT_MODES.join('|')}; hide_navigation; show_dev_button; login_on_start;
     login_overlay: none|black|white; show_connection_error; custom_css
 
 Example: {"start_view": "Overview", "menu": {"mode": "fix", "type": "block", "background": "#0B1F33", "color": "#FFFFFF",
   "items": [{"text": "Overview", "view": "Overview", "icon": "home"}, {"text": "Alarms", "alarms": true, "icon": "warning"}]},
-  "header": {"title": "Impianto Cariati", "background": "#0B1F33", "color": "#FFFFFF", "alarms": "fix", "date_time": "DD/MM/YYYY HH:mm"}}
+  "header": {"title": "Impianto Cariati", "background": "#0B1F33", "color": "#FFFFFF", "alarms": "fix", "date_time": "dd/MM/yyyy HH:mm"}}
 
 Returns: the resulting layout.
 ${RELOAD_NOTE}`,

@@ -16,21 +16,12 @@ import { fileURLToPath } from 'url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, '..', '..');
-const WDIR = path.join(REPO, 'server/_widgets/openbridge');
+const WDIR = path.join(REPO, 'server/_widgets/openbridge'); // catalog location
 const OB = path.join(REPO, 'client/src/assets/lib/openbridge');
 const OUT = path.join(HERE, 'previews');
 const SCALE = 2;
 
-// Preview state per widget: shows the symbol in a representative, neutral state.
-const STATE = {
-  'ob-pump': { _pb_running: 1 }, 'ob-motor': { _pb_running: 1 }, 'ob-fan': { _pb_running: 1 },
-  'ob-valve-digital': { _pb_open: 1 }, 'ob-valve-analog': { _pn_position: 60, _pb_open: 1 },
-  'ob-tank': { _pn_level: 60 }, 'ob-readout': { _pn_value: 123 },
-  'ob-line-horizontal': { _ps_medium: 'water' }, 'ob-line-vertical': { _ps_medium: 'water' },
-  'ob-line-elbow': { _ps_medium: 'water' }, 'ob-line-tee': { _ps_medium: 'water' },
-  'ob-line-cross': { _ps_medium: 'water' }, 'ob-line-overlap': { _ps_medium: 'water' },
-  'ob-line-end': { _ps_medium: 'water' }, 'ob-line-flow': { _ps_medium: 'water' },
-};
+// Preview state per widget comes from the catalog ("preview": [[variable, value], ...], applied in order).
 
 // FUXA's SvgUtils, bundled for the browser with Angular stubbed out.
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'obprev-'));
@@ -51,6 +42,7 @@ await page.setContent(`<!doctype html><html data-obc-theme="day"><head>
 <style>${fs.readFileSync(path.join(OB, 'openbridge.css'), 'utf8')}</style>
 <style>${fs.readFileSync(path.join(OB, 'scadacraft-openbridge.css'), 'utf8')}</style>
 <script>${fs.readFileSync(path.join(OB, 'openbridge-automation.min.js'), 'utf8')}</script>
+<style>body{font-family:var(--global-typography-ui-body-font-family, sans-serif)}</style>
 <script>${fs.readFileSync(path.join(tmp, 'svgutils.js'), 'utf8')}</script>
 <style>body{margin:0;background:transparent} #box{position:absolute;left:100px;top:100px}</style>
 </head><body><div id="box"></div></body></html>`);
@@ -58,8 +50,12 @@ await page.setContent(`<!doctype html><html data-obc-theme="day"><head>
 fs.mkdirSync(OUT, { recursive: true });
 for (const w of catalog.widgets) {
   const svgContent = fs.readFileSync(path.join(REPO, 'server', w.file), 'utf8');
-  await page.evaluate(({ svgContent, values }) => {
+  await page.evaluate(({ svgContent, values, panel }) => {
     const box = document.getElementById('box'); box.innerHTML = '';
+    // controls, instruments, charts and alerts get the OpenBridge panel colour behind them, so they stay
+    // readable on the dark editor library; P&ID symbols keep a transparent background
+    box.style.background = panel ? 'var(--container-background-color, #fff)' : 'transparent';
+    box.style.width = panel ? panel[0] + 'px' : ''; box.style.height = panel ? panel[1] + 'px' : '';
     const svg = new DOMParser().parseFromString(svgContent, 'image/svg+xml').querySelector('svg');
     const guid = Math.random().toString(36).slice(2, 8);
     const idMap = window.SvgUtils.renameIdsInSvg(svg, guid);
@@ -70,9 +66,10 @@ for (const w of catalog.widgets) {
     const sc = document.createElement('script');
     sc.textContent = window.SvgUtils.initWidget(res.content, res.vars);
     document.body.appendChild(sc);
-    Object.entries(values).forEach(([k, v]) => window[moduleId].putValue(k, v));
-  }, { svgContent, values: STATE[w.widget] || {} });
-  await page.waitForTimeout(150);
+    values.forEach(([k, v]) => window[moduleId].putValue(k, v));
+  }, { svgContent, values: w.preview || [], panel: w.layout === 'anchor' ? null : [w.size.width, w.size.height] });
+  // charts animate (Chart.js); give them time to settle
+  await page.waitForTimeout(w.category === 'charts' || w.element === 'obc-gauge-trend' ? 1500 : 250);
   await page.screenshot({
     path: path.join(OUT, `${w.widget}.png`), omitBackground: true,
     clip: { x: 100, y: 100, width: w.size.width, height: w.size.height },

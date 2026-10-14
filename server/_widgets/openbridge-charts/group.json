@@ -1,0 +1,27 @@
+{
+  "label": "OpenBridge · Charts",
+  "order": 2,
+  "description": "Live charts: rolling line/area trends of a tag, pie/donut/radial bars of several tags.",
+  "items": [
+    {
+      "file": "ob-line-graph.svg",
+      "label": "Line graph (live)"
+    },
+    {
+      "file": "ob-area-graph.svg",
+      "label": "Area graph (live)"
+    },
+    {
+      "file": "ob-pie-chart.svg",
+      "label": "Pie chart"
+    },
+    {
+      "file": "ob-donut-chart.svg",
+      "label": "Donut chart"
+    },
+    {
+      "file": "ob-radial-bar-chart.svg",
+      "label": "Radial bar chart"
+    }
+  ]
+}

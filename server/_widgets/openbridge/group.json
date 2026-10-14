@@ -1,0 +1,95 @@
+{
+  "label": "OpenBridge · Automation (P&ID)",
+  "order": 0,
+  "description": "Process equipment and pipes, placed on the 24 px P&ID grid by their anchor point.",
+  "items": [
+    {
+      "file": "ob-pump.svg",
+      "label": "Pump"
+    },
+    {
+      "file": "ob-motor.svg",
+      "label": "Motor"
+    },
+    {
+      "file": "ob-fan.svg",
+      "label": "Fan"
+    },
+    {
+      "file": "ob-valve-digital.svg",
+      "label": "On/off valve"
+    },
+    {
+      "file": "ob-valve-analog.svg",
+      "label": "Control valve"
+    },
+    {
+      "file": "ob-damper.svg",
+      "label": "Damper"
+    },
+    {
+      "file": "ob-filter.svg",
+      "label": "Filter"
+    },
+    {
+      "file": "ob-converter.svg",
+      "label": "Converter / drive"
+    },
+    {
+      "file": "ob-transformer.svg",
+      "label": "Transformer"
+    },
+    {
+      "file": "ob-breaker.svg",
+      "label": "Breaker / switch"
+    },
+    {
+      "file": "ob-source.svg",
+      "label": "Power source"
+    },
+    {
+      "file": "ob-ground.svg",
+      "label": "Ground / earth"
+    },
+    {
+      "file": "ob-tank.svg",
+      "label": "Tank"
+    },
+    {
+      "file": "ob-readout.svg",
+      "label": "Readout"
+    },
+    {
+      "file": "ob-line-horizontal.svg",
+      "label": "Pipe horizontal"
+    },
+    {
+      "file": "ob-line-vertical.svg",
+      "label": "Pipe vertical"
+    },
+    {
+      "file": "ob-line-elbow.svg",
+      "label": "Pipe elbow"
+    },
+    {
+      "file": "ob-line-tee.svg",
+      "label": "Pipe tee"
+    },
+    {
+      "file": "ob-line-cross.svg",
+      "label": "Pipe cross (junction)"
+    },
+    {
+      "file": "ob-line-overlap.svg",
+      "label": "Pipe crossover (no junction)"
+    },
+    {
+      "file": "ob-line-end.svg",
+      "label": "Pipe end"
+    },
+    {
+      "file": "ob-line-flow.svg",
+      "label": "Flow arrow (1 cell)"
+    }
+  ]
+}

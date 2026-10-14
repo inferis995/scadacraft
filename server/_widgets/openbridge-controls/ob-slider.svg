@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="ob_root" width="288" height="48" viewBox="0 0 288 48" overflow="visible">
+  <desc>ScadaCraft OpenBridge widget: Setpoint slider (obc-slider, OpenBridge 1.0.0, Apache-2.0).
+Library: OpenBridge · Controls. Box 288x48 px, anchor at (0,0).
+Bindable properties:
+  _pn_value (default 50, rw): Setpoint, written while dragging (debounced)
+  _pn_min (default 0, read): Minimum
+  _pn_max (default 100, read): Maximum
+  _pn_step (default 1, read): Step
+  _pn_stepClick (default 10, read): Step of the -/+ buttons (enhanced variant)
+  _ps_variant (default 'normal', read): Style: normal | enhanced (with -/+ buttons) | no-input (read only)
+  _pb_disabled (default false, read): Disabled (operator cannot act)</desc>
+  <rect id="ob_bg" x="0" y="0" width="288" height="48" fill="none" />
+  <image id="ob_preview" x="0" y="0" width="288" height="48" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAkAAAABgCAIAAAB6y1p+AAADvUlEQVR4nOzdwYuUdRzH8d/sjKWxSGuatlKZmorpQYOM8BB20yKwgg6lt7z4F3QIunUOorqEZBFkHsKsg3aSQCtaSCgNbVNy2yJGC9mxtd1ptm4Ryyzok5/H12seZhie7/GBN7+Hh+fX6nQ6BQDStAoABBIwACIJGACRBAyASAIGQCQBAyCSgAEQScAAiCRgAEQSMAAiCRgAkQQMgEgCBkAkAQMgkoABEEnAAIgkYABEEjAAIgkYAJEEDIBIAgZAJAEDIJKAARBJwIh38sz44WOnRsfaoxcu9v7et3xo5fJF27eu27h6WQHqq9HpdArEevW9z975eOQ/T+3asXnvs48UoKYEjGC7X3r/29FfZhlYv3LpvpefKUAdDRTI9PqB47PXq+eb739+8+CJAtSRgBGpl659h77sZ/KtD7/47vyvBagdASPSgSNfd7t9TfbGDh49WYDa8RQikX4Yu3idhoEUAkaksz+2+x8+99OlAtSOgBGp88fV/ofbv08UoHYEDIBIAgZAJAEDIJKAARBJwACIJGAARBIwACIJGACRBAyASAIGQCQBAyBS1QE7evz0/sMj58YvTVz5s8BcfL5/b7kWxsbGCnDtDAwMtFqtwcHB+fPnlwpVGrBPT5x+8bUjBYAamZ6enpycbLfbQ0NDCxYsKFWpdEPLtz8aKX9vMNjfToQAJLl8+XKpUKUrsNF/tmVq9D4A1M3U1FSpUKUBazUrXfABUGOVFuXuOxfO/HRn7iICUDPNZrNUqNKA7Xp8U++70Zg5AKiZwcHBUqFKbyE+tmXtK43GvkNfnR//beLKHLaEB+CGdVM8Rt+z7aE1vaPA/2d4eLgA+byJA4BIAgZAJAEDIJKAARBJwACIJGAARBIwACIJGACRBAyASAIGQCQBAyCSDbqIdMftt12nYSCFgBFpzT2L+x9ee++SAtSOgBHp/rkEbN0KAYMaEjAi7dy2odXs6+q9dV7zyUfXF6B2BIxIw0sW7nlqSz+Te55++K7FCwtQOwJGqt1PPPjAqqWzz2xYtfS57ZsKUEeNTqdTINPk1ak3Pjj+7icj3e6/TzUa5fkdm1/YueWWec0C1JGAEe/kmfHDx06NXmifvdBuDjRWDA+tXL5o+9Z1G1cvK0B9CRh5ut1uo7fCAm5u3sRBHvUCioABEErAAIgkYABEEjAAIgkYAJEEDIBIAgZAJAEDIJKAARBJwACIJGAARBIwACIJGACRBAyASAIGQCQBAyCSgAEQScAAiCRgAEQSMAAiCRgAkQQMgEh/AQAA///9nvq1AAAABklEQVQDAGhzsbQvlYrnAAAAAElFTkSuQmCC" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAkAAAABgCAIAAAB6y1p+AAADvUlEQVR4nOzdwYuUdRzH8d/sjKWxSGuatlKZmorpQYOM8BB20yKwgg6lt7z4F3QIunUOorqEZBFkHsKsg3aSQCtaSCgNbVNy2yJGC9mxtd1ptm4Ryyzok5/H12seZhie7/GBN7+Hh+fX6nQ6BQDStAoABBIwACIJGACRBAyASAIGQCQBAyCSgAEQScAAiCRgAEQSMAAiCRgAkQQMgEgCBkAkAQMgkoABEEnAAIgkYABEEjAAIgkYAJEEDIBIAgZAJAEDIJKAARBJwIh38sz44WOnRsfaoxcu9v7et3xo5fJF27eu27h6WQHqq9HpdArEevW9z975eOQ/T+3asXnvs48UoKYEjGC7X3r/29FfZhlYv3LpvpefKUAdDRTI9PqB47PXq+eb739+8+CJAtSRgBGpl659h77sZ/KtD7/47vyvBagdASPSgSNfd7t9TfbGDh49WYDa8RQikX4Yu3idhoEUAkaksz+2+x8+99OlAtSOgBGp88fV/ofbv08UoHYEDIBIAgZAJAEDIJKAARBJwACIJGAARBIwACIJGACRBAyASAIGQCQBAyBS1QE7evz0/sMj58YvTVz5s8BcfL5/b7kWxsbGCnDtDAwMtFqtwcHB+fPnlwpVGrBPT5x+8bUjBYAamZ6enpycbLfbQ0NDCxYsKFWpdEPLtz8aKX9vMNjfToQAJLl8+XKpUKUrsNF/tmVq9D4A1M3U1FSpUKUBazUrXfABUGOVFuXuOxfO/HRn7iICUDPNZrNUqNKA7Xp8U++70Zg5AKiZwcHBUqFKbyE+tmXtK43GvkNfnR//beLKHLaEB+CGdVM8Rt+z7aE1vaPA/2d4eLgA+byJA4BIAgZAJAEDIJKAARBJwACIJGAARBIwACIJGACRBAyASAIGQCQBAyCSDbqIdMftt12nYSCFgBFpzT2L+x9ee++SAtSOgBHp/rkEbN0KAYMaEjAi7dy2odXs6+q9dV7zyUfXF6B2BIxIw0sW7nlqSz+Te55++K7FCwtQOwJGqt1PPPjAqqWzz2xYtfS57ZsKUEeNTqdTINPk1ak3Pjj+7icj3e6/TzUa5fkdm1/YueWWec0C1JGAEe/kmfHDx06NXmifvdBuDjRWDA+tXL5o+9Z1G1cvK0B9CRh5ut1uo7fCAm5u3sRBHvUCioABEErAAIgkYABEEjAAIgkYAJEEDIBIAgZAJAEDIJKAARBJwACIJGAARBIwACIJGACRBAyASAIGQCQBAyCSgAEQScAAiCRgAEQSMAAiCRgAkQQMgEh/AQAA///9nvq1AAAABklEQVQDAGhzsbQvlYrnAAAAAElFTkSuQmCC" />
+  <foreignObject id="ob_fo" x="0" y="0" width="288" height="48" overflow="visible">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;width:100%;height:100%;overflow:visible;display:flex;align-items:center;">
+      <obc-slider id="ob_el" style="display:block;width:100%;"></obc-slider>
+    </div>
+  </foreignObject>
+  <script type="text/javascript"><![CDATA[
+//!export-start
+let _pn_value = 50;
+let _pn_min = 0;
+let _pn_max = 100;
+let _pn_step = 1;
+let _pn_stepClick = 10;
+let _ps_variant = 'normal';
+let _pb_disabled = false;
+//!export-end
+
+var __busyUntil = 0;
+
+function toBool(v) {
+    if (v === true || v === 1) return true;
+    var s = String(v).toLowerCase();
+    return s === 'true' || s === '1' || s === 'on';
+}
+
+function toNum(v) {
+    var n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+}
+
+function apply() {
+    var preview = document.getElementById('ob_preview');
+    if (preview && preview.parentNode) { preview.parentNode.removeChild(preview); }
+    var el = document.getElementById('ob_el');
+    if (!el) return;
+    el.value = toNum(_pn_value);
+    el.min = toNum(_pn_min);
+    el.max = toNum(_pn_max);
+    el.step = toNum(_pn_step);
+    el.stepClick = toNum(_pn_stepClick);
+    el.variant = String(_ps_variant);
+    el.disabled = toBool(_pb_disabled);
+}
+
+function putValue(id, value) {
+    if (Date.now() < __busyUntil && ["_pn_value"].indexOf(id) >= 0) return;
+    if (id === '_pn_value') { _pn_value = toNum(value); }
+    if (id === '_pn_min') { _pn_min = toNum(value); }
+    if (id === '_pn_max') { _pn_max = toNum(value); }
+    if (id === '_pn_step') { _pn_step = toNum(value); }
+    if (id === '_pn_stepClick') { _pn_stepClick = toNum(value); }
+    if (id === '_ps_variant') { _ps_variant = String(value); }
+    if (id === '_pb_disabled') { _pb_disabled = toBool(value); }
+    apply();
+}
+
+function postValue(id, value) {
+    // replaced at runtime: writes value to the tag bound to "id"
+}
+
+(function () {
+    var el = document.getElementById('ob_el');
+    if (!el) return;
+    var timer = null;
+    el.addEventListener('value', function (ev) {
+        if (!(true)) return;
+        _pn_value = toNum(ev.detail);
+        __busyUntil = Date.now() + 1250;
+        if (timer) { clearTimeout(timer); }
+        timer = setTimeout(function () { timer = null; postValue('_pn_value', _pn_value); }, 250);
+    });
+})();
+
+function fitBox() {
+    var root = document.getElementById('ob_root');
+    var fo = document.getElementById('ob_fo');
+    var el = document.getElementById('ob_el');
+    if (!root || !fo || !el) return;
+    var w = parseFloat(root.getAttribute('width')) || 288;
+    var h = parseFloat(root.getAttribute('height')) || 48;
+    if (root.getAttribute('viewBox') !== '0 0 ' + w + ' ' + h) {
+        root.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    }
+    fo.setAttribute('width', w);
+    fo.setAttribute('height', h);
+
+}
+
+(function () {
+    var root = document.getElementById('ob_root');
+    fitBox();
+    if (root && window.MutationObserver) {
+        new MutationObserver(fitBox).observe(root, { attributes: true, attributeFilter: ['width', 'height'] });
+    }
+})();
+
+apply();
+]]></script>
+</svg>

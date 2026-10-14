@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="ob_root" width="96" height="288" viewBox="0 0 96 288" overflow="visible">
+  <desc>ScadaCraft OpenBridge widget: Vertical gauge (bar) (obc-gauge-vertical, OpenBridge 1.0.0, Apache-2.0).
+Library: OpenBridge · Instruments. Box 96x288 px, anchor at (0,0).
+Bindable properties:
+  _pn_value (default 0, read): Process value
+  _pn_min (default 0, read): Scale minimum
+  _pn_max (default 100, read): Scale maximum
+  _pb_hasSetpoint (default false, read): Show the setpoint marker
+  _pn_setpoint (default 0, read): Setpoint (shown when _pb_hasSetpoint is true)
+  _ps_fillMode (default 'fill', read): Bar fill: fill | tint
+  _pb_labels (default true, read): Show scale labels
+  _ps_priority (default 'regular', read): Colour priority: regular | enhanced
+  _pb_off (default false, read): Instrument off (greyed out)</desc>
+  <rect id="ob_bg" x="0" y="0" width="96" height="288" fill="none" />
+  <image id="ob_preview" x="0" y="0" width="96" height="288" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAAJACAIAAABUkf6hAAAIdklEQVR4nOzduXIXRwKA8ZYsDmNhDC5fOLEL2wWBHdm5Q0eEPAABT8DL8BSkxISEEEAVUAUJ930JlqO2kQzLrmFL7Me6lvXvF4xGClT/mvmmu6cVaGllZWXAf2ppQCAgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCInlNQE+ePLl69erKysrfXnj8+PH4i9mwatOmTVu2bPnoo4+2b9++uLg4+IOFV/9v/Azl4sWLly5devr06XgPzTs97/o8uX///ruNfmlp6csvv9y5c+cHH3wweMU/Arp27drp06fXzjdv3vzxxx8vLy/PR3Beu7W78r9vftr5yce78GjVvXv3bt26df369Tkqzx/O0WjPnj0bN24cvPB7QPNKnThxYqxeo6+//nrr1q3jPfQOA/oXc1SeT9fMaD5LP/30k4Zeej6vz0ft5MmT82TO9Lt3735P6/mvmvPXL7/88uGHH86Z8dSpU4MXngd07ty5+WzNBcQ333wzeIM5ts2xZ66B5gLrwoULg1WLc708p/l59u233y4sLAzebM7v33///TyZrxqDVYtzhfjs2bNPP/3UvL4eX3zxxbxQc2tj7aljcb58zS87duwYrMPcDZoNzZM7d+4M5gW5ffv2WN1BGazPtm3b5vHu3buDtZ3oOSbbZl2/uRKax4cPHw7WArK7+lbWtlXnwnGwFtDcax6s29rbxtreNNIhERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRLB05cmRpaWl5eXm8//bt27dr167Bn2jp7Nmz4//Fb7/9NvhzmcJIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIFqfB23j8+PE8btiwYTAD2rRp0+BtrAW0tGTwfk5Ab+3+/fvzuHnz5sEM6LPPPhu8jZs3b87j1q1bBzOgPXv2DNbt2bNnV65cmSfLy8uDGdCvv/66sLAwWJ9Lly7NNdDGjRu3bds2mAF9/vnnu3fvHqzDysrKmTNn5snOnTsHq56/w+/fv3/Lli2Df+vRo0fHjx9/+vTpnLy++uqrwarnAc3LceDAgcGbXb58+dixYw8ePJiT1w8//DB44ffNjJ9//vngwYOHDh26e/fuYHW8me7du3fr1q0bN26s7f1s3759165dthBftTDn9Zff3Llz5/Dhw0ePHp3XbryHfvzxx717947VrZq1W/6ufPLJJ3PdY+H8R/8U0Evnz5+/ePHifPjmgDSfwidPnoz3wdzc++6778a7sGHV/IUzmh07dsyZa/A6rw8I1skfdEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCR/BwAA//9cOkKJAAAABklEQVQDAHkEJq8i6xH5AAAAAElFTkSuQmCC" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAAJACAIAAABUkf6hAAAIdklEQVR4nOzduXIXRwKA8ZYsDmNhDC5fOLEL2wWBHdm5Q0eEPAABT8DL8BSkxISEEEAVUAUJ930JlqO2kQzLrmFL7Me6lvXvF4xGClT/mvmmu6cVaGllZWXAf2ppQCAgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCInlNQE+ePLl69erKysrfXnj8+PH4i9mwatOmTVu2bPnoo4+2b9++uLg4+IOFV/9v/Azl4sWLly5devr06XgPzTs97/o8uX///ruNfmlp6csvv9y5c+cHH3wweMU/Arp27drp06fXzjdv3vzxxx8vLy/PR3Beu7W78r9vftr5yce78GjVvXv3bt26df369Tkqzx/O0WjPnj0bN24cvPB7QPNKnThxYqxeo6+//nrr1q3jPfQOA/oXc1SeT9fMaD5LP/30k4Zeej6vz0ft5MmT82TO9Lt3735P6/mvmvPXL7/88uGHH86Z8dSpU4MXngd07ty5+WzNBcQ333wzeIM5ts2xZ66B5gLrwoULg1WLc708p/l59u233y4sLAzebM7v33///TyZrxqDVYtzhfjs2bNPP/3UvL4eX3zxxbxQc2tj7aljcb58zS87duwYrMPcDZoNzZM7d+4M5gW5ffv2WN1BGazPtm3b5vHu3buDtZ3oOSbbZl2/uRKax4cPHw7WArK7+lbWtlXnwnGwFtDcax6s29rbxtreNNIhERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRLB05cmRpaWl5eXm8//bt27dr167Bn2jp7Nmz4//Fb7/9NvhzmcJIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIFqfB23j8+PE8btiwYTAD2rRp0+BtrAW0tGTwfk5Ab+3+/fvzuHnz5sEM6LPPPhu8jZs3b87j1q1bBzOgPXv2DNbt2bNnV65cmSfLy8uDGdCvv/66sLAwWJ9Lly7NNdDGjRu3bds2mAF9/vnnu3fvHqzDysrKmTNn5snOnTsHq56/w+/fv3/Lli2Df+vRo0fHjx9/+vTpnLy++uqrwarnAc3LceDAgcGbXb58+dixYw8ePJiT1w8//DB44ffNjJ9//vngwYOHDh26e/fuYHW8me7du3fr1q0bN26s7f1s3759165dthBftTDn9Zff3Llz5/Dhw0ePHp3XbryHfvzxx717947VrZq1W/6ufPLJJ3PdY+H8R/8U0Evnz5+/ePHifPjmgDSfwidPnoz3wdzc++6778a7sGHV/IUzmh07dsyZa/A6rw8I1skfdEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCQCIhEQiYBIBEQiIBIBkQiIREAkAiIREImASAREIiASAZEIiERAJAIiERCJgEgERCIgEgGRCIhEQCR/BwAA//9cOkKJAAAABklEQVQDAHkEJq8i6xH5AAAAAElFTkSuQmCC" />
+  <foreignObject id="ob_fo" x="0" y="0" width="96" height="288" overflow="visible">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;width:100%;height:100%;overflow:visible;">
+      <obc-gauge-vertical id="ob_el" style="position:absolute;left:0;top:0;width:96px;height:288px;display:block;"></obc-gauge-vertical>
+    </div>
+  </foreignObject>
+  <script type="text/javascript"><![CDATA[
+//!export-start
+let _pn_value = 0;
+let _pn_min = 0;
+let _pn_max = 100;
+let _pb_hasSetpoint = false;
+let _pn_setpoint = 0;
+let _ps_fillMode = 'fill';
+let _pb_labels = true;
+let _ps_priority = 'regular';
+let _pb_off = false;
+//!export-end
+
+var __busyUntil = 0;
+
+function toBool(v) {
+    if (v === true || v === 1) return true;
+    var s = String(v).toLowerCase();
+    return s === 'true' || s === '1' || s === 'on';
+}
+
+function toNum(v) {
+    var n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+}
+
+function apply() {
+    var preview = document.getElementById('ob_preview');
+    if (preview && preview.parentNode) { preview.parentNode.removeChild(preview); }
+    var el = document.getElementById('ob_el');
+    if (!el) return;
+    el.value = toNum(_pn_value);
+    el.minValue = toNum(_pn_min);
+    el.maxValue = toNum(_pn_max);
+    el.fillMode = String(_ps_fillMode);
+    el.showLabels = toBool(_pb_labels);
+    el.priority = String(_ps_priority);
+    el.setpoint = toBool(_pb_hasSetpoint) ? toNum(_pn_setpoint) : undefined;
+    el.state = toBool(_pb_off) ? 'off' : 'active';
+}
+
+function putValue(id, value) {
+    if (id === '_pn_value') { _pn_value = toNum(value); }
+    if (id === '_pn_min') { _pn_min = toNum(value); }
+    if (id === '_pn_max') { _pn_max = toNum(value); }
+    if (id === '_pb_hasSetpoint') { _pb_hasSetpoint = toBool(value); }
+    if (id === '_pn_setpoint') { _pn_setpoint = toNum(value); }
+    if (id === '_ps_fillMode') { _ps_fillMode = String(value); }
+    if (id === '_pb_labels') { _pb_labels = toBool(value); }
+    if (id === '_ps_priority') { _ps_priority = String(value); }
+    if (id === '_pb_off') { _pb_off = toBool(value); }
+    apply();
+}
+
+function postValue(id, value) {
+    // replaced at runtime: writes value to the tag bound to "id"
+}
+
+(function () {
+    var el = document.getElementById('ob_el');
+    if (!el) return;
+    el.fixedAspectRatio = true;
+})();
+
+function fitBox() {
+    var root = document.getElementById('ob_root');
+    var fo = document.getElementById('ob_fo');
+    var el = document.getElementById('ob_el');
+    if (!root || !fo || !el) return;
+    var w = parseFloat(root.getAttribute('width')) || 96;
+    var h = parseFloat(root.getAttribute('height')) || 288;
+    if (root.getAttribute('viewBox') !== '0 0 ' + w + ' ' + h) {
+        root.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    }
+    fo.setAttribute('width', w);
+    fo.setAttribute('height', h);
+    el.style.width = w + 'px';
+    el.style.height = h + 'px';
+}
+
+(function () {
+    var root = document.getElementById('ob_root');
+    fitBox();
+    if (root && window.MutationObserver) {
+        new MutationObserver(fitBox).observe(root, { attributes: true, attributeFilter: ['width', 'height'] });
+    }
+})();
+
+apply();
+]]></script>
+</svg>

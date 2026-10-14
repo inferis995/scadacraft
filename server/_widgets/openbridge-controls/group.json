@@ -1,0 +1,39 @@
+{
+  "label": "OpenBridge · Controls",
+  "order": 3,
+  "description": "Operator commands: buttons, start/stop and toggle switches, slider, number input, mode selector.",
+  "items": [
+    {
+      "file": "ob-button.svg",
+      "label": "Command button"
+    },
+    {
+      "file": "ob-start-stop.svg",
+      "label": "Start/stop switch"
+    },
+    {
+      "file": "ob-toggle-switch.svg",
+      "label": "Toggle switch"
+    },
+    {
+      "file": "ob-slider.svg",
+      "label": "Setpoint slider"
+    },
+    {
+      "file": "ob-number-input.svg",
+      "label": "Number input"
+    },
+    {
+      "file": "ob-mode-selector.svg",
+      "label": "Mode selector (3 options)"
+    },
+    {
+      "file": "ob-check-button.svg",
+      "label": "Check button"
+    },
+    {
+      "file": "ob-ok-nok.svg",
+      "label": "OK / NOK selector"
+    }
+  ]
+}
