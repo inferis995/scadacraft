@@ -5,6 +5,11 @@ All notable changes to ScadaCraft. Versions of the MCP server are in brackets.
 ## Unreleased
 
 ### Added
+- AVEVA Custom Widgets (`.cwp`): import from the editor (Widgets panel, import button, also for
+  `.svg` widgets) or the MCP (`scadacraft_import_widgets`). The page runs unchanged in the widget;
+  each `.wjson` property becomes a widget variable (Boolean / number / text) bound to tags in the
+  property panel, with its description; ScadaCraft serves the `cwidget` API (read, write, `on`).
+- MCP library widgets report labels, descriptions and directions from the widget metadata.
 - MCP: interaction on pages. `scadacraft_set_events` (click → page, popup, floating card, close,
   set / add / toggle a tag, script, link) on widgets, charts, buttons and shapes;
   `scadacraft_animate_shape` (colour by value, blink, hide/show, rotate, spin, move);

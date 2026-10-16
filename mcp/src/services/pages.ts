@@ -140,9 +140,13 @@ export class PagesService {
     }
     const info = inspectWidgetSvg(svg, key);
     return {
-      widget: key, file: item.path, title: item.label ?? basename(key), category: `library:${group.name}`, group: group.name,
+      widget: key, file: item.path, title: item.label ?? info.title ?? basename(key), category: `library:${group.name}`, group: group.name,
       element: 'svg', layout: 'fill', size: info.size, anchor: { x: 0, y: 0 }, stretch: null,
-      properties: info.vars.map((v) => ({ name: v.name, type: v.type, default: v.default, dir: 'read' as const, write: false, description: '' })),
+      properties: info.vars.map((v) => {
+        const m = info.meta[v.name] ?? {};
+        const dir = m.dir === 'write' || m.dir === 'rw' ? m.dir : 'read' as const;
+        return { name: v.name, type: v.type, default: v.default, dir, write: dir !== 'read', description: [m.label, m.description].filter(Boolean).join(' — ') };
+      }),
     };
   }
 
@@ -156,6 +160,7 @@ export class PagesService {
     if (!/^[\w .-]+$/.test(group)) throw new Error('Group name may contain letters, digits, space, "-", "_" and "." only.');
     if (BUILTIN_GROUP.test(group)) throw new Error(`"${group}" is a built-in OpenBridge library; import into another group.`);
     const files: { name: string; svg: string }[] = [];
+    const packages: string[] = [];
     if (input.svg) {
       if (!input.name) throw new Error('"name" is required with "svg".');
       files.push({ name: input.name, svg: input.svg });
@@ -163,14 +168,36 @@ export class PagesService {
     for (const p of input.paths ?? []) {
       const full = resolve(p);
       const list = statSync(full).isDirectory()
-        ? readdirSync(full).filter((f) => extname(f).toLowerCase() === '.svg').map((f) => join(full, f))
+        ? readdirSync(full).filter((f) => ['.svg', '.cwp'].includes(extname(f).toLowerCase())).map((f) => join(full, f))
         : [full];
-      for (const f of list) files.push({ name: basename(f), svg: readFileSync(f, 'utf8') });
+      for (const f of list) {
+        if (extname(f).toLowerCase() === '.cwp') packages.push(f);
+        else files.push({ name: basename(f), svg: readFileSync(f, 'utf8') });
+      }
     }
-    if (!files.length) throw new Error('Nothing to import: pass "paths" (files or folders of .svg) or "svg" with "name".');
+    if (!files.length && !packages.length) throw new Error('Nothing to import: pass "paths" (.svg widgets, AVEVA .cwp packages or folders of them) or "svg" with "name".');
     const existing = new Set((await this.library()).flatMap((g) => g.items.map((i) => i.path)));
     const imported: { path: string; size: { width: number; height: number }; properties: string[] }[] = [];
     const warnings: string[] = [];
+    // AVEVA Custom Widgets: converted by the server (package kept as is, properties become widget variables)
+    for (const f of packages) {
+      let r;
+      try {
+        r = await this.client.postJson<{ path: string; size: { width: number; height: number }; properties: { name: string; aveva: string; dir: string; description: string }[] }>(
+        '/api/resources/importCwp',
+        { group, data: readFileSync(f).toString('base64'), ...(input.name && packages.length === 1 ? { name: input.name.replace(/\.cwp$/i, '') } : {}), overwrite: !!input.overwrite },
+        120_000,
+        );
+      } catch (err) {
+        if ((err as { status?: number }).status === 409) {
+          warnings.push(`${basename(f)}: already in "${group}", skipped (overwrite: true replaces it).`);
+          continue;
+        }
+        throw err;
+      }
+      this.svgCache.delete(r.path.replace(/^_widgets\//, '').replace(/\.svg$/, ''));
+      imported.push({ path: r.path, size: r.size, properties: r.properties.map((p) => `${p.name} (${p.dir}${p.description ? `, ${p.description}` : ''})`) });
+    }
     for (const f of files) {
       const file = f.name.toLowerCase().endsWith('.svg') ? f.name : `${f.name}.svg`;
       if (!/^[\w .-]+\.svg$/i.test(file)) throw new Error(`Invalid file name "${file}".`);
@@ -621,7 +648,9 @@ export class PagesService {
 }
 
 /** Size and bindable variables of a FUXA SVG widget. */
-export function inspectWidgetSvg(svg: string, label: string): { size: { width: number; height: number }; hasScript: boolean; vars: { name: string; type: string; default: string }[] } {
+export interface VarMeta { label?: string; description?: string; dir?: string }
+
+export function inspectWidgetSvg(svg: string, label: string): { size: { width: number; height: number }; hasScript: boolean; vars: { name: string; type: string; default: string }[]; meta: Record<string, VarMeta>; title?: string } {
   const doc = new DOMParser().parseFromString(svg, 'image/svg+xml');
   const root = doc.documentElement;
   if (!root || root.nodeName !== 'svg') throw new Error(`${label}: not an SVG document.`);
@@ -641,5 +670,16 @@ export function inspectWidgetSvg(svg: string, label: string): { size: { width: n
       vars.push({ name: v.name, type: v.type, default: String(v.variableValue ?? '') });
     }
   }
-  return { size: { width: Math.round(width), height: Math.round(height) }, hasScript: scripts.length > 0, vars };
+  // labels, descriptions and directions: <metadata data-scadacraft="widget-properties"> (docs/HowTo-Widgets.md)
+  let meta: Record<string, VarMeta> = {};
+  let title: string | undefined;
+  for (const m of Array.from(root.getElementsByTagName('metadata'))) {
+    if (m.getAttribute('data-scadacraft') !== 'widget-properties') continue;
+    try {
+      const data = JSON.parse(m.textContent ?? '{}') as { widget?: string; properties?: Record<string, VarMeta> };
+      meta = data.properties ?? {};
+      title = data.widget;
+    } catch { /* invalid metadata: ignore */ }
+  }
+  return { size: { width: Math.round(width), height: Math.round(height) }, hasScript: scripts.length > 0, vars, meta, title };
 }

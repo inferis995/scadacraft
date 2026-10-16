@@ -335,7 +335,7 @@ Returns: the new view id and name.`,
     if (widget) {
       const w = await ctx.pages.describeLibraryWidget(widget);
       const lines = [`## ${w.widget} — ${w.title}`, `file ${w.file}, box ${w.size.width}x${w.size.height} px, ${w.layout === 'anchor' ? `anchor (${w.anchor.x}, ${w.anchor.y})` : 'top-left anchored'}`];
-      for (const p of w.properties) lines.push(`- \`${p.name}\` ${p.type}, default ${p.default || '—'}${p.description ? `: ${p.description}` : ''}`);
+      for (const p of w.properties) lines.push(`- \`${p.name}\` ${p.type}, ${p.dir}, default ${p.default || '—'}${p.description ? `: ${p.description}` : ''}`);
       if (!w.properties.length) lines.push('(no bindable properties)');
       return ok(lines.join('\n'), { widget: w });
     }
@@ -356,11 +356,18 @@ Returns: the new view id and name.`,
   bindable variables: _pb_ boolean, _pn_ number, _ps_ string, _pc_ colour; putValue(id, value) receives tag values and
   postValue(id, value) writes to the bound tag. The import reports each widget's properties.
 
+  AVEVA Custom Widgets (.cwp packages, e.g. built for AVEVA System Platform / OMI) are imported too: the HTML page runs
+  unchanged inside the widget, every property of its .wjson becomes a widget variable (Boolean → _pb_, Integer/Double → _pn_,
+  String → _ps_, same name, description as label) and the page's cwidget API is served by ScadaCraft: cwidget.<prop> reads the
+  bound tag, cwidget.<prop> = v writes it, cwidget.on('<prop>', fn) fires on changes. Bind tags with
+  scadacraft_place_widgets / scadacraft_set_properties ({"sp_pressione": {"tag": "PLC.SetpointPressione"}}) or in the editor.
+
   Args:
     - group (string): library group (folder), e.g. "Impianto" — created if missing; OpenBridge groups are reserved
-    - paths (string[], optional): .svg files or folders of .svg files on the machine running the MCP server
+    - paths (string[], optional): .svg widgets, AVEVA .cwp packages, or folders of them, on the machine running the MCP server
     - svg (string, optional) + name (string): widget content given inline
     - overwrite (boolean, default false): replace widgets with the same name
+    - name (with one .cwp): library name instead of the package name
 
   Returns: imported widgets (path, size, properties) and warnings (no script, no variables, skipped).
   Then place them with scadacraft_place_widgets {"widget": "group/file", "node": {...}, "size": {...}, "properties": {...}}.`,

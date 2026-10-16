@@ -3,7 +3,7 @@ import { Component, Inject, OnInit, OnDestroy, AfterViewInit, ViewChild, ViewCon
 import { ChangeDetectorRef } from '@angular/core';
 import { MatDialog as MatDialog, MatDialogRef as MatDialogRef, MAT_DIALOG_DATA as MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { MatDrawer } from '@angular/material/sidenav';
-import { Subject, Subscription, switchMap, takeUntil } from 'rxjs';
+import { Subject, Subscription, firstValueFrom, switchMap, takeUntil } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 
 import { ProjectService, SaveMode } from '../_services/project.service';
@@ -40,6 +40,9 @@ import { PipePropertyData } from '../gauges/controls/pipe/pipe-property/pipe-pro
 import { MapsViewComponent } from '../maps/maps-view/maps-view.component';
 import { KioskWidgetsComponent } from '../resources/kiosk-widgets/kiosk-widgets.component';
 import { ResourcesService } from '../_services/resources.service';
+import { MyFileService } from '../_services/my-file.service';
+import { ToastrService } from 'ngx-toastr';
+import { EditNameComponent, EditNameData } from '../gui-helpers/edit-name/edit-name.component';
 import { InputPropertyComponent } from '../gauges/controls/html-input/input-property/input-property.component';
 import { SettingsService } from '../_services/settings.service';
 import { OnboardingWizardComponent } from './onboarding-wizard/onboarding-wizard.component';
@@ -140,6 +143,8 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
         private resolver: ComponentFactoryResolver,
         private resourcesService: ResourcesService,
         private libWidgetsService: LibWidgetsService,
+        private fileService: MyFileService,
+        private toastr: ToastrService,
         private settingsService: SettingsService) {
     }
 
@@ -1610,6 +1615,60 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
                 this.libWidgetsService.refreshResources();
+            }
+        });
+    }
+
+    /**
+     * Import widgets from files: native SVG widgets and AVEVA Custom Widget packages (.cwp),
+     * into a library group chosen by the user.
+     */
+    onWidgetFilesImport(event: any) {
+        const files: File[] = Array.from(event?.target?.files || []);
+        if (!files.length) {
+            return;
+        }
+        const hasCwp = files.some(f => f.name.toLowerCase().endsWith('.cwp'));
+        const dialogRef = this.dialog.open(EditNameComponent, {
+            position: { top: '60px' },
+            data: <EditNameData>{
+                name: hasCwp ? 'AVEVA' : 'Custom',
+                title: this.translateService.instant('editor.widgets-import'),
+                label: this.translateService.instant('editor.widgets-import-group'),
+                validator: (name: string) => /^[\w .-]+$/.test(name || '') && !/^openbridge(-|$)/.test(name)
+            }
+        });
+        dialogRef.afterClosed().subscribe(async (result: EditNameData) => {
+            const group = result?.name?.trim();
+            if (!group) {
+                return;
+            }
+            const errors: string[] = [];
+            for (const file of files) {
+                try {
+                    if (file.name.toLowerCase().endsWith('.cwp')) {
+                        const data = await new Promise<string>((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => resolve(String(reader.result));
+                            reader.onerror = () => reject(reader.error);
+                            reader.readAsDataURL(file);
+                        });
+                        await firstValueFrom(this.resourcesService.importCwp(group, data, true));
+                    } else {
+                        const res = await firstValueFrom(this.fileService.upload(file, 'widgets', `${group}/${file.name}`));
+                        if (!res?.result) {
+                            throw new Error(res?.error || 'upload failed');
+                        }
+                    }
+                } catch (err) {
+                    errors.push(`${file.name}: ${err?.error?.message || err?.message || err}`);
+                }
+            }
+            this.libWidgetsService.refreshResources();
+            if (errors.length) {
+                this.toastr.error(errors.join('\n'), this.translateService.instant('editor.widgets-import'), { timeOut: 8000 });
+            } else {
+                this.toastr.success(this.translateService.instant('editor.widgets-import-done', { count: files.length, group: group }));
             }
         });
     }

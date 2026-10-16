@@ -26,6 +26,12 @@ export class ResourcesService {
         return this.http.post<any>(this.endPointConfig + '/api/resources/removeWidget', params, { headers: header });
     }
 
+    /** Import an AVEVA Custom Widget package (.cwp, base64) into a widget library group. */
+    importCwp(group: string, data: string, overwrite = true): Observable<any> {
+        let header = new HttpHeaders({ 'Content-Type': 'application/json' });
+        return this.http.post<any>(this.endPointConfig + '/api/resources/importCwp', { group, data, overwrite }, { headers: header });
+    }
+
     generateImage(imageProperty: any) {
         let header = new HttpHeaders({ 'Content-Type': 'application/json' });
         const requestOptions: Object = {

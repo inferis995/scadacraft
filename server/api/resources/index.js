@@ -10,6 +10,7 @@ const Report = require('../../runtime/jobs/report');
 const fontkit = require('fontkit');
 const os = require('os');
 const { resolveWithin } = require('../path-helper');
+const cwp = require('../../runtime/utils/cwp');
 
 var runtime;
 var secureFnc;
@@ -282,7 +283,7 @@ module.exports = {
                         if (meta.label) group.label = meta.label;
                         group.order = Number.isFinite(meta.order) ? meta.order : 1000;
                         var itemMeta = Array.isArray(meta.items) ? meta.items : [];
-                        var files = getFilesRecursive(dirPath, ['.svg']);
+                        var files = getFilesRecursive(dirPath, ['.svg'], dirPath, true);
                         for (var x = 0; x < files.length; x++) {
                             var filename = files[x];
                             var rel = filename.split(path.sep).join(path.posix.sep);
@@ -316,6 +317,39 @@ module.exports = {
         /**
          * POST Remove Server widget item
          */
+        /**
+         * POST AVEVA Custom Widget package (.cwp) import into the widget library
+         * body: { group, data: base64 of the .cwp, name?, overwrite? }
+         */
+        resourcesApp.post('/api/resources/importCwp', secureFnc, function (req, res) {
+            const permission = checkGroupsFnc(req);
+            if (res.statusCode === 403) {
+                runtime.logger.error("api resources/importCwp: Tocken Expired");
+                return;
+            } else if (!authJwt.haveAdminPermission(permission)) {
+                runtime.logger.error("api resources/importCwp: Unauthorized!");
+                return res.status(401).json({ error: "unauthorized_error", message: "Unauthorized!" });
+            }
+            try {
+                const data = req.body?.data;
+                if (!data || typeof data !== 'string') {
+                    return res.status(400).json({ error: "invalid_data", message: "Missing package data (base64)." });
+                }
+                const buf = Buffer.from(data.replace(/^data:.*?,/, ''), 'base64');
+                const result = cwp.importCwp(buf, {
+                    widgetsDir: runtime.settings.widgetsFileDir,
+                    group: req.body.group,
+                    name: req.body.name,
+                    overwrite: !!req.body.overwrite,
+                });
+                runtime.logger.info(`api resources/importCwp: ${result.path} (${result.properties.length} properties)`);
+                res.json(result);
+            } catch (err) {
+                runtime.logger.error("api resources/importCwp: " + err.message);
+                res.status(err.code === 'exists' ? 409 : 400).json({ error: err.code || "invalid_package", message: err.message });
+            }
+        });
+
         resourcesApp.post('/api/resources/removeWidget', secureFnc, function (req, res) {
             const permission = checkGroupsFnc(req);
             if (res.statusCode === 403) {
@@ -346,6 +380,7 @@ module.exports = {
 
                 try {
                     fs.unlinkSync(fullPath);
+                    if (fullPath.toLowerCase().endsWith('.svg')) cwp.removeCwpFor(fullPath);
                     res.json({ success: true, path: relPath });
                 } catch (err) {
                     runtime.logger.error("api removeWidget: " + err.message);
@@ -390,13 +425,15 @@ function getFiles(pathDir, extensions) {
     return filesInDIrectory;
 }
 
-function getFilesRecursive(pathDir, extensions, baseDir = pathDir) {
+function getFilesRecursive(pathDir, extensions, baseDir = pathDir, skipPrivate = false) {
     const entries = fs.readdirSync(pathDir, { withFileTypes: true });
     const files = [];
     for (const entry of entries) {
         const entryPath = path.join(pathDir, entry.name);
         if (entry.isDirectory()) {
-            files.push(...getFilesRecursive(entryPath, extensions, baseDir));
+            // "_" folders hold widget assets (e.g. imported AVEVA packages), not library items
+            if (skipPrivate && entry.name.startsWith('_')) continue;
+            files.push(...getFilesRecursive(entryPath, extensions, baseDir, skipPrivate));
         } else if (extensions.indexOf(path.extname(entry.name).toLowerCase()) !== -1) {
             files.push(path.relative(baseDir, entryPath));
         }

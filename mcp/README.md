@@ -79,7 +79,7 @@ pages created through MCP appear, run and can be edited by hand like any other.
 | Tool | What it does |
 | --- | --- |
 | `scadacraft_list_library_widgets` | Groups and widgets of the editor's Widgets panel; describe one widget (size, properties) |
-| `scadacraft_import_widgets` | Import native FUXA/ScadaCraft SVG widgets (files, folders or inline SVG) into a library group |
+| `scadacraft_import_widgets` | Import native FUXA/ScadaCraft SVG widgets (files, folders or inline SVG) and AVEVA Custom Widget packages (`.cwp`) into a library group |
 | `scadacraft_remove_library_widgets` | Remove imported widgets from the library |
 
 Imported widgets are placed with `scadacraft_place_widgets` using `"group/file"` as widget name,
@@ -221,6 +221,8 @@ npm test
 - `test/parity.mjs`: widget script processing matches the editor's code for every widget.
 - `test/http-auth.mjs`: HTTP transport security (token required on the network, 401 without it, DNS-rebinding protection on localhost).
 - `test/e2e.mjs`: page building with server memory tags (tank, pump, valve, readout, pipes).
+- `test/e2e-cwp.mjs`: AVEVA Custom Widget import (package built by the test): properties, directions and labels,
+  files served, cwidget host, placement with bindings, invalid package, removal.
 - `test/e2e-library.mjs`: widget import into the library, placement of imported widgets with
   bindings, trend chart on a page (history mode), one-step trend page with menu entry.
 - `test/e2e-widgets.mjs`: the five OpenBridge libraries; builds the page "OpenBridge showcase" with

@@ -100,3 +100,28 @@ let _pb_cmd = false;    // Start/stop command | Written 1/0 on click
 <metadata data-scadacraft="widget-properties">{"widget": "Level bar", "properties": {
   "_pn_level": {"label": "Level", "description": "Tank level in %", "dir": "read"}}}</metadata>
 ```
+
+
+## AVEVA Custom Widgets (.cwp)
+
+ScadaCraft imports the Custom Widget packages made for AVEVA (a `.cwp` is a zip with `index.html`,
+`<name>.wjson` and the widget scripts). In the editor: Widgets panel, import button (next to the
+widget kiosk), choose the `.cwp` and the library group. Through the MCP: `scadacraft_import_widgets`
+with the `.cwp` path.
+
+- The package is kept as it is in `_widgets/<group>/_cwp/<name>/` and the page runs unchanged inside
+  the widget (an iframe). A widget `<name>` appears in the library group.
+- Every property of the `.wjson` becomes a widget variable: `Boolean` → `_pb_<name>`,
+  `Integer`/`Double`/`Float` → `_pn_<name>`, `String` and the other types → `_ps_<name>`, with the
+  default value of the `.wjson`. The property panel shows the AVEVA name and description; bind a tag
+  to each property or give it a fixed value.
+- ScadaCraft provides the `cwidget` object of AVEVA's `proxy.js`: `cwidget.<prop>` returns the value of
+  the bound tag, `cwidget.<prop> = v` writes the tag, `cwidget.on('<prop>', fn)` is called when the value
+  changes.
+- Directions: if the package carries `window.CW_PROPS = [{name, dir: "in" | "out" | "inout"}]` (for
+  example in `build/props.js`), the panel shows read / write / read-write; otherwise every property is
+  read-write.
+- In the editor the page is shown but does not take the mouse (to select and resize the widget); in the
+  runtime it is fully interactive.
+- Not supported: AVEVA services outside the `cwidget` properties (`MASvrHelper` is an empty stub) and
+  widget events.

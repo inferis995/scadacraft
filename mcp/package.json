@@ -29,7 +29,7 @@
     "build": "tsc && node scripts/copy-docs.mjs",
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
-    "test": "node test/parity.mjs && node test/http-auth.mjs && node test/e2e.mjs && node test/e2e-widgets.mjs && node test/e2e-library.mjs && node test/e2e-interaction.mjs && node test/e2e-plant.mjs && node test/e2e-admin.mjs",
+    "test": "node test/parity.mjs && node test/http-auth.mjs && node test/e2e.mjs && node test/e2e-widgets.mjs && node test/e2e-library.mjs && node test/e2e-cwp.mjs && node test/e2e-interaction.mjs && node test/e2e-plant.mjs && node test/e2e-admin.mjs",
     "clean": "rm -rf dist docs"
   },
   "license": "MIT",
