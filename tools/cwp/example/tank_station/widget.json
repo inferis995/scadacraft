@@ -1,0 +1,18 @@
+{
+  "name": "tank_station",
+  "title": "Tank station",
+  "width": 960,
+  "height": 540,
+  "properties": [
+    {"name": "level", "type": "Double", "value": "0", "dir": "in", "desc": "Tank level (m)", "tag": "TS_Level"},
+    {"name": "level_max", "type": "Double", "value": "5", "dir": "inout", "desc": "Tank height, full scale of the level bar (m)"},
+    {"name": "pump_run", "type": "Boolean", "value": "false", "dir": "in", "desc": "Pump running", "tag": "TS_PumpRun"},
+    {"name": "pump_fault", "type": "Boolean", "value": "false", "dir": "in", "desc": "Pump fault", "tag": "TS_PumpFault"},
+    {"name": "cmd_start", "type": "Boolean", "value": "false", "dir": "out", "desc": "Start command (pulse)", "tag": "TS_CmdStart"},
+    {"name": "cmd_stop", "type": "Boolean", "value": "false", "dir": "out", "desc": "Stop command (pulse)", "tag": "TS_CmdStop"},
+    {"name": "sp_level", "type": "Double", "value": "3", "dir": "inout", "desc": "Level setpoint (m)", "tag": "TS_SpLevel"},
+    {"name": "flow_raw", "type": "Integer", "value": "0", "dir": "in", "desc": "Outlet flow, raw value", "tag": "TS_Flow"},
+    {"name": "k_flow", "type": "Double", "value": "0.1", "dir": "inout", "desc": "Flow scale factor (m3/h = raw x k)"},
+    {"name": "title", "type": "String", "value": "Tank station", "dir": "inout", "desc": "Title shown in the header"}
+  ]
+}

@@ -1,7 +1,8 @@
 import { AfterViewInit, ChangeDetectorRef, Component, Inject, OnDestroy, ViewChild } from '@angular/core';
 import { MatDialogRef as MatDialogRef, MAT_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SelOptionType, SelOptionsComponent } from '../../../gui-helpers/sel-options/sel-options.component';
-import { BehaviorSubject, Observable, Subject, combineLatest, map, of, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, combineLatest, from, map, of, takeUntil } from 'rxjs';
+import { ObIcons } from '../../../framework/scada-icon/ob-icons';
 import { Define } from '../../../_helpers/define';
 import { Role, UserGroups } from '../../../_models/user';
 import { LinkType, NaviItem } from '../../../_models/hmi';
@@ -37,18 +38,20 @@ export class LayoutMenuItemPropertyComponent implements AfterViewInit, OnDestroy
                 @Inject(MAT_DIALOG_DATA) public data: any) {
                 this.data.item.children = this.data.item.children || [];
 
-        this.icons$ = of(Define.MaterialIconsRegular).pipe(
+        const material$ = of(Define.MaterialIconsRegular).pipe(
             map((data: string) => data.split('\n')),
             map(lines => lines.map(line => line.split(' ')[0])),
             map(names => names.filter(name => !!name))
         );
+        // OpenBridge icons first ("ob:<name>"), then Material icons
+        this.icons$ = combineLatest([from(ObIcons.list()), material$]).pipe(map(([ob, mat]) => [...ob, ...mat]));
 
         this.filteredIcons$ = combineLatest([
             this.icons$,
             this.filterTextSubject.asObservable()
         ]).pipe(
             map(([icons, filterText]) =>
-                icons.filter(icon => icon.toLowerCase().includes(filterText.toLowerCase()))
+                ObIcons.filter(icons, filterText, this.data?.item?.icon)
             )
         );
     }

@@ -9,6 +9,7 @@ import { GaugeAction, GaugeRangeProperty, Hmi, View, ViewProperty } from '../../
 import { filter, Subject, takeUntil } from 'rxjs';
 import { MapsLocation, MAPSLOCATION_PREFIX } from '../../_models/maps';
 import { MapsLocationPropertyComponent } from '../maps-location-property/maps-location-property.component';
+import { ObIcons } from '../../framework/scada-icon/ob-icons';
 import { Utils } from '../../_helpers/utils';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
@@ -144,7 +145,10 @@ export class MapsViewComponent implements AfterViewInit, OnDestroy {
             const iconHtml = loc.showMarkerIcon
                                 ? image
                                     ? `<img class="bubble-image" src="${image}" alt="">`
-                                    : `<span class="material-icons bubble-icon"
+                                    : ObIcons.isOb(icon)
+                                        ? `<span class="ob-icon bubble-icon"
+                                            style="color: var(--bubble-fg);-webkit-mask-image:url('${ObIcons.url(icon)}');mask-image:url('${ObIcons.url(icon)}')"></span>`
+                                        : `<span class="material-icons bubble-icon"
                                             style="color: var(--bubble-fg);">${icon}</span>`
                                 : '';
             const valueHtml = loc.markerTagValueId && loc.showMarkerValue

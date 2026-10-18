@@ -10,12 +10,14 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { IconSelectorComponent } from './icon-selector/icon-selector.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { ScadaIconComponent } from './scada-icon/scada-icon.component';
 
 @NgModule({
   declarations: [
     JsonTooltipDirective,
     FileUploadComponent,
-    IconSelectorComponent
+    IconSelectorComponent,
+    ScadaIconComponent
   ],
   imports: [
     CommonModule,
@@ -31,7 +33,8 @@ import { TranslateModule } from '@ngx-translate/core';
     NgxTouchKeyboardModule,
     JsonTooltipDirective,
     FileUploadComponent,
-    IconSelectorComponent
+    IconSelectorComponent,
+    ScadaIconComponent
   ],
 
 })

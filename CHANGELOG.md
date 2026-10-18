@@ -5,6 +5,13 @@ All notable changes to ScadaCraft. Versions of the MCP server are in brackets.
 ## Unreleased
 
 ### Added
+- OpenBridge icons (about 2000, `ob:<name>`) for menu items, header buttons, page buttons and map
+  markers, in the editor icon pickers (search by name); tools/openbridge/make-icons.mjs.
+- Side menu: sub-menus also with the icon and icon + text styles.
+- Report charts drawn as SVG when the optional canvas plugins are missing (they were skipped).
+- MCP: header items (buttons, labels with tag values, icons; colours by value; click events),
+  `scadacraft_list_icons`, map locations and map pages; OpenBridge icon names validated;
+  `scadacraft_install_driver "Chart"` installs every package of the type; button icons.
 - AVEVA Custom Widgets (`.cwp`): import from the editor (Widgets panel, import button, also for
   `.svg` widgets) or the MCP (`scadacraft_import_widgets`). The page runs unchanged in the widget;
   each `.wjson` property becomes a widget variable (Boolean / number / text) bound to tags in the

@@ -302,18 +302,25 @@ Returns: drivers [{type, package, version, installed}].`,
     description: `Install a driver package on the ScadaCraft server (downloads it with npm; can take a few minutes and needs internet access on that server).
 
 Args:
-  - type (string): driver type from scadacraft_list_drivers, e.g. "Modbus", "SiemensS7", "OPCUA", "BACnet"
+  - type (string): driver type from scadacraft_list_drivers, e.g. "Modbus", "SiemensS7", "OPCUA", "BACnet";
+    "Chart" installs the packages that draw charts in PDF reports
 
 Returns: confirmation. Devices of that type start communicating afterwards.`,
     inputSchema: { type: z.string().min(1) },
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true },
   }, async ({ type }) => run(async () => {
     const plugins = await ctx.client.getPlugins();
-    const p = plugins.find((x) => x.type.toLowerCase() === type.toLowerCase() || x.name === type);
-    if (!p) throw new Error(`Unknown driver "${type}". Available: ${plugins.map((x) => x.type).join(', ')}.`);
-    if (p.current) return ok(`${p.type} driver already installed (${p.name} ${p.current}).`, { type: p.type, installed: p.current });
-    await ctx.client.installPlugin(p);
-    const after = (await ctx.client.getPlugins()).find((x) => x.name === p.name);
-    return ok(`Installed ${p.type} driver (${p.name} ${after?.current || p.version}).`, { type: p.type, installed: after?.current || p.version });
+    // a type can need several packages (e.g. "Chart" for report charts: chart.js + chartjs-node-canvas)
+    const matches = plugins.filter((x) => x.type.toLowerCase() === type.toLowerCase() || x.name === type);
+    if (!matches.length) throw new Error(`Unknown driver "${type}". Available: ${[...new Set(plugins.map((x) => x.type))].join(', ')}.`);
+    const done: string[] = [];
+    for (const p of matches) {
+      if (p.current) { done.push(`${p.name} ${p.current} (already installed)`); continue; }
+      await ctx.client.installPlugin(p);
+      const after = (await ctx.client.getPlugins()).find((x) => x.name === p.name);
+      if (!after?.current) throw new Error(`${p.name} was not installed (check the server log: npm needs internet access on the ScadaCraft server).`);
+      done.push(`${p.name} ${after.current}`);
+    }
+    return ok(`${matches[0].type}: ${done.join(', ')}.`, { type: matches[0].type, installed: done });
   }));
 }

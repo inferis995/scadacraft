@@ -1,0 +1,11 @@
+﻿property;type;direction;register;tag;description
+level;Double;read;;TS_Level;Tank level (m)
+level_max;Double;read/write;;;Tank height, full scale of the level bar (m)
+pump_run;Boolean;read;;TS_PumpRun;Pump running
+pump_fault;Boolean;read;;TS_PumpFault;Pump fault
+cmd_start;Boolean;write;;TS_CmdStart;Start command (pulse)
+cmd_stop;Boolean;write;;TS_CmdStop;Stop command (pulse)
+sp_level;Double;read/write;;TS_SpLevel;Level setpoint (m)
+flow_raw;Integer;read;;TS_Flow;Outlet flow, raw value
+k_flow;Double;read/write;;;Flow scale factor (m3/h = raw x k)
+title;String;read/write;;;Title shown in the header

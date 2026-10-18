@@ -7,19 +7,33 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import {
   ALARM_RETENTIONS, DB_TYPES, groupsToNames, INPUT_MODES, NAV_MODES, NAV_TYPES, NOTIFY_MODES, RETENTIONS, USER_GROUPS, ZOOM_MODES,
-  type LayoutInput, type MenuItemInput, type SettingsInput,
+  type LayoutInput, type MapLocationInput, type MenuItemInput, type SettingsInput,
 } from '../services/admin.js';
-import { iso, ok, RELOAD_NOTE, run, type Ctx } from './common.js';
+import { EventSchema, iso, ok, RELOAD_NOTE, run, type Ctx } from './common.js';
 
 const MenuItemSchema: z.ZodType<MenuItemInput> = z.lazy(() => z.object({
   text: z.string().min(1).max(100),
   view: z.string().optional().describe('view name to open'),
   link: z.string().optional().describe('external URL'),
   alarms: z.boolean().optional().describe('open the alarm list'),
-  icon: z.string().optional().describe('Material icon name, e.g. "home", "water_drop", "warning", "trending_up", "settings"'),
+  icon: z.string().optional().describe('OpenBridge icon "ob:<name>" (scadacraft_list_icons) or Material icon name, e.g. "home", "warning"'),
   image: z.string().optional().describe('image URL from scadacraft_upload_image'),
   children: z.array(MenuItemSchema).optional().describe('sub-menu'),
 }).strict());
+
+const HeaderItemSchema = z.object({
+  type: z.enum(['button', 'label', 'image']).describe('button; label (text, or the tag value when "tag" is set); image (icon only)'),
+  text: z.string().max(100).optional(),
+  icon: z.string().optional().describe('OpenBridge "ob:<name>" or Material icon'),
+  image: z.string().optional().describe('image URL from scadacraft_upload_image'),
+  background: z.string().optional(), color: z.string().optional(),
+  tag: z.string().optional().describe('"Device.Tag": label value, colours, default target of set/toggle events'),
+  colors: z.array(z.object({ min: z.number(), max: z.number(), fill: z.string().optional(), stroke: z.string().optional() }).strict()).max(20).optional()
+    .describe('background (fill) / text colour (stroke) by tag value'),
+  events: z.array(EventSchema).max(20).optional(),
+  margin_left: z.number().int().min(0).max(200).optional(), margin_right: z.number().int().min(0).max(200).optional(),
+  height: z.number().int().min(10).max(200).optional(),
+}).strict();
 
 const Retention = z.enum(RETENTIONS);
 
@@ -48,7 +62,10 @@ Args (all optional):
   - menu: {mode: ${NAV_MODES.join('|')} (void = no menu, fix = always open), type: ${NAV_TYPES.join('|')} (item style),
            background, color, logo (URL from scadacraft_upload_image, or null), items: [{text, view | link | alarms: true, icon, children}]}
   - header: {title, background, color, height, font_family, font_size, alarms: ${NOTIFY_MODES.join('|')}, infos: ${NOTIFY_MODES.join('|')},
-             login_info: nothing|username|fullname|both, date_time (Angular date format, e.g. "dd/MM/yyyy HH:mm:ss"), language: nothing|simple|key|fullname}
+             login_info: nothing|username|fullname|both, date_time (Angular date format, e.g. "dd/MM/yyyy HH:mm:ss"), language: nothing|simple|key|fullname,
+             items_anchor: left|center|right, items: [{type: button|label|image, text, icon, tag, colors, events, background, color}] (replaces the list)}
+    Header item events use the same actions as scadacraft_set_events (open_page, open_popup, set_value, toggle_value, run_script, open_link…).
+  Icons: OpenBridge icons as "ob:<name>" (search them with scadacraft_list_icons) or Material icon names.
   - zoom: ${ZOOM_MODES.join('|')}; input_dialog: ${INPUT_MODES.join('|')}; hide_navigation; show_dev_button; login_on_start;
     login_overlay: none|black|white; show_connection_error; custom_css;
     openbridge_theme: day | dusk | night (control room) | bright (sunlight) — palette of all OpenBridge widgets;
@@ -83,12 +100,104 @@ ${RELOAD_NOTE}`,
         alarms: z.enum(NOTIFY_MODES).optional(), infos: z.enum(NOTIFY_MODES).optional(),
         login_info: z.enum(['nothing', 'username', 'fullname', 'both']).optional(), date_time: z.string().optional(),
         language: z.enum(['nothing', 'simple', 'key', 'fullname']).optional(), items_anchor: z.enum(['left', 'center', 'right']).optional(),
+        items: z.array(HeaderItemSchema).max(30).optional(),
       }).strict().optional(),
     },
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }, async (input) => run(async () => {
     const layout = await admin.setLayout(input as LayoutInput);
     return ok(`Layout updated.\n${JSON.stringify(layout, null, 2)}\n\n${RELOAD_NOTE}`, { layout });
+  }));
+
+  server.registerTool('scadacraft_list_icons', {
+    title: 'Search OpenBridge icons',
+    description: `Search the OpenBridge icon set (about 2000 icons: alerts, automation, navigation, weather, equipment, arrows…).
+Use the names as "icon" of menu items, header items, buttons (scadacraft_place_button) and map markers: "ob:<name>".
+Material icon names ("home", "warning", "settings") work everywhere too.
+
+Args:
+  - search (string): words that must all appear in the name, e.g. "pump", "alarm", "tank level", "arrow left"
+  - limit (number, default 60)`,
+    inputSchema: { search: z.string().optional(), limit: z.number().int().min(1).max(500).default(60) },
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async ({ search, limit }) => run(async () => {
+    const r = await admin.listIcons(search, limit);
+    return ok(`${r.total} icon(s)${search ? ` for "${search}"` : ''}${r.total > r.icons.length ? `, first ${r.icons.length}` : ''}:\n${r.icons.join(', ')}`, r);
+  }));
+
+  // ---------------------------------------------------------------- maps
+  server.registerTool('scadacraft_list_map_locations', {
+    title: 'List map locations',
+    description: 'Map locations (markers) of the project: name, coordinates, page opened in a card, page to navigate to, link, icon, tag shown on the marker.',
+    inputSchema: {},
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async () => run(async () => {
+    const project = await ctx.client.getProject();
+    const list = (await admin.listMapLocations()).map((l) => admin.describeLocation(project, l));
+    const lines = list.map((l) => `- **${l.name}** (${l.latitude}, ${l.longitude})${l.page ? ` → page ${l.page}` : ''}${l.card_page ? `, card ${l.card_page}` : ''}${l.value_tag ? `, value ${l.value_tag}` : ''}`);
+    return ok(lines.length ? lines.join('\n') : 'No map locations.', { locations: list });
+  }));
+
+  server.registerTool('scadacraft_set_map_location', {
+    title: 'Create or update a map location',
+    description: `Create or update (by name) a marker for map pages (OpenStreetMap): a site, a pumping station, a tank.
+The marker can show its name, an icon and a live tag value; its popup offers the page in a card, navigation to a page, a link.
+
+Args:
+  - name, latitude, longitude (WGS84 decimal degrees)
+  - description?
+  - card_page?: page shown in a floating card on the map (e.g. a small faceplate page)
+  - page?: page the marker navigates to (e.g. the site's synoptic)
+  - url?: external link
+  - value_tag?: "Device.Tag" shown on the marker (e.g. level or pressure)
+  - icon?: "ob:<name>" (default "ob:location-1") or Material icon; image?: image URL instead
+  - background?, color?: marker colours; show_name?, show_icon? (default true)
+Then put the locations on a page with scadacraft_set_map_page. null clears a field.`,
+    inputSchema: {
+      name: z.string().min(1).max(100),
+      latitude: z.number().min(-90).max(90), longitude: z.number().min(-180).max(180),
+      description: z.string().max(500).optional(),
+      card_page: z.string().nullable().optional(), page: z.string().nullable().optional(), url: z.string().nullable().optional(),
+      value_tag: z.string().nullable().optional(),
+      icon: z.string().optional(), image: z.string().nullable().optional(),
+      background: z.string().optional(), color: z.string().optional(),
+      show_name: z.boolean().optional(), show_icon: z.boolean().optional(),
+    },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async (input) => run(async () => {
+    const l = await admin.setMapLocation(input as MapLocationInput);
+    return ok(`Map location **${l.name}** saved (${l.latitude}, ${l.longitude}).\n${RELOAD_NOTE}`, { location: l });
+  }));
+
+  server.registerTool('scadacraft_delete_map_location', {
+    title: 'Delete a map location',
+    description: 'Delete a map location (by name or id) and remove it from the map pages.',
+    inputSchema: { location: z.string().min(1) },
+    annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false },
+  }, async ({ location }) => run(async () => {
+    const l = await admin.deleteMapLocation(location);
+    return ok(`Deleted map location **${l.name}**.`, { location: l });
+  }));
+
+  server.registerTool('scadacraft_set_map_page', {
+    title: 'Create or update a map page',
+    description: `Create or update (by name) a map page (OpenStreetMap, needs internet on the operator PC) with the given locations.
+Add it to the menu with scadacraft_set_layout (menu item {"text": "Map", "view": "<name>", "icon": "ob:map"}).
+
+Args:
+  - name: page name
+  - locations: location names or ids (scadacraft_set_map_location)
+  - center?: {latitude, longitude} (default: centre of the locations); zoom? (1-19, default 13, or 9 with several locations)`,
+    inputSchema: {
+      name: z.string().min(1).max(100),
+      locations: z.array(z.string().min(1)).max(500),
+      center: z.object({ latitude: z.number().min(-90).max(90), longitude: z.number().min(-180).max(180) }).strict().optional(),
+      zoom: z.number().int().min(1).max(19).optional(),
+    },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }, async (input) => run(async () => {
+    const r = await admin.setMapPage(input);
+    return ok(`Map page **${r.page}**: ${(r.locations as string[]).join(', ') || 'no locations'}, zoom ${r.zoom}.\n${RELOAD_NOTE}`, r);
   }));
 
   server.registerTool('scadacraft_upload_image', {

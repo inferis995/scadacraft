@@ -11,6 +11,7 @@ import { ScadaCraftClient } from '../fuxa/client.js';
 import { guid } from '../fuxa/ids.js';
 import { allTags, resolveTag } from '../fuxa/tags.js';
 import type { Project, View } from '../fuxa/types.js';
+import { buildEvents, type EventSpec } from '../fuxa/interaction.js';
 
 type Rec = Record<string, unknown>;
 
@@ -66,7 +67,48 @@ export interface LayoutInput {
     date_time?: string;
     language?: 'nothing' | 'simple' | 'key' | 'fullname';
     items_anchor?: 'left' | 'center' | 'right';
+    /** buttons, labels and icons in the header bar (replaces the list) */
+    items?: HeaderItemInput[];
   };
+}
+
+export interface HeaderItemInput {
+  /** button: raised button; label: shows the text, or the tag value when "tag" is set; image: icon only */
+  type: 'button' | 'label' | 'image';
+  text?: string;
+  /** Material icon name or OpenBridge "ob:<name>" (scadacraft_list_icons) */
+  icon?: string;
+  image?: string;
+  background?: string;
+  color?: string;
+  /** tag: colours by value (colors) and, for a label, the value shown; default target of set/toggle events */
+  tag?: string;
+  colors?: { min: number; max: number; fill?: string; stroke?: string }[];
+  events?: EventSpec[];
+  margin_left?: number;
+  margin_right?: number;
+  height?: number;
+}
+
+export interface MapLocationInput {
+  name: string;
+  latitude: number;
+  longitude: number;
+  description?: string;
+  /** page opened in a card on the map (marker popup button) */
+  card_page?: string | null;
+  /** page the marker navigates to */
+  page?: string | null;
+  url?: string | null;
+  show_name?: boolean;
+  show_icon?: boolean;
+  /** Material icon or "ob:<name>" */
+  icon?: string;
+  image?: string | null;
+  background?: string;
+  color?: string;
+  /** tag whose value is shown on the marker */
+  value_tag?: string | null;
 }
 
 // ---------------------------------------------------------------- settings
@@ -120,6 +162,8 @@ export function groupsToNames(v: number): string[] {
 }
 
 export class AdminService {
+  private iconNames?: string[];
+
   constructor(readonly client: ScadaCraftClient) {}
 
   private viewByName(project: Project, ref: string): View {
@@ -173,6 +217,7 @@ export class AdminService {
   }
 
   async setLayout(input: LayoutInput): Promise<Rec> {
+    await this.validateIcons([...this.menuIcons(input.menu?.items), ...(input.header?.items ?? []).map((i) => i.icon)]);
     const project = await this.client.getProject();
     const current = JSON.parse(JSON.stringify(((project.hmi as Rec | undefined)?.layout ?? {}))) as Rec;
     const layout: Rec = {
@@ -213,6 +258,7 @@ export class AdminService {
         ['language', 'language'], ['items_anchor', 'itemsAnchor'],
       ];
       for (const [k, f] of map) if (h[k] !== undefined) header[f] = h[k];
+      if (h.items) header.items = this.headerItems(project, h.items);
     }
     await this.client.setProjectData('layout', layout);
     return (await this.getLayout()).readable;
@@ -233,8 +279,153 @@ export class AdminService {
     }
   }
 
+  private headerItems(project: Project, items: HeaderItemInput[]): Rec[] {
+    return items.map((i) => {
+      const property: Rec = { text: i.text ?? '', events: [], actions: [] };
+      if (i.tag) property.variableId = resolveTag(project, i.tag).id;
+      if (i.colors?.length) {
+        if (!i.tag) throw new Error(`Header item "${i.text ?? i.icon ?? i.type}": colors need a "tag".`);
+        property.ranges = i.colors.map((r) => ({ min: r.min, max: r.max, color: r.fill ?? null, stroke: r.stroke ?? null }));
+      }
+      if (i.events?.length) property.events = buildEvents(project, i.events, i.tag);
+      if (i.type === 'image' && !i.icon && !i.image) throw new Error('Header item of type "image" needs an icon or an image.');
+      return {
+        id: guid('i_'), type: i.type, icon: i.icon ?? '', image: i.image ?? '',
+        ...(i.background ? { bkcolor: i.background } : {}), ...(i.color ? { fgcolor: i.color } : {}),
+        marginLeft: i.margin_left ?? 5, marginRight: i.margin_right ?? 5, ...(i.height ? { height: i.height } : {}),
+        property,
+      };
+    });
+  }
+
+  /** OpenBridge icon names ("ob:<name>") must exist; Material names are not checked. */
+  async validateIcons(names: (string | undefined)[]): Promise<void> {
+    const ob = names.filter((n): n is string => !!n && n.startsWith('ob:'));
+    if (!ob.length) return;
+    await this.listIcons();
+    const known = new Set(this.iconNames);
+    for (const n of ob) {
+      if (known.has(n)) continue;
+      const words = n.slice(3).split(/[-_\s]+/).filter((w) => w.length > 2);
+      const similar = this.iconNames!.filter((i) => words.some((w) => i.includes(w))).sort((a, b) => a.length - b.length).slice(0, 8);
+      throw new Error(`Unknown OpenBridge icon "${n}".${similar.length ? ` Similar: ${similar.join(', ')}.` : ''} Search with scadacraft_list_icons.`);
+    }
+  }
+
+  private menuIcons(items: MenuItemInput[] | undefined): (string | undefined)[] {
+    return (items ?? []).flatMap((i) => [i.icon, ...this.menuIcons(i.children)]);
+  }
+
+  // ------------------------------------------------------------ icons
+  /** OpenBridge icon names ("ob:<name>"), filtered by words. */
+  async listIcons(search?: string, limit = 60): Promise<{ total: number; icons: string[] }> {
+    if (!this.iconNames) {
+      const text = await this.client.getText('/assets/lib/openbridge/icons/icons.json');
+      this.iconNames = (JSON.parse(text) as string[]).map((n) => `ob:${n}`);
+    }
+    const words = (search ?? '').toLowerCase().split(/[\s,]+/).filter(Boolean);
+    const hits = this.iconNames.filter((n) => words.every((w) => n.includes(w)));
+    // shortest names first: "ob:pump" before "ob:pump-centrifugal-…"
+    hits.sort((a, b) => a.length - b.length || a.localeCompare(b));
+    return { total: hits.length, icons: hits.slice(0, limit) };
+  }
+
+  // ------------------------------------------------------------ maps
+  async listMapLocations(): Promise<Rec[]> {
+    const project = await this.client.getProject();
+    return ((project as unknown as { mapsLocations?: Rec[] }).mapsLocations ?? []);
+  }
+
+  describeLocation(project: Project, l: Rec): Rec {
+    const views = project.hmi?.views ?? [];
+    const vname = (id: unknown) => (id ? views.find((v) => v.id === id)?.name ?? String(id) : undefined);
+    let tag: string | undefined;
+    if (l.markerTagValueId) { try { tag = resolveTag(project, String(l.markerTagValueId)).ref; } catch { tag = String(l.markerTagValueId); } }
+    return {
+      id: l.id, name: l.name, latitude: l.latitude, longitude: l.longitude, description: l.description || undefined,
+      card_page: vname(l.viewId), page: vname(l.pageId), url: l.url || undefined, icon: l.markerIcon || undefined, value_tag: tag,
+    };
+  }
+
+  /** Create or update (by name) a map location. */
+  async setMapLocation(input: MapLocationInput): Promise<Rec> {
+    await this.validateIcons([input.icon]);
+    const project = await this.client.getProject();
+    const all = ((project as unknown as { mapsLocations?: Rec[] }).mapsLocations ?? []);
+    const existing = all.find((l) => String(l.name).toLowerCase() === input.name.toLowerCase());
+    if (Math.abs(input.latitude) > 90 || Math.abs(input.longitude) > 180) throw new Error('latitude must be -90..90 and longitude -180..180.');
+    const loc: Rec = existing ? { ...existing } : { id: guid('l_'), showMarkerName: true, showMarkerIcon: true, showMarkerValue: true, markerIcon: 'ob:location-1', markerBackground: '#ffffff', markerColor: '#1D3C67' };
+    loc.name = input.name;
+    loc.latitude = input.latitude;
+    loc.longitude = input.longitude;
+    if (input.description !== undefined) loc.description = input.description;
+    if (input.card_page !== undefined) loc.viewId = input.card_page ? this.viewByName(project, input.card_page).id : '';
+    if (input.page !== undefined) loc.pageId = input.page ? this.viewByName(project, input.page).id : '';
+    if (input.url !== undefined) loc.url = input.url ?? '';
+    if (input.show_name !== undefined) loc.showMarkerName = input.show_name;
+    if (input.show_icon !== undefined) loc.showMarkerIcon = input.show_icon;
+    if (input.icon !== undefined) loc.markerIcon = input.icon;
+    if (input.image !== undefined) loc.markerImage = input.image ?? '';
+    if (input.background !== undefined) loc.markerBackground = input.background;
+    if (input.color !== undefined) loc.markerColor = input.color;
+    if (input.value_tag !== undefined) {
+      loc.markerTagValueId = input.value_tag ? resolveTag(project, input.value_tag).id : '';
+      if (input.value_tag) loc.showMarkerValue = true;
+    }
+    await this.client.setProjectData('set-maps-location', loc);
+    return this.describeLocation(project, loc);
+  }
+
+  async deleteMapLocation(ref: string): Promise<Rec> {
+    const project = await this.client.getProject();
+    const all = ((project as unknown as { mapsLocations?: Rec[] }).mapsLocations ?? []);
+    const loc = all.find((l) => l.id === ref) ?? all.find((l) => String(l.name).toLowerCase() === ref.toLowerCase());
+    if (!loc) throw new Error(`Map location "${ref}" not found. Locations: ${all.map((l) => l.name).join(', ') || '(none)'}.`);
+    await this.client.setProjectData('del-maps-location', loc);
+    // drop it from map pages
+    for (const v of project.hmi?.views ?? []) {
+      if ((v as unknown as Rec).type !== 'maps') continue;
+      let ids: string[] = [];
+      try { ids = JSON.parse(v.svgcontent || '[]'); } catch { ids = []; }
+      if (ids.includes(String(loc.id))) {
+        v.svgcontent = JSON.stringify(ids.filter((i) => i !== loc.id));
+        await this.client.saveView(v);
+      }
+    }
+    return this.describeLocation(project, loc);
+  }
+
+  /** Map page (OpenStreetMap) showing locations; created or updated by name. */
+  async setMapPage(input: { name: string; locations: string[]; center?: { latitude: number; longitude: number }; zoom?: number }): Promise<Rec> {
+    const project = await this.client.getProject();
+    const all = ((project as unknown as { mapsLocations?: Rec[] }).mapsLocations ?? []);
+    const ids = input.locations.map((ref) => {
+      const l = all.find((x) => x.id === ref) ?? all.find((x) => String(x.name).toLowerCase() === ref.toLowerCase());
+      if (!l) throw new Error(`Map location "${ref}" not found. Create it with scadacraft_set_map_location.`);
+      return l;
+    });
+    const views = project.hmi?.views ?? [];
+    let view = views.find((v) => v.name.toLowerCase() === input.name.toLowerCase()) as unknown as Rec | undefined;
+    if (view && view.type !== 'maps') throw new Error(`"${input.name}" is a ${String(view.type ?? 'svg')} page, not a map page.`);
+    const center = input.center ?? (ids.length
+      ? { latitude: ids.reduce((a, l) => a + Number(l.latitude), 0) / ids.length, longitude: ids.reduce((a, l) => a + Number(l.longitude), 0) / ids.length }
+      : { latitude: 41.9, longitude: 12.5 });
+    if (!view) {
+      view = {
+        id: guid('v_'), name: input.name, type: 'maps', items: {}, variables: {},
+        profile: { width: 1024, height: 768, bkcolor: '#ffffffff', margin: 10, align: 'topCenter', gridType: 'fixed', viewRenderDelay: 0 },
+        property: {},
+      };
+    }
+    view.svgcontent = JSON.stringify(ids.map((l) => l.id));
+    view.property = { ...((view.property as Rec) ?? {}), startLocation: { id: guid('l_'), ...center }, startZoom: input.zoom ?? (ids.length > 1 ? 9 : 13) };
+    await this.client.saveView(view as unknown as View);
+    return { page: input.name, locations: ids.map((l) => l.name), center, zoom: (view.property as Rec).startZoom };
+  }
+
   /** Append a menu entry (kept if a menu entry already opens the same view). */
   async addMenuItem(item: MenuItemInput): Promise<{ added: boolean }> {
+    await this.validateIcons(this.menuIcons([item]));
     const project = await this.client.getProject();
     const current = JSON.parse(JSON.stringify(((project.hmi as Rec | undefined)?.layout ?? {}))) as Rec;
     const nav = { mode: 'over', type: 'block', bkcolor: '#F4F5F7', fgcolor: '#1D1D1D', items: [], ...(current.navigation as Rec ?? {}) } as Rec;

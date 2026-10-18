@@ -112,3 +112,9 @@
     border-right: 6px solid transparent;
     border-top: 7px solid var(--bubble-color);   /* ✔ colore dinamico */
 }
+
+:host ::ng-deep .ob-icon.bubble-icon {
+    width: 18px;
+    height: 18px;
+    display: block;
+}

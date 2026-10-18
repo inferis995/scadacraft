@@ -10,7 +10,7 @@ API keys, logs, backups).
 Everything is written in the same format as the ScadaCraft editor, so devices, alarms and
 pages created through MCP appear, run and can be edited by hand like any other.
 
-## Tools (86)
+## Tools (91)
 
 **Project**
 
@@ -33,7 +33,7 @@ pages created through MCP appear, run and can be edited by hand like any other.
 | `scadacraft_update_tags` | Rename, address, type, scaling, decimals, history logging, deadband |
 | `scadacraft_delete_tags` | Delete, listing remaining references |
 | `scadacraft_list_drivers` | Optional driver packages and whether they are installed |
-| `scadacraft_install_driver` | Install a driver on the ScadaCraft server |
+| `scadacraft_install_driver` | Install a driver on the ScadaCraft server (`Chart`: optional canvas renderer for report charts) |
 
 **Data**
 
@@ -95,7 +95,10 @@ Times accept ISO 8601, epoch ms, or relative values such as `-15m`, `-24h`, `-7d
 
 | Tool | What it does |
 | --- | --- |
-| `scadacraft_get_layout`, `scadacraft_set_layout` | Start page, menu (items, mode, colours, logo), header (title, colours, alarms, date/time, login info), zoom, OpenBridge palette (`openbridge_theme`, page backgrounds) |
+| `scadacraft_get_layout`, `scadacraft_set_layout` | Start page, menu (items with sub-menus, mode, colours, logo), header (title, colours, alarms, date/time, login info, buttons / labels / icons with tags and click events), zoom, OpenBridge palette (`openbridge_theme`, page backgrounds) |
+| `scadacraft_list_icons` | Search the ~2000 OpenBridge icons, used as `ob:<name>` in menu, header, buttons and map markers |
+| `scadacraft_list_map_locations`, `scadacraft_set_map_location`, `scadacraft_delete_map_location` | Map markers: coordinates, icon, live tag value, page in a card, page to open, link |
+| `scadacraft_set_map_page` | Map page (OpenStreetMap) with a set of locations, centre and zoom |
 | `scadacraft_upload_image` | Upload a logo, icon or background image |
 | `scadacraft_get_settings`, `scadacraft_set_settings` | Language, port, security, SMTP, history database (type, retention), alarm and log retention, broadcast |
 | `scadacraft_send_test_mail` | Test the SMTP settings |
@@ -106,7 +109,7 @@ Times accept ISO 8601, epoch ms, or relative values such as `-15m`, `-24h`, `-7d
 | `scadacraft_list_notifications`, `scadacraft_set_notification`, `scadacraft_delete_notification` | Alarm e-mail notifications |
 | `scadacraft_get_texts`, `scadacraft_set_languages`, `scadacraft_set_texts`, `scadacraft_delete_texts` | Languages and translated texts |
 | `scadacraft_list_charts`, `scadacraft_set_chart`, `scadacraft_delete_chart` | Chart definitions (pens on tags) |
-| `scadacraft_list_reports`, `scadacraft_set_report`, `scadacraft_build_report`, `scadacraft_delete_report` | PDF reports (tags table, chart, alarms), scheduled or on demand |
+| `scadacraft_list_reports`, `scadacraft_set_report`, `scadacraft_build_report`, `scadacraft_delete_report` | PDF reports (tags table, chart, alarms), scheduled or on demand; charts are drawn without extra plugins |
 | `scadacraft_list_api_keys`, `scadacraft_create_api_key`, `scadacraft_delete_api_key` | API keys |
 | `scadacraft_read_logs` | Server log |
 | `scadacraft_backup_status`, `scadacraft_create_backup`, `scadacraft_set_backup_schedule`, `scadacraft_restore_backup`, `scadacraft_delete_backup` | Backups of project, settings and history database; schedule, retention, restore on restart |
@@ -229,6 +232,8 @@ npm test
   every instrument, chart, control and alert bound to server tags (sizes in cells, top-left anchor).
 - `test/e2e-interaction.mjs`: events (page, popup, card, close, set/add/toggle tag, script, link) on
   widgets, buttons and shapes; value display; shape colour/blink/hide animation; stored format as the editor expects.
+- `test/e2e-navigation.mjs`: OpenBridge icon search, menu with OpenBridge icons and a sub-menu, header items with
+  tags, colours and events, map locations and map page, unknown icon names rejected.
 - `test/e2e-plant.mjs`: full plant against a simulated Modbus TCP PLC (`test/modbus-sim.mjs`):
   driver install, device, tags with scaling and history, live read, write to the PLC,
   connection status, alarm raise/acknowledge/history, tag history with CSV, page bound to

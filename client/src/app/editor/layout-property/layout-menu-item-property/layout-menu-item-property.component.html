@@ -10,7 +10,7 @@
                         style="width: 60px; height: 40px"
                         #iconsel>
                 <mat-select-trigger>
-                    <mat-icon>{{iconsel.value}}</mat-icon>
+                    <app-scada-icon *ngIf="iconsel.value && iconsel.value !== 'image'" [name]="iconsel.value"></app-scada-icon>
                 </mat-select-trigger>
                 <mat-option [value]="'image'" (click)="imagefile.value = '';imagefile.click();">
                     {{'dlg.menuitem-image' | translate}}
@@ -29,8 +29,8 @@
                             autocomplete="off"/>
                     </div>
                 </mat-option>
-                <mat-option *ngFor="let icon of filteredIcons$ | async" [value]="icon" (click)="data.item.image = ''" style="display: inline-block !important; width: 18px;">
-                    <mat-icon class="">{{ icon }}</mat-icon>
+                <mat-option *ngFor="let icon of filteredIcons$ | async" [value]="icon" (click)="data.item.image = ''" [matTooltip]="icon" style="display: inline-block !important; width: 18px;">
+                    <app-scada-icon [name]="icon"></app-scada-icon>
                 </mat-option>
             </mat-select>
         </div>

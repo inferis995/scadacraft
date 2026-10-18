@@ -1,0 +1,89 @@
+{
+  "version": 0,
+  "useSDK": false,
+  "height": 540,
+  "width": 960,
+  "events": {},
+  "properties": {
+    "0": {
+      "type": "Double",
+      "name": "level",
+      "value": "0",
+      "desc": {
+        "1033": "Tank level (m)"
+      }
+    },
+    "1": {
+      "type": "Double",
+      "name": "level_max",
+      "value": "5",
+      "desc": {
+        "1033": "Tank height, full scale of the level bar (m)"
+      }
+    },
+    "2": {
+      "type": "Boolean",
+      "name": "pump_run",
+      "value": "false",
+      "desc": {
+        "1033": "Pump running"
+      }
+    },
+    "3": {
+      "type": "Boolean",
+      "name": "pump_fault",
+      "value": "false",
+      "desc": {
+        "1033": "Pump fault"
+      }
+    },
+    "4": {
+      "type": "Boolean",
+      "name": "cmd_start",
+      "value": "false",
+      "desc": {
+        "1033": "Start command (pulse)"
+      }
+    },
+    "5": {
+      "type": "Boolean",
+      "name": "cmd_stop",
+      "value": "false",
+      "desc": {
+        "1033": "Stop command (pulse)"
+      }
+    },
+    "6": {
+      "type": "Double",
+      "name": "sp_level",
+      "value": "3",
+      "desc": {
+        "1033": "Level setpoint (m)"
+      }
+    },
+    "7": {
+      "type": "Integer",
+      "name": "flow_raw",
+      "value": "0",
+      "desc": {
+        "1033": "Outlet flow, raw value"
+      }
+    },
+    "8": {
+      "type": "Double",
+      "name": "k_flow",
+      "value": "0.1",
+      "desc": {
+        "1033": "Flow scale factor (m3/h = raw x k)"
+      }
+    },
+    "9": {
+      "type": "String",
+      "name": "title",
+      "value": "Tank station",
+      "desc": {
+        "1033": "Title shown in the header"
+      }
+    }
+  }
+}

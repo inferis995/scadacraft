@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { BehaviorSubject, Observable, combineLatest, map, of } from 'rxjs';
+import { BehaviorSubject, Observable, combineLatest, from, map, of } from 'rxjs';
+import { ObIcons } from '../scada-icon/ob-icons';
 import { Define } from '../../_helpers/define';
 
 @Component({
@@ -30,18 +31,20 @@ export class IconSelectorComponent implements OnInit {
     private filterTextSubject = new BehaviorSubject<string>('');
 
     ngOnInit() {
-        this.icons$ = of(Define.MaterialIconsRegular).pipe(
+        const material$ = of(Define.MaterialIconsRegular).pipe(
             map((data: string) => data.split('\n')),
             map(lines => lines.map(line => line.split(' ')[0])),
             map(names => names.filter(name => !!name))
         );
+        // OpenBridge icons first ("ob:<name>"), then Material icons
+        this.icons$ = combineLatest([from(ObIcons.list()), material$]).pipe(map(([ob, mat]) => [...ob, ...mat]));
 
         this.filteredIcons$ = combineLatest([
             this.icons$,
             this.filterTextSubject.asObservable()
         ]).pipe(
             map(([icons, filterText]) =>
-                icons.filter(icon => icon.toLowerCase().includes(filterText.toLowerCase()))
+                ObIcons.filter(icons, filterText, this.value)
             )
         );
     }

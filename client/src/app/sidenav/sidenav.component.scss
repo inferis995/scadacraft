@@ -170,5 +170,23 @@
         padding: 0;
         margin: 0;
         list-style: none;
+        background-color: rgba(127, 127, 127, 0.14);
+    }
+
+    /* icon and icon + text blocks: sub-menu items keep the block height, small arrow in the corner */
+    .submenu-list .sidenav-submenu-item.menu-item-block,
+    .submenu-list .sidenav-submenu-item.menu-item-icon {
+        height: auto !important;
+    }
+    .menu-item-block .sidenav-submenu-icon,
+    .menu-item-icon .sidenav-submenu-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        right: 4px;
+        top: auto;
+        bottom: 2px;
+        transform: none;
+        opacity: 0.8;
     }
 }

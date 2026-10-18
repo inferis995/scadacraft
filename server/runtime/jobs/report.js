@@ -6,6 +6,7 @@ const Pdfmake = require('pdfmake');
 var fs = require('fs')
 var path = require('path');
 var imageGenerator = require('./helper/image-generator');
+var svgChart = require('./helper/svg-chart');
 const { time } = require('console');
 
 'use strict';
@@ -208,9 +209,15 @@ function Report(_property, _runtime) {
                     }
                     resolve(content);
                 }).catch(function (err) {
-                    // keep the rest of the report: show a note instead of the chart
-                    logger.warn(`report chart '${itemChart.chart?.name}' skipped: ${err}`);
-                    resolve({ text: `[Chart "${itemChart.chart?.name || ''}" not available: ${err && err.message ? err.message : err}]`, italics: true, fontSize: 8 });
+                    // no canvas renderer (optional native plugin): draw the chart as SVG, pdfmake renders it natively
+                    try {
+                        const svg = svgChart.createSvgChart(itemChart, values, _getDateRange(itemChart.range));
+                        resolve({ svg: svg, width: itemChart.width || 500 });
+                    } catch (svgErr) {
+                        // keep the rest of the report: show a note instead of the chart
+                        logger.warn(`report chart '${itemChart.chart?.name}' skipped: ${svgErr}`);
+                        resolve({ text: `[Chart "${itemChart.chart?.name || ''}" not available: ${svgErr && svgErr.message ? svgErr.message : svgErr}]`, italics: true, fontSize: 8 });
+                    }
                 });
             } catch (err) {
                 reject(err);

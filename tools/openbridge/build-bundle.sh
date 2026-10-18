@@ -23,5 +23,6 @@ npx esbuild entry.js --bundle --minify --format=iife --legal-comments=eof \
 PKG="node_modules/@oicl/openbridge-webcomponents"
 cp "$PKG/dist/openbridge.css" "$OUT/openbridge.css"
 cp "$PKG/dist/NotoSans.ttf" "$OUT/NotoSans.ttf"   # font used by the components (SIL OFL 1.1)
+node "$HERE/make-icons.mjs" "$WORK/$PKG"   # OpenBridge icons as SVG (menu, header, buttons, map markers)
 echo "${OB_VERSION}" > "$OUT/VERSION"
 echo "OpenBridge ${OB_VERSION} bundle written to $OUT"

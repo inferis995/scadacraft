@@ -1268,3 +1268,23 @@ mat-toolbar-row {
     justify-content: center;
     align-items: center;
   }
+
+/* ScadaCraft: OpenBridge icons ("ob:<name>"), drawn with the text colour */
+.ob-icon {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    flex: none;
+    background-color: currentColor;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    vertical-align: middle;
+}
+.ob-icon.ob-icon-fill {
+    width: 100%;
+    height: 100%;
+}

@@ -125,3 +125,15 @@ with the `.cwp` path.
   runtime it is fully interactive.
 - Not supported: AVEVA services outside the `cwidget` properties (`MASvrHelper` is an empty stub) and
   widget events.
+
+### Building a Custom Widget for AVEVA and ScadaCraft
+
+`tools/cwp/make_cwp.py` builds a `.cwp` from a folder with `widget.json` (name, size and the
+property list with type, direction, description and optional tag / register), `index.html` and
+`build/<name>.js`. It writes the `.wjson`, `build/props.js` (directions for the property panel) and a
+`<name>_bindings.csv` table property → tag that the MCP uses to bind the widget. A complete example
+is in `tools/cwp/example/tank_station/`:
+
+```
+python3 tools/cwp/make_cwp.py tools/cwp/example/tank_station
+```

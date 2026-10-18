@@ -3,6 +3,7 @@ import { GaugeBaseComponent } from '../../gauge-base/gauge-base.component';
 import { GaugeAction, GaugeSettings, GaugeStatus, Variable, GaugeActionsType, GaugePropertyColor } from '../../../_models/hmi';
 import { Utils } from '../../../_helpers/utils';
 import { GaugeDialogType } from '../../gauge-property/gauge-property.component';
+import { ObIcons } from '../../../framework/scada-icon/ob-icons';
 
 declare var SVG: any;
 
@@ -82,6 +83,11 @@ export class HtmlButtonComponent extends GaugeBaseComponent {
             img.style.height = '1em';
             img.style.objectFit = 'contain';
             htmlButton.appendChild(img);
+        } else if (ObIcons.isOb(icon)) {
+            const iconElement = ObIcons.element(icon);
+            iconElement.style.width = '1.2em';
+            iconElement.style.height = '1.2em';
+            htmlButton.appendChild(iconElement);
         } else if (icon) {
             const iconElement = document.createElement('span');
             iconElement.className = 'material-icons';

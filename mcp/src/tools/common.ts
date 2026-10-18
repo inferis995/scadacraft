@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { EVENT_ACTIONS, EVENT_TRIGGERS } from '../fuxa/interaction.js';
 import type { ScadaCraftClient } from '../fuxa/client.js';
 import type { AdminService } from '../services/admin.js';
 import type { AlarmsService } from '../services/alarms.js';
@@ -76,3 +77,32 @@ export function parseTime(t: string | number | undefined, fallback: number): num
 }
 
 export const iso = (ms: number | undefined | null): string => (ms ? new Date(ms).toISOString() : '—');
+
+// ------------------------------------------------------------------ click events (pages, header)
+export const EventSchema = z.object({
+  on: z.enum(EVENT_TRIGGERS).default('click').describe('Mouse trigger, default click'),
+  action: z.enum(EVENT_ACTIONS),
+  page: z.string().optional().describe('open_page / open_popup / open_card: page name or id'),
+  tag: z.string().optional().describe('set_value / toggle_value: "Device.Tag" (default: the item\'s own tag, for value/button/shape)'),
+  value: z.union([z.string(), z.number(), z.boolean()]).optional().describe('set_value: value to write (or amount for add/remove)'),
+  mode: z.enum(['set', 'add', 'remove']).optional().describe('set_value: write (default), add to or subtract from the current value'),
+  bit: z.number().int().min(0).max(31).optional().describe('toggle_value: toggle only this bit'),
+  script: z.string().optional().describe('run_script: script name or id (scadacraft_list_scripts)'),
+  params: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional().describe('run_script: parameter values by name (tagid parameters take "Device.Tag")'),
+  url: z.string().optional().describe('open_link: URL'),
+  new_tab: z.boolean().optional(),
+  x: z.number().optional().describe('open_card: left, px'),
+  y: z.number().optional().describe('open_card: top, px'),
+  relative_to: z.enum(['window', 'mouse']).optional().describe('open_card: position relative to the window (default) or the mouse'),
+  single: z.boolean().optional().describe('open_card: close the other cards first'),
+  hide_close: z.boolean().optional().describe('open_popup / open_card: no close button (put a button with action "close" on that page)'),
+}).strict();
+export const EVENT_HELP = `Each event: {on? (click|dblclick|mousedown|mouseup|mouseover|mouseout, default click), action, ...}
+  action "open_page"    {page}                         navigate to another page
+  action "open_popup"   {page, hide_close?}            modal popup showing that page
+  action "open_card"    {page, x?, y?, relative_to?, single?, hide_close?}   floating, draggable window
+  action "close"                                       close the popup/card this item is in
+  action "set_value"    {tag?, value, mode? set|add|remove}   write a tag (e.g. setpoint +1, start command)
+  action "toggle_value" {tag?, bit?}                   invert a boolean / one bit
+  action "run_script"   {script, params?}              run a server/client script
+  action "open_link"    {url, new_tab?}`;

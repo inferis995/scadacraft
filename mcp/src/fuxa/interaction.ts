@@ -348,6 +348,8 @@ export function addValueControl(project: Project, view: View, s: ValueSpec): Gau
 export interface ButtonSpec {
   x: number; y: number; width: number; height: number;
   text: string;
+  /** Material icon or OpenBridge "ob:<name>" shown before the text */
+  icon?: string;
   background?: string;
   color?: string;
   font_size?: number;
@@ -382,7 +384,7 @@ export function addButtonControl(project: Project, view: View, s: ButtonSpec): G
   g.appendChild(fo as never);
   layer.appendChild(g as never);
   save(view, doc);
-  const property: Record<string, unknown> = { text: s.text, events: [], actions: [] };
+  const property: Record<string, unknown> = { text: s.text, events: [], actions: [], ...(s.icon ? { icon: s.icon } : {}) };
   if (s.tag) property.variableId = resolveTag(project, s.tag).id;
   if (s.colors?.length) {
     if (!s.tag) throw new Error('button colors need a "tag".');

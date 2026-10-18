@@ -27,7 +27,9 @@ export class SidenavComponent implements AfterContentChecked {
     showSidenav = false;
     layoutNavigation = new NavigationSettings();
     expandedItems: Set<string> = new Set();
-    private expandableNavItems = [Utils.getEnumKey(NaviItemType, NaviItemType.text), Utils.getEnumKey(NaviItemType, NaviItemType.inline)];
+    // every menu style can open sub-menus (ScadaCraft: also icons and icon + text blocks)
+    private expandableNavItems = [Utils.getEnumKey(NaviItemType, NaviItemType.text), Utils.getEnumKey(NaviItemType, NaviItemType.inline),
+        Utils.getEnumKey(NaviItemType, NaviItemType.block), Utils.getEnumKey(NaviItemType, NaviItemType.icon)];
 
     constructor(private location: Location,
                 private router: Router,

@@ -8,7 +8,7 @@
     <mat-select-trigger>
         <img *ngIf="image; else iconTrigger" class="icon-selector-image" [src]="image" alt="">
         <ng-template #iconTrigger>
-            <mat-icon *ngIf="iconsel.value">{{iconsel.value}}</mat-icon>
+            <app-scada-icon *ngIf="iconsel.value && iconsel.value !== 'image'" [name]="iconsel.value"></app-scada-icon>
         </ng-template>
     </mat-select-trigger>
     <mat-option *ngIf="allowClear" [value]="''" (click)="onClear()">
@@ -36,7 +36,8 @@
         *ngFor="let icon of filteredIcons$ | async"
         [value]="icon"
         (click)="onSelect(icon)"
+        [matTooltip]="icon"
         style="display: inline-block !important;">
-        <mat-icon>{{ icon }}</mat-icon>
+        <app-scada-icon [name]="icon"></app-scada-icon>
     </mat-option>
 </mat-select>

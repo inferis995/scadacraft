@@ -3,8 +3,8 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import type { PlaceSpec, PropertyValue } from '../services/pages.js';
 import type { ShapeSpec } from '../fuxa/view.js';
-import { EVENT_ACTIONS, EVENT_TRIGGERS, type AnimationSpec, type EventSpec } from '../fuxa/interaction.js';
-import { itemLine, ok, RELOAD_NOTE, run, ViewRef, type Ctx } from './common.js';
+import { type AnimationSpec, type EventSpec } from '../fuxa/interaction.js';
+import { EVENT_HELP, EventSchema, itemLine, ok, RELOAD_NOTE, run, ViewRef, type Ctx } from './common.js';
 
 const NodeSchema = z.object({
   x: z.number().int().min(0).describe('Grid column (node x). Pixel = x * 24.'),
@@ -544,33 +544,7 @@ Returns: the new view id and name.`,
   }));
 
   // ------------------------------------------------------------------ events, animations, native controls
-  const EventSchema = z.object({
-    on: z.enum(EVENT_TRIGGERS).default('click').describe('Mouse trigger, default click'),
-    action: z.enum(EVENT_ACTIONS),
-    page: z.string().optional().describe('open_page / open_popup / open_card: page name or id'),
-    tag: z.string().optional().describe('set_value / toggle_value: "Device.Tag" (default: the item\'s own tag, for value/button/shape)'),
-    value: z.union([z.string(), z.number(), z.boolean()]).optional().describe('set_value: value to write (or amount for add/remove)'),
-    mode: z.enum(['set', 'add', 'remove']).optional().describe('set_value: write (default), add to or subtract from the current value'),
-    bit: z.number().int().min(0).max(31).optional().describe('toggle_value: toggle only this bit'),
-    script: z.string().optional().describe('run_script: script name or id (scadacraft_list_scripts)'),
-    params: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional().describe('run_script: parameter values by name (tagid parameters take "Device.Tag")'),
-    url: z.string().optional().describe('open_link: URL'),
-    new_tab: z.boolean().optional(),
-    x: z.number().optional().describe('open_card: left, px'),
-    y: z.number().optional().describe('open_card: top, px'),
-    relative_to: z.enum(['window', 'mouse']).optional().describe('open_card: position relative to the window (default) or the mouse'),
-    single: z.boolean().optional().describe('open_card: close the other cards first'),
-    hide_close: z.boolean().optional().describe('open_popup / open_card: no close button (put a button with action "close" on that page)'),
-  }).strict();
-  const EVENT_HELP = `Each event: {on? (click|dblclick|mousedown|mouseup|mouseover|mouseout, default click), action, ...}
-    action "open_page"    {page}                         navigate to another page
-    action "open_popup"   {page, hide_close?}            modal popup showing that page
-    action "open_card"    {page, x?, y?, relative_to?, single?, hide_close?}   floating, draggable window
-    action "close"                                       close the popup/card this item is in
-    action "set_value"    {tag?, value, mode? set|add|remove}   write a tag (e.g. setpoint +1, start command)
-    action "toggle_value" {tag?, bit?}                   invert a boolean / one bit
-    action "run_script"   {script, params?}              run a server/client script
-    action "open_link"    {url, new_tab?}`;
+
 
   server.registerTool('scadacraft_set_events', {
     title: 'Set click events',
@@ -676,7 +650,7 @@ Returns: the new view id and name.`,
 
   Args:
     - view, x, y, width?, height? (default 4 x 1.5 cells), unit: "cell" (default) | "px"
-    - text, background?, color? (hex or ob: token; default OpenBridge raised button), font_size?
+    - text, icon? ("ob:<name>" or Material), background?, color? (hex or ob: token; default OpenBridge raised button), font_size?
     - tag? (own tag: target of set_value/toggle_value without "tag", and source of colors)
     - colors? [{min, max, fill? (background), stroke? (text colour)}] by the tag value
     - events (same as scadacraft_set_events; usually [{action:"set_value", value:1}] or [{action:"open_page", page:"Trend"}])
@@ -688,6 +662,7 @@ Returns: the new view id and name.`,
       width: z.number().positive().default(4), height: z.number().positive().default(1.5),
       unit: z.enum(['cell', 'px']).default('cell'),
       text: z.string().min(1).max(100),
+      icon: z.string().optional().describe('OpenBridge "ob:<name>" (scadacraft_list_icons) or Material icon, shown before the text'),
       background: z.string().optional(), color: z.string().optional(),
       font_size: z.number().min(6).max(100).optional(),
       tag: z.string().optional(),
@@ -697,6 +672,7 @@ Returns: the new view id and name.`,
     },
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   }, async ({ view, unit, ...spec }) => run(async () => {
+    await ctx.admin.validateIcons([spec.icon]);
     const item = await ctx.pages.placeButton(view, { ...spec, events: spec.events as EventSpec[] | undefined }, unit);
     return ok(`Placed button:\n${itemLine(item)}\n\n${RELOAD_NOTE}`, { item });
   }));

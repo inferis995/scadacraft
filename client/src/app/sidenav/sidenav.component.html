@@ -13,19 +13,19 @@
                         [ngSwitch]="layout.navigation.type">
                     <div *ngSwitchCase="'icon'" class="menu-item-content-icon">
                         <img *ngIf="item.image" src="{{item.image}}">
-                        <mat-icon *ngIf="item.icon" [style.color]="layoutNavigation.fgcolor">{{item.icon}}</mat-icon>
+                        <app-scada-icon *ngIf="item.icon" [style.color]="layoutNavigation.fgcolor" [name]="item.icon"></app-scada-icon>
                     </div>
                     <div *ngSwitchCase="'text'" class="menu-item-content-text">
                         <span [style.color]="layoutNavigation.fgcolor">{{item.text}}</span>
                     </div>
                     <div *ngSwitchCase="'block'" class="menu-item-content-block">
                         <img *ngIf="item.image" src="{{item.image}}">
-                        <mat-icon *ngIf="item.icon" [style.color]="layoutNavigation.fgcolor">{{item.icon}}</mat-icon>
+                        <app-scada-icon *ngIf="item.icon" [style.color]="layoutNavigation.fgcolor" [name]="item.icon"></app-scada-icon>
                         <span [style.color]="layoutNavigation.fgcolor">{{item.text}}</span>
                     </div>
                     <div *ngSwitchCase="'inline'" class="menu-item-content-inline">
                         <img *ngIf="item.image" src="{{item.image}}">
-                        <mat-icon *ngIf="item.icon" [style.color]="layoutNavigation.fgcolor">{{item.icon}}</mat-icon>
+                        <app-scada-icon *ngIf="item.icon" [style.color]="layoutNavigation.fgcolor" [name]="item.icon"></app-scada-icon>
                         <span style="display: inline-block" [style.color]="layoutNavigation.fgcolor">{{item.text}}</span>
                     </div>
                     <mat-icon *ngIf="isExpandable(item)" class="sidenav-submenu-icon">
@@ -43,19 +43,19 @@
                             [ngSwitch]="layout.navigation.type">
                         <div *ngSwitchCase="'icon'" class="menu-item-content-icon">
                             <img *ngIf="child.image" src="{{child.image}}">
-                            <mat-icon *ngIf="child.icon" [style.color]="layoutNavigation.fgcolor">{{child.icon}}</mat-icon>
+                            <app-scada-icon *ngIf="child.icon" [style.color]="layoutNavigation.fgcolor" [name]="child.icon"></app-scada-icon>
                         </div>
                         <div *ngSwitchCase="'text'" class="menu-item-content-text">
                             <span [style.color]="layoutNavigation.fgcolor">{{child.text}}</span>
                         </div>
                         <div *ngSwitchCase="'block'" class="menu-item-content-block">
                             <img *ngIf="child.image" src="{{child.image}}">
-                            <mat-icon *ngIf="child.icon" [style.color]="layoutNavigation.fgcolor">{{child.icon}}</mat-icon>
+                            <app-scada-icon *ngIf="child.icon" [style.color]="layoutNavigation.fgcolor" [name]="child.icon"></app-scada-icon>
                             <span [style.color]="layoutNavigation.fgcolor">{{child.text}}</span>
                         </div>
                         <div *ngSwitchCase="'inline'" class="menu-item-content-inline">
                             <img *ngIf="child.image" src="{{child.image}}">
-                            <mat-icon *ngIf="child.icon" [style.color]="layoutNavigation.fgcolor">{{child.icon}}</mat-icon>
+                            <app-scada-icon *ngIf="child.icon" [style.color]="layoutNavigation.fgcolor" [name]="child.icon"></app-scada-icon>
                             <span style="display: inline-block" [style.color]="layoutNavigation.fgcolor">{{child.text}}</span>
                         </div>
                     </button>

@@ -290,3 +290,13 @@ lists the libraries, `scadacraft_place_widgets` places widgets by node (with `si
 for resizable widgets) and `scadacraft_draw_pipe` turns a path of nodes into pipes and elbows.
 
 ![A page built by the MCP server with instruments, charts, controls and alerts](images/openbridge-showcase.png)
+
+
+## OpenBridge icons
+
+The about 2000 icons of the OpenBridge design system (alerts, automation, equipment, navigation,
+weather, arrows…) are available wherever ScadaCraft shows an icon: side menu items, header buttons,
+page buttons and map markers. In the editor, open the icon picker and type part of the name (for
+example `pump`, `alarm`, `tank`); OpenBridge icons are listed first. Their name is `ob:<name>`
+(`ob:alerts`, `ob:tank`, `ob:location-1`), which can also be typed or set through the MCP
+(`scadacraft_list_icons` searches them). The icons take the text colour of the menu or button.
