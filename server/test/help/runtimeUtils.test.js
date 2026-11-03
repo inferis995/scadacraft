@@ -1,5 +1,7 @@
 
 const Utils = require('../../runtime/utils');
+const assert = require('node:assert/strict');
+const { useFakeTimers } = require('sinon');
 
 describe('Utils Help functions', () => {
     describe('Utils.domStringSplitter with foreignobject', () => {
@@ -41,9 +43,37 @@ describe('Utils Help functions', () => {
             const result = Utils.domStringSplitter(src, tagsplitter, first);
 
             expect(result).to.be.an('object');
-            //expect(result.before).to.equal(src);
+            expect(result.before).to.equal(src);
             expect(result.tagcontent).to.equal('');
-            //expect(result.after).to.equal('');
+            expect(result.after).to.equal('');
+        });
+
+        it('should return the whole input as before when the input is empty', () => {
+            const src = '';
+            const result = Utils.domStringSplitter(src, 'foreignobject', 0);
+
+            expect(result).to.be.an('object');
+            expect(result.before).to.equal('');
+            expect(result.tagcontent).to.equal('');
+            expect(result.after).to.equal('');
+        });
+
+        it('should keep the rest of the input as tagcontent when the closing tag is missing', () => {
+            const src = '<svg><foreignobject><div>Hello</div></svg>';
+            const result = Utils.domStringSplitter(src, 'foreignobject', 0);
+
+            expect(result.before).to.equal('<svg>');
+            expect(result.tagcontent).to.equal('<foreignobject><div>Hello</div></svg>');
+            expect(result.after).to.equal('');
+        });
+
+        it('should handle a single tag that spans the whole input', () => {
+            const src = '<foreignobject><div>Hello</div></foreignobject>';
+            const result = Utils.domStringSplitter(src, 'foreignobject', 0);
+
+            expect(result.before).to.equal('');
+            expect(result.tagcontent).to.equal('<foreignobject><div>Hello</div>');
+            expect(result.after).to.equal('</foreignobject>');
         });
 
         it('should handle case-insensitivity for <foreignobject> tags', () => {
@@ -150,15 +180,19 @@ describe('Utils Help functions', () => {
     });
 
     describe('Utils.endTime', () => {
-        it('should return a positive number representing the time difference in milliseconds', () => {
-            const startTime = new Date();
-            const delay = 10; // Milliseconds
-            setTimeout(() => {
-                const result = Utils.endTime(startTime);
-                expect(result).to.be.a('number');
-                expect(result).to.be.greaterThan(0);
-                expect(result).to.be.lessThan(delay + 50);
-            }, delay);
+        it('returns the exact elapsed milliseconds without leaving asynchronous assertions', () => {
+            // Fake Date only: this test needs no real timeout or scheduler tolerance.
+            const clock = useFakeTimers({ now: 1767225600000, toFake: ['Date'] });
+            try {
+                const startTime = new Date();
+                assert.equal(Utils.endTime(startTime), 0);
+                clock.tick(10);
+                assert.equal(Utils.endTime(startTime), 10);
+                clock.tick(1250);
+                assert.equal(Utils.endTime(startTime), 1260);
+            } finally {
+                clock.restore();
+            }
         });
     });
 

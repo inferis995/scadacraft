@@ -1269,6 +1269,12 @@ mat-toolbar-row {
     align-items: center;
   }
 
+/* html button rendered as pressed (button action with 'show pressed' enabled) */
+.md-btn.md-btn-pressed {
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(0, 0, 0, 0.15) !important;
+    filter: brightness(0.93);
+}
+
 /* ScadaCraft: OpenBridge icons ("ob:<name>"), drawn with the text colour */
 .ob-icon {
     display: inline-block;

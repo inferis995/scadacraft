@@ -1,13 +1,16 @@
 import { Component, OnInit, Inject, OnDestroy, ViewChild } from '@angular/core';
-import { MatDialogRef as MatDialogRef, MAT_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef as MatDialogRef, MAT_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatExpansionPanel } from '@angular/material/expansion';
-import { Subscription, delay } from 'rxjs';
+import { Subscription, Subject, delay, takeUntil } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 
 import { EndPointSettings, HmiService } from '../../_services/hmi.service';
 import { AppService } from '../../_services/app.service';
 import { ProjectService } from '../../_services/project.service';
-import { DeviceType, DeviceSecurity, MessageSecurityMode, SecurityPolicy, ModbusOptionType, ModbusReuseModeType, RedisReadModeType, RedisOptions } from './../../_models/device';
+import { DeviceType, DeviceSecurity, MessageSecurityMode, SecurityPolicy, ModbusOptionType, ModbusReuseModeType, RedisReadModeType, RedisOptions, SnmpOptions, SnmpVersion, SnmpTransport, SnmpSecurityLevel, SnmpAuthProtocol, SnmpPrivProtocol, EthernetIPModule, ETHERNETIPMODULE_PREFIX } from './../../_models/device';
+import { Utils } from '../../_helpers/utils';
+import { DeviceEnipmoduleComponent } from '../device-enipmodule/device-enipmodule.component';
+import { ConfirmDialogComponent } from '../../gui-helpers/confirm-dialog/confirm-dialog.component';
 
 @Component({
 	selector: 'app-device-property',
@@ -73,6 +76,7 @@ export class DevicePropertyComponent implements OnInit, OnDestroy {
 	databitsType = [7, 8];
 	stopbitsType = [1, 1.5, 2];
 	parityType = ['None', 'Odd', 'Even'];
+	melsecFrameType = ['1E', '3E'];
 	methodType = ['GET'];//, 'POST'];
 	parserType = ['JSON'];//, 'CSV'];
 	hostInterfaces = [];
@@ -85,15 +89,29 @@ export class DevicePropertyComponent implements OnInit, OnDestroy {
 	// redisReadModeCustom = RedisReadModeType.custom;
 	redisOptions = new RedisOptions();
 	writeArgsTooltip = '';
+	snmpOptions = new SnmpOptions();
+	snmpVersionType = SnmpVersion;
+	snmpVersionV3 = SnmpVersion.v3;
+	snmpTransportType = SnmpTransport;
+	snmpSecurityLevelType = SnmpSecurityLevel;
+	snmpSecurityLevelNoAuthNoPriv = SnmpSecurityLevel.noAuthNoPriv;
+	snmpSecurityLevelAuthPriv = SnmpSecurityLevel.authPriv;
+	snmpAuthProtocolType = SnmpAuthProtocol;
+	snmpPrivProtocolType = SnmpPrivProtocol;
+	showPrivKey: boolean;
 	result = '';
 	private subscriptionDeviceProperty: Subscription;
 	private subscriptionHostInterfaces: Subscription;
 	private subscriptionDeviceWebApiRequest: Subscription;
+	private destroy$ = new Subject<void>();
+	ethernetIpDevices: any[] = [];
+	browseLoading = false;
 
 	private projectService: ProjectService;
 
 	constructor(
 		private hmiService: HmiService,
+		private dialog: MatDialog,
 		private translateService: TranslateService,
 		private appService: AppService,
 		public dialogRef: MatDialogRef<DevicePropertyComponent>,
@@ -103,6 +121,7 @@ export class DevicePropertyComponent implements OnInit, OnDestroy {
 
 	ngOnInit() {
 		this.isToRemove = this.data.remove;
+		this.ensureGenericEthernetIPConfig();
 		this.isFuxaServer = (this.data.device.type && this.data.device.type === DeviceType.FuxaServer) ? true : false;
 		for (let key in DeviceType) {
 			if (!this.isFuxaServer && key !== DeviceType.FuxaServer) {
@@ -173,7 +192,7 @@ export class DevicePropertyComponent implements OnInit, OnDestroy {
 		});
 		// check security
 		if (this.data.device.id && (this.data.device.type === DeviceType.OPCUA || this.data.device.type === DeviceType.MQTTclient
-			|| this.data.device.type === DeviceType.ODBC)) {
+			|| this.data.device.type === DeviceType.ODBC || this.data.device.type === DeviceType.SNMP)) {
 			this.projectService.getDeviceSecurity(this.data.device.id).pipe(
 				delay(500)
 			).subscribe(result => {
@@ -222,11 +241,23 @@ export class DevicePropertyComponent implements OnInit, OnDestroy {
 			}
 			this.propertyLoading = false;
 		});
+		this.hmiService.onDeviceBrowseForDevices.pipe(
+			takeUntil(this.destroy$)
+		).subscribe(res => {
+			if (res.device !== this.data.device.id) {
+				return;
+			}
+			this.browseLoading = false;
+			this.ethernetIpDevices = res.result || [];
+			this.propertyError = res.error || '';
+		});
 		this.writeArgsTooltip = this.translateService.instant('device.property-redis-write-args-tooltip');
 		this.onDeviceTypeChanged();
 	}
 
 	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 		try {
 			if (this.subscriptionDeviceProperty) {
 				this.subscriptionDeviceProperty.unsubscribe();
@@ -250,6 +281,23 @@ export class DevicePropertyComponent implements OnInit, OnDestroy {
 		this.data.security = this.getSecurity();
 		if (this.data.device.type === DeviceType.REDIS) {
 			this.data.device.property.options = this.redisOptions;
+		}
+		if (this.data.device.type === DeviceType.SNMP) {
+			this.data.device.property.options = this.snmpOptions;
+		}
+	}
+
+	/**
+	 * SNMP options are stored in property.options, keep the defaults for the missing fields
+	 */
+	loadSnmpOptions() {
+		const opts = this.data.device?.property?.options;
+		this.snmpOptions = new SnmpOptions();
+		if (opts && typeof opts === 'object') {
+			Object.assign(this.snmpOptions, opts);
+		}
+		if (this.data.device.property && !this.data.device.property.port) {
+			this.data.device.property.port = '161';
 		}
 	}
 
@@ -289,6 +337,20 @@ export class DevicePropertyComponent implements OnInit, OnDestroy {
 		this.propertyLoading = false;
 	}
 
+	browseForEthernetIpDevices() {
+		this.browseLoading = true;
+		this.propertyError = '';
+		this.ethernetIpDevices = [];
+		this.hmiService.askDeviceBrowseForDevices(this.data.device.id);
+	}
+
+	selectEthernetIpDevice(device) {
+		if (device) {
+			this.data.device.property.address = device.socketAddress?.sin_addr || '';
+			this.data.device.name = device.productName || this.data.device.name;
+		}
+	}
+
 	onDeviceTypeChanged() {
 		if (this.data.device.type === DeviceType.WebAPI) {
 			this.pollingType = this.pollingWebApiType;
@@ -297,6 +359,63 @@ export class DevicePropertyComponent implements OnInit, OnDestroy {
 		} else {
 			this.pollingType = this.pollingPlcType;
 		}
+		if (this.data.device.type === DeviceType.SNMP) {
+			this.loadSnmpOptions();
+		}
+		this.ensureGenericEthernetIPConfig();
+	}
+
+	private ensureGenericEthernetIPConfig() {
+		if (this.data.device.type !== DeviceType.GenericEthernetIP) {
+			return;
+		}
+		const modules = this.data.device.modules;
+		this.data.device.modules = Array.isArray(modules)
+			? Object.fromEntries(modules.filter(module => module?.id).map(module => [module.id, module]))
+			: (modules || {});
+		this.data.device.property = this.data.device.property || {};
+		this.data.device.property.ioport = parseInt(this.data.device.property.ioport) || 2222;
+	}
+
+	ethernetIpModules(): EthernetIPModule[] {
+		return Object.values(this.data.device.modules || {});
+	}
+
+	onAddEnipModule() {
+		this.editEnipModule(new EthernetIPModule(Utils.getGUID(ETHERNETIPMODULE_PREFIX)));
+	}
+
+	onEditEnipModule(module: EthernetIPModule) {
+		this.editEnipModule(module);
+	}
+
+	onRemoveEnipModule(module: EthernetIPModule) {
+		const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+			disableClose: true,
+			data: { msg: this.translateService.instant('device.enip-module-remove-confirm', { name: module.name }) },
+			position: { top: '60px' }
+		});
+		dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe(result => {
+			if (result) {
+				delete this.data.device.modules[module.id];
+			}
+		});
+	}
+
+	private editEnipModule(module: EthernetIPModule) {
+		const draft = Object.assign(new EthernetIPModule(module.id), module);
+		const dialogRef = this.dialog.open(DeviceEnipmoduleComponent, {
+			disableClose: true,
+			panelClass: 'app-device-enipmodule',
+			data: { module: draft },
+			position: { top: '60px' }
+		});
+		dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe(result => {
+			if (result) {
+				this.data.device.modules = this.data.device.modules || {};
+				this.data.device.modules[result.id] = result;
+			}
+		});
 	}
 
 	isValid(device): boolean {
@@ -346,6 +465,16 @@ export class DevicePropertyComponent implements OnInit, OnDestroy {
 				};
 				return result;
 			}
+		} else if (this.data.device.type === DeviceType.SNMP) {
+			// v1/v2c: pwd is the community, v3: uid user name, pwd authentication key, privKey privacy key
+			if (this.security.username || this.security.password || this.security.privKey) {
+				let result = <DeviceSecurityGeneral>{
+					uid: this.security.username,
+					pwd: this.security.password,
+					privKey: this.security.privKey
+				};
+				return result;
+			}
 		}
 		return null;
 	}
@@ -358,6 +487,7 @@ export class DevicePropertyComponent implements OnInit, OnDestroy {
 			this.security.password = value.pwd;
 			this.security.clientId = value.clientId;
 			this.security.grant_type = value.gt;
+			this.security.privKey = value.privKey;
 			if (value.uid || value.pwd || value.clientId) {
 				this.panelProperty?.open();
 			}
@@ -425,4 +555,5 @@ interface DeviceSecurityGeneral {
 	cert: string;
 	pkey: string;
 	caCert: string;
+	privKey: string;
 }

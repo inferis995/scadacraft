@@ -6,7 +6,7 @@ const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
 const prjstorage = require('../../runtime/project/prjstorage');
-const apiKeysStorage = require('../../runtime/apikeys/apikeysStorage');
+const apiKeysStorage = require('../../runtime/apikeys/apiKeysStorage');
 const alarmstorage = require('../../runtime/alarms/alarmstorage');
 
 function runSql(db, sql, params = []) {
@@ -126,8 +126,8 @@ describe('Storage insert/select regression', () => {
             await alarmstorage.init({ workDir }, makeLogger());
         });
 
-        afterEach(() => {
-            alarmstorage.close();
+        afterEach(async () => {
+            await alarmstorage.close();
         });
 
         it('insert/select alarms and history works', async () => {
@@ -158,7 +158,7 @@ describe('Storage insert/select regression', () => {
         });
 
         it('migrates old chronicle schema without value column', async () => {
-            alarmstorage.close();
+            await alarmstorage.close();
             const dbfile = path.join(workDir, 'alarms.fuxap.db');
             fs.unlinkSync(dbfile);
             const db = new sqlite3.Database(dbfile);

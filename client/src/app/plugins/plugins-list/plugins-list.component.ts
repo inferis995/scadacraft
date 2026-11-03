@@ -105,11 +105,14 @@ export class PluginsListComponent implements OnInit, OnDestroy {
         case PluginType.Raspberry:
         case PluginType.SiemensS7:
         case PluginType.EthernetIP:
+        case PluginType.GenericEthernetIP:
         case PluginType.OmronEthernetIP:
         case PluginType.MELSEC:
             return 'settings_input_component';
         case PluginType.REDIS:
             return 'storage';
+        case PluginType.SNMP:
+            return 'router';
         case PluginGroupType.Chart:
             return 'insert_chart';
         case PluginGroupType.Service:

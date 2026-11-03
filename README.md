@@ -18,7 +18,7 @@ ScadaCraft is a fork of [FUXA](https://github.com/frangoteam/FUXA) by frangoteam
 
 ## Drivers
 
-Modbus RTU/TCP, Siemens S7, OPC UA, MQTT, BACnet, EtherNet/IP, Omron, Melsec, ADS, ODBC, Redis, HTTP and more (inherited from FUXA).
+Modbus RTU/TCP, Siemens S7, OPC UA, MQTT, BACnet, EtherNet/IP, Omron, Melsec, ADS, ODBC, Redis, SNMP, HTTP and more (inherited from FUXA).
 
 ## Quick start
 

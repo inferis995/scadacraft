@@ -33,9 +33,12 @@ function AlarmsManager(_runtime) {
     this.start = function () {
         return new Promise(function (resolve, reject) {
             logger.info('alarms check start', true);
-            alarmsCheckStatus = setInterval(function () {
-                _checkStatus();
-            }, ALARMS_CHECK_STATUS_INTERVAL);
+            if (!alarmsCheckStatus) {
+                alarmsCheckStatus = setInterval(function () {
+                    _checkStatus();
+                }, ALARMS_CHECK_STATUS_INTERVAL);
+            }
+            resolve();
         });
     }
 
@@ -179,7 +182,7 @@ function AlarmsManager(_runtime) {
                     alr.userack = result[i].userack;
                     alr.group = result[i].grp;
                     alr.value = result[i].value;
-                    if (alr.ontime) {
+                    if (alr.ontime || alr.ontime === 0) {
                         var alrPermission = { show: true, enabled: true };
                         if (alarmsProperty[alr.name]) {
                             alrPermission = runtime.checkPermission(permission, alarmsProperty[alr.name].property);
@@ -223,7 +226,6 @@ function AlarmsManager(_runtime) {
                         }
                         if (alrPermission.enabled) {
                             if (alr.isToAck() > 0) {
-                                alr.setAck(userId);
                                 changed.push(alr);
                             }
                         } else {
@@ -236,6 +238,8 @@ function AlarmsManager(_runtime) {
                 reject({code: 401, error:"unauthorized_error", message: "Unauthorized!"});
             } else {
                 if (changed.length) {
+                    // Authorize the complete selection before changing acknowledgement state.
+                    changed.forEach(alr => alr.setAck(userId));
                     alarmstorage.setAlarms(changed).then(function (result) {
                         resolve(true);
                     }).catch(function (err) {
