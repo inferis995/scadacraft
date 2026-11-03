@@ -7,6 +7,24 @@ on:
   workflow_dispatch:
 
 jobs:
+  server:
+    name: Server — unit and integration tests
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.repository.private }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - name: Install
+        working-directory: server
+        run: npm ci
+      - name: Tests (FUXA suite and ScadaCraft additions)
+        working-directory: server
+        run: npm test
+
   mcp:
     name: MCP server — build and widget parity
     runs-on: ubuntu-latest
@@ -16,7 +34,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: mcp/package-lock.json
       - name: Install
@@ -43,7 +61,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: |
             server/package-lock.json

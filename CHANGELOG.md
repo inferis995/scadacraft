@@ -4,6 +4,17 @@ All notable changes to ScadaCraft. Versions of the MCP server are in brackets.
 
 ## Unreleased
 
+### Changed
+- Aligned with FUXA master of 2026-11-01 (1.3.6-3007, 90 commits after 1.3.5): S7 reconnection and
+  rack/slot checks, alarm acknowledgement authorization, DAQ/SQLite/InfluxDB fixes, session-scoped
+  history responses, SNMP driver, generic EtherNet/IP, MELSEC 1E/3E frames, HTML button actions,
+  dependency updates; runtime on Node.js 22.
+- CI runs the server test suite (FUXA tests and ScadaCraft additions); a weekly workflow opens an
+  issue when FUXA has new commits to align.
+
+### Fixed
+- The backup API answered 404 to every API request when backups were not initialised.
+
 ### Added
 - OpenBridge icons (about 2000, `ob:<name>`) for menu items, header buttons, page buttons and map
   markers, in the editor icon pickers (search by name); tools/openbridge/make-icons.mjs.

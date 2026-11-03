@@ -17,9 +17,11 @@ export enum PluginType {
     Raspberry = 'Raspberry',
     SiemensS7 = 'SiemensS7',
     EthernetIP = 'EthernetIP',
+    GenericEthernetIP = 'GenericEthernetIP',
     OmronEthernetIP = 'OmronEthernetIP',
     MELSEC = 'MELSEC',
-    REDIS = 'REDIS'
+    REDIS = 'REDIS',
+    SNMP = 'SNMP'
 }
 
 export enum PluginGroupType {

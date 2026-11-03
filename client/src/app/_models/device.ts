@@ -31,6 +31,8 @@ export class Device {
     polling: number;
     /** Tags list of Tag */
     tags: DictionaryTag;
+    /** Generic EtherNet/IP I/O modules */
+    modules?: { [id: string]: EthernetIPModule };
 
     constructor(_id: string) {
         this.id = _id;
@@ -40,7 +42,7 @@ export class Device {
         id: 'Device id, GUID',
         name: 'Device name',
         enabled: 'Enabled',
-        type: 'Device Type: FuxaServer | SiemensS7 | OPCUA | BACnet | ModbusRTU | ModbusTCP | WebAPI | MQTTclient | internal | EthernetIP | ADSclient | Gpio | WebCam | MELSEC | REDIS',
+        type: 'Device Type: FuxaServer | SiemensS7 | OPCUA | BACnet | ModbusRTU | ModbusTCP | WebAPI | MQTTclient | internal | EthernetIP | GenericEthernetIP | ADSclient | Gpio | WebCam | MELSEC | REDIS | SNMP',
         polling: 'Polling interval in millisec., check changed value after ask value, by OPCUA there is a monitor',
         property: 'Connection property depending of type',
         tags: 'Tags list of Tag',
@@ -106,6 +108,9 @@ export class Tag {
     direction?: string;
     edge?: string;
 
+    /** Generic EtherNet/IP tag configuration */
+    enipOptions?: EnipTagOptions;
+
 
     constructor(_id: string) {
         this.id = _id;
@@ -130,6 +135,87 @@ export class Tag {
         direction: 'A string specifying whether the GPIO should be configured as an input or output. The valid values are: \'in\', \'out\', \'high\', and \'low\'. If \'out\' is specified the GPIO will be configured as an output and the value of the GPIO will be set to 0. \'high\' and \'low\' are variants of \'out\' that configure the GPIO as an output with an initial level of 1 or 0 respectively.',
         edge: 'An optional string specifying the interrupt generating edge or edges for an input GPIO. The valid values are: \'none\', \'rising\', \'falling\' or \'both\'. The default value is \'none\' indicating that the GPIO will not generate interrupts. Whether or not interrupts are supported by an input GPIO is GPIO specific. If interrupts are not supported by a GPIO the edge argument should not be specified. The edge argument is ignored for output GPIOs.',
     };
+}
+
+export enum EnipTypes {
+    BOOL = 0xc1,
+    SINT = 0xc2,
+    INT = 0xc3,
+    DINT = 0xc4,
+    LINT = 0xc5,
+    USINT = 0xc6,
+    UINT = 0xc7,
+    UDINT = 0xc8,
+    REAL = 0xca,
+    LREAL = 0xcb,
+    STIME = 0xcc,
+    DATE = 0xcd,
+    TIME_AND_DAY = 0xce,
+    DATE_AND_STRING = 0xcf,
+    STRING = 0xd0,
+    WORD = 0xd1,
+    DWORD = 0xd2,
+    BIT_STRING = 0xd3,
+    LWORD = 0xd4,
+    STRING2 = 0xd5,
+    FTIME = 0xd6,
+    LTIME = 0xd7,
+    ITIME = 0xd8,
+    STRINGN = 0xd9,
+    SHORT_STRING = 0xda,
+    TIME = 0xdb,
+    EPATH = 0xdc,
+    ENGUNIT = 0xdd,
+    STRINGI = 0xde,
+    STRUCT = 0x02a0
+}
+
+export enum EnipTagDataSourceType {
+    symbolic,
+    explicit,
+    assemblyIO
+}
+
+export enum EnipIODataType {
+    bit,
+    integer16
+}
+
+export interface EnipTagOptions {
+    tagType: EnipTagDataSourceType;
+    symbolicOpt?: { program?: string; dataType?: EnipTypes };
+    explicitOpt?: {
+        class?: number;
+        instance?: number;
+        attribute?: number;
+        getOrSend?: boolean;
+        sendBuffer?: string;
+    };
+    ioOpt?: {
+        ioModuleId?: string;
+        ioType?: EnipIODataType;
+        ioByteOffset?: number;
+        ioBitOffset?: number;
+        ioOutput?: boolean;
+    };
+}
+
+export class EthernetIPModule {
+    id: string;
+    name: string;
+    description: string;
+    rpi: number;
+    inputInstance: number;
+    inputSize: number;
+    outputInstance: number;
+    outputSize: number;
+    configurationInstance: number;
+    configurationSize: number;
+    configurationData: string;
+
+    constructor(id: string) {
+        this.id = id;
+    }
 }
 
 export interface TagDevice extends Tag {
@@ -183,7 +269,7 @@ export class DeviceNetProperty {
     stopbits: string;
     /** Serial parity used for Modbus RTU connection */
     parity: string;
-    /** Options settings used for Modbus tockenized frame, redis for field */
+    /** Options settings used for Modbus tockenized frame, redis for field, SNMP for SnmpOptions */
     options: string;
     /** Method flag used for WebAPI (GET/POST) */
     method: string;
@@ -200,6 +286,8 @@ export class DeviceNetProperty {
     /** MELSEC */
     ascii?: boolean;
     octalIO?: boolean;
+    /** MELSEC MC protocol frame: '1E' (default) or '3E' (Q/L/iQ built-in Ethernet) */
+    frame?: string;
     timeout?: number;
 
     static descriptor = {
@@ -234,6 +322,8 @@ export class DeviceSecurity {
     certificateFileName: string;
     privateKeyFileName: string;
     caCertificateFileName: string;
+    /** SNMP v3 privacy (encryption) key, the authentication key is in password */
+    privKey: string;
 }
 
 export enum DeviceType {
@@ -247,13 +337,15 @@ export enum DeviceType {
     MQTTclient = 'MQTTclient',
     internal = 'internal',
     EthernetIP = 'EthernetIP',
+    GenericEthernetIP = 'GenericEthernetIP',
     OmronEthernetIP = 'OmronEthernetIP',
     ODBC = 'ODBC',
     ADSclient = 'ADSclient',
     GPIO = 'GPIO',
     WebCam = 'WebCam',
     MELSEC = 'MELSEC',
-    REDIS = 'REDIS'
+    REDIS = 'REDIS',
+    SNMP = 'SNMP'
     // Template: 'template'
 }
 
@@ -359,6 +451,74 @@ export class RedisOptions {
     };
 }
 
+export enum SnmpVersion {
+    v1 = 'v1',
+    v2c = 'v2c',
+    v3 = 'v3'
+}
+
+export enum SnmpTransport {
+    udp4 = 'udp4',
+    udp6 = 'udp6'
+}
+
+export enum SnmpSecurityLevel {
+    noAuthNoPriv = 'noAuthNoPriv',
+    authNoPriv = 'authNoPriv',
+    authPriv = 'authPriv'
+}
+
+export enum SnmpAuthProtocol {
+    md5 = 'md5',
+    sha = 'sha',
+    sha224 = 'sha224',
+    sha256 = 'sha256',
+    sha384 = 'sha384',
+    sha512 = 'sha512'
+}
+
+export enum SnmpPrivProtocol {
+    des = 'des',
+    aes = 'aes',
+    aes256b = 'aes256b',
+    aes256r = 'aes256r'
+}
+
+/** Keys match the net-snmp ObjectType names, used for the SET encoding and the read coercion */
+export enum SnmpTagType {
+    Integer = 'Integer',
+    OctetString = 'OctetString',
+    Hex = 'Hex',
+    Counter32 = 'Counter32',
+    Gauge32 = 'Gauge32',
+    Unsigned32 = 'Unsigned32',
+    TimeTicks = 'TimeTicks',
+    Counter64 = 'Counter64',
+    IpAddress = 'IpAddress',
+    OID = 'OID',
+    Boolean = 'Boolean'
+}
+
+export class SnmpOptions {
+    version: SnmpVersion = SnmpVersion.v3;
+    transport: SnmpTransport = SnmpTransport.udp4;
+    /** Request timeout in millisec., keep timeout * (retries + 1) below the polling interval (default 3000) */
+    timeout = 1000;
+    retries = 1;
+    /** SNMP v3 */
+    securityLevel: SnmpSecurityLevel = SnmpSecurityLevel.authPriv;
+    authProtocol: SnmpAuthProtocol = SnmpAuthProtocol.sha256;
+    privProtocol: SnmpPrivProtocol = SnmpPrivProtocol.aes;
+    context = '';
+    /** OIDs for each GET request */
+    maxOidsPerRequest = 25;
+    /** Consecutive polls without answer before reconnect */
+    offlineAfterTimeouts = 3;
+    /** Receive the traps/informs sent by the agent, with the same credentials of the session */
+    trapsEnabled = false;
+    trapPort = 162;
+}
+
 export enum ModbusOptionType {
     SerialPort = 'SerialPort',
     RTUBufferedPort = 'RTUBufferedPort',
@@ -442,6 +602,7 @@ export enum BACnetObjectType {
 
 export const DEVICE_PREFIX = 'd_';
 export const TAG_PREFIX = 't_';
+export const ETHERNETIPMODULE_PREFIX = 'm_';
 
 export class DevicesUtils {
     static getDeviceTagText(devices: Device[], id: string): string {

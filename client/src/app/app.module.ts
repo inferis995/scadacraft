@@ -46,6 +46,7 @@ import { LanguageTextListComponent } from './language/language-text-list/languag
 import { LabComponent } from './lab/lab.component';
 import { DeviceComponent } from './device/device.component';
 import { DevicePropertyComponent } from './device/device-property/device-property.component';
+import { DeviceEnipmoduleComponent } from './device/device-enipmodule/device-enipmodule.component';
 import { TagOptionsComponent } from './device/tag-options/tag-options.component';
 import { TopicPropertyComponent } from './device/topic-property/topic-property.component';
 import { DeviceListComponent } from './device/device-list/device-list.component';
@@ -132,6 +133,7 @@ import { PipePropertyComponent } from './gauges/controls/pipe/pipe-property/pipe
 import { PipeComponent } from './gauges/controls/pipe/pipe.component';
 import { SliderComponent } from './gauges/controls/slider/slider.component';
 import { SliderPropertyComponent } from './gauges/controls/slider/slider-property/slider-property.component';
+import { ButtonActionPropertyComponent } from './gauges/controls/html-button/button-action-property/button-action-property.component';
 import { HtmlSwitchPropertyComponent } from './gauges/controls/html-switch/html-switch-property/html-switch-property.component';
 
 import { NgxUplotComponent } from './gui-helpers/ngx-uplot/ngx-uplot.component';
@@ -190,6 +192,7 @@ import { TagPropertyEditOpcuaComponent } from './device/tag-property/tag-propert
 import { TagPropertyEditBacnetComponent } from './device/tag-property/tag-property-edit-bacnet/tag-property-edit-bacnet.component';
 import { TagPropertyEditWebapiComponent } from './device/tag-property/tag-property-edit-webapi/tag-property-edit-webapi.component';
 import { TagPropertyEditEthernetipComponent } from './device/tag-property/tag-property-edit-ethernetip/tag-property-edit-ethernetip.component';
+import { TagPropertyEditGenericEthernetIPComponent } from './device/tag-property/tag-property-edit-generic-ethernetip/tag-property-edit-generic-ethernetip.component';
 import { ViewPropertyComponent } from './editor/view-property/view-property.component';
 import { ResizeDirective } from './_directives/resize.directive';
 import { EditorViewsListComponent } from './editor/editor-views-list/editor-views-list.component';
@@ -235,6 +238,8 @@ import { ApiKeysListComponent } from './apikeys/api-keys-list/api-keys-list.comp
 import { ApiKeyPropertyComponent } from './apikeys/api-key-property/api-key-property.component';
 import { TagPropertyEditRedisComponent } from './device/tag-property/tag-property-edit-redis/tag-property-edit-redis.component';
 import { TagPropertyRedisScanComponent } from './device/tag-property/tag-property-edit-redis/tag-property-redis-scan/tag-property-redis-scan.component';
+import { TagPropertyEditSnmpComponent } from './device/tag-property/tag-property-edit-snmp/tag-property-edit-snmp.component';
+import { TagPropertySnmpScanComponent } from './device/tag-property/tag-property-edit-snmp/tag-property-snmp-scan/tag-property-snmp-scan.component';
 import { OnboardingWizardComponent } from './editor/onboarding-wizard/onboarding-wizard.component';
 import { PluginsListComponent } from './plugins/plugins-list/plugins-list.component';
 import { SectionMessageDialogComponent } from './editor/section-message-dialog/section-message-dialog.component';
@@ -276,12 +281,14 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
         TagPropertyEditBacnetComponent,
         TagPropertyEditWebapiComponent,
         TagPropertyEditEthernetipComponent,
+        TagPropertyEditGenericEthernetIPComponent,
         TagPropertyEditADSclientComponent,
         TagPropertyEditGpioComponent,
         TagPropertyEditMelsecComponent,
         TagOptionsComponent,
         TopicPropertyComponent,
         DevicePropertyComponent,
+        DeviceEnipmoduleComponent,
         DeviceWebapiPropertyDialogComponent,
         LayoutPropertyComponent,
         TagsIdsConfigComponent,
@@ -321,6 +328,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
         PipePropertyComponent,
         SliderPropertyComponent,
         HtmlSwitchPropertyComponent,
+        ButtonActionPropertyComponent,
         ShapesComponent,
         ProcEngComponent,
         ApeShapesComponent,
@@ -432,6 +440,8 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
         ApiKeyPropertyComponent,
         TagPropertyEditRedisComponent,
         TagPropertyRedisScanComponent,
+        TagPropertyEditSnmpComponent,
+        TagPropertySnmpScanComponent,
         OnboardingWizardComponent,
         PluginsListComponent,
         SectionMessageDialogComponent,

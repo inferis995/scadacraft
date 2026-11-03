@@ -27,6 +27,7 @@ import { NgxTouchKeyboardDirective } from '../framework/ngx-touch-keyboard/ngx-t
 import { HmiService } from '../_services/hmi.service';
 import { EndPointApi } from '../_helpers/endpointapi';
 import { HtmlSelectComponent } from '../gauges/controls/html-select/html-select.component';
+import { HtmlButtonComponent } from '../gauges/controls/html-button/html-button.component';
 import { FuxaViewDialogComponent, FuxaViewDialogData } from './fuxa-view-dialog/fuxa-view-dialog.component';
 import { DialogPosition as DialogPosition, MatDialog as MatDialog } from '@angular/material/dialog';
 import { WebcamPlayerDialogComponent, WebcamPlayerDialogData } from '../gui-helpers/webcam-player/webcam-player-dialog/webcam-player-dialog.component';
@@ -85,6 +86,8 @@ export class FuxaViewComponent implements OnInit, AfterViewInit, OnDestroy {
     private loadOk = false;
     private zIndexCounter = 1000;
 
+    private buttonActionDisposers: Array<() => void> = [];
+
     constructor(
         private translateService: TranslateService,
         private changeDetector: ChangeDetectorRef,
@@ -132,6 +135,8 @@ export class FuxaViewComponent implements OnInit, AfterViewInit, OnDestroy {
             if (this['subscriptionOnGaugeEvent']) {
                 this['subscriptionOnGaugeEvent'].unsubscribe();
             }
+            this.buttonActionDisposers.forEach(dispose => dispose());
+            this.buttonActionDisposers = []; // prevent running dispose again if ngOnDestroy is called multiple times
             if (this.inputDialogRef) {
                 this.inputDialogRef.nativeElement.style.display = 'none';
             }
@@ -216,6 +221,8 @@ export class FuxaViewComponent implements OnInit, AfterViewInit, OnDestroy {
                     this.gaugesManager.unbindGauge(this.id);
                     this.clearGaugeStatus();
                     this.viewContainerRef.clear();
+                    this.buttonActionDisposers.forEach(dispose => dispose());
+                    this.buttonActionDisposers = [];
                     this.dataContainer.nativeElement.innerHTML = '';
                 } catch (err) {
                     console.error(err);
@@ -583,7 +590,17 @@ export class FuxaViewComponent implements OnInit, AfterViewInit, OnDestroy {
                     self.runEvents(self, ga, ev, mouseOutEvents);
                 });
             }
+            if (HtmlButtonComponent.hasButtonAction(ga)) {
+                self.bindButtonAction(ga, svgele.node);
+            }
         }
+    }
+
+    private bindButtonAction(ga: GaugeSettings, element: HTMLElement) {
+        this.buttonActionDisposers.push(HtmlButtonComponent.bindAction(ga, element, {
+            read: () => this.hmiService.variables[ga.property.variableId]?.value,
+            write: (value: string) => this.gaugesManager.putSignalValue(ga.property.variableId, value)
+        }));
     }
 
     public runEvents(self: any, ga: GaugeSettings, ev: any, events: any) {
@@ -649,6 +666,7 @@ export class FuxaViewComponent implements OnInit, AfterViewInit, OnDestroy {
             this.touchKeyboard.ngxTouchKeyboardFullScreen = true;
         }
         if (htmlevent.type === 'key-enter') {
+            let submittingByEnter = false;
             htmlevent.dom.onkeydown = function(ev) {
                 if (ev.key === 'Enter') {
                     const isToSkip = HtmlInputComponent.SkipEnterEvent.includes((htmlevent?.dom?.nodeName ?? '').toLowerCase());
@@ -666,7 +684,13 @@ export class FuxaViewComponent implements OnInit, AfterViewInit, OnDestroy {
                     else {
                         htmlevent.value = res.value;
                         self.gaugesManager.putEvent(htmlevent);
-                        htmlevent.dom.blur();
+                        // blur fires synchronously; Confirm on leave must not submit again.
+                        submittingByEnter = true;
+                        try {
+                            htmlevent.dom.blur();
+                        } finally {
+                            submittingByEnter = false;
+                        }
                     }
                     if (htmlevent.ga.type === HtmlInputComponent.TypeTag) {
                         // htmlevent.dom.focus();
@@ -738,7 +762,7 @@ export class FuxaViewComponent implements OnInit, AfterViewInit, OnDestroy {
                     }
                     // Remove any error message when input is blured
                     htmlevent.dom.setCustomValidity('');
-                    self.checkRestoreValue(htmlevent);
+                    self.checkRestoreValue(htmlevent, submittingByEnter);
                 };
 
                 htmlevent.dom.oninput = function(ev){
@@ -760,7 +784,7 @@ export class FuxaViewComponent implements OnInit, AfterViewInit, OnDestroy {
         }
     }
 
-    private checkRestoreValue(htmlevent: Event) {
+    private checkRestoreValue(htmlevent: Event, submittingByEnter: boolean = false) {
         if (htmlevent.ga?.property?.options?.updated &&
             (htmlevent.ga.property.options.updatedEsc || htmlevent.ga.property.options.actionOnEsc === InputActionEscType.update)) {
             //ToDo there is definitely a better way
@@ -771,7 +795,7 @@ export class FuxaViewComponent implements OnInit, AfterViewInit, OnDestroy {
                     htmlevent.dom.value = currentInputValue;
                 }
             }, 1000);
-        } else if (htmlevent.ga?.property?.options?.actionOnEsc === InputActionEscType.enter) {
+        } else if (!submittingByEnter && htmlevent.ga?.property?.options?.actionOnEsc === InputActionEscType.enter) {
             this.emulateEnterKey(htmlevent.dom);
         }
     }

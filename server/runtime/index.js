@@ -15,7 +15,9 @@ var notificator = require('./notificator');
 var scripts = require('./scripts');
 var plugins = require('./plugins');
 var utils = require('./utils');
+var localization = require('./localization');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 const daqstorage = require('./storage/daqstorage');
 const schedulerStorage = require('./scheduler/scheduler-storage');
 const schedulerService = require('./scheduler/scheduler-service');
@@ -55,6 +57,10 @@ function init(_io, _api, _settings, _log, eventsMain) {
     settings = _settings;
     logger = _log;
     api = _api;
+    localization.init({
+        i18nPath: settings.httpStatic ? path.join(settings.httpStatic, 'assets', 'i18n') : undefined,
+        logger
+    });
     // check runtime init dependency and send to main if ready
     var checkInit = function () {
         if (!events.listenerCount('init-plugins-ok') && !events.listenerCount('init-users-ok') && !events.listenerCount('init-project-ok')) {
@@ -245,6 +251,21 @@ function init(_io, _api, _settings, _log, eventsMain) {
                 logger.error(`${Events.IoEventTypes.DEVICE_BROWSE}: ${err}`);
             }
         });
+        socket.on(Events.IoEventTypes.DEVICE_BROWSE_FOR_DEVICES, (message) => {
+            if (!isSocketAdminAuthorized(socket)) {
+                logger.warn(`${Events.IoEventTypes.DEVICE_BROWSE_FOR_DEVICES}: unauthorized request from ${socket.userId || 'guest'}`);
+                return;
+            }
+            if (!message || !message.device) {
+                return;
+            }
+            devices.browseForDevices(message.device, message.node).then(result => {
+                socket.emit(Events.IoEventTypes.DEVICE_BROWSE_FOR_DEVICES, { ...message, result });
+            }).catch(error => {
+                logger.error(`${Events.IoEventTypes.DEVICE_BROWSE_FOR_DEVICES}: ${error}`);
+                socket.emit(Events.IoEventTypes.DEVICE_BROWSE_FOR_DEVICES, { ...message, error: error.message || error });
+            });
+        });
         // client ask device node attribute
         socket.on(Events.IoEventTypes.DEVICE_NODE_ATTRIBUTE, (message) => {
             try {
@@ -282,7 +303,7 @@ function init(_io, _api, _settings, _log, eventsMain) {
                                     dbfncs.push(daqstorage.getNodeValues(msg.sids[i], chunk.start, chunk.end));
                                 }
                                 const values = await Promise.all(dbfncs);
-                                io.emit(Events.IoEventTypes.DAQ_RESULT, {
+                                socket.emit(Events.IoEventTypes.DAQ_RESULT, {
                                     gid: msg.gid,
                                     result: values,
                                     chunk: {
@@ -292,7 +313,7 @@ function init(_io, _api, _settings, _log, eventsMain) {
                                 });
                             } catch (error) {
                                 logger.error(`${Events.IoEventTypes.DAQ_QUERY}: ${error.stack || error}`);
-                                io.emit(Events.IoEventTypes.DAQ_ERROR, { gid, error });
+                                socket.emit(Events.IoEventTypes.DAQ_ERROR, { gid: msg.gid, error });
                                 return;
                             }
                         }
@@ -388,8 +409,14 @@ function init(_io, _api, _settings, _log, eventsMain) {
         });
         socket.on(Events.IoEventTypes.DEVICE_TAGS_SUBSCRIBE, (message) => {
             try {
-                socket.tagsClientSubscriptions = message.tagsId
-                if (message.sendLastValue) {
+                // Never trust the client payload: a non-array value would make
+                // the broadcast loop below throw on .includes() and abort the
+                // delivery for every other socket (see updateDeviceValues).
+                const tagsId = message && message.tagsId;
+                socket.tagsClientSubscriptions = Array.isArray(tagsId)
+                    ? tagsId.filter(id => typeof id === 'string')
+                    : [];
+                if (message && message.sendLastValue) {
                     var adevs = devices.getDevicesValues();
                     for (var id in adevs) {
                         updateDeviceValues({ id: id, values: adevs[id] || {}});
@@ -587,13 +614,22 @@ function updateDeviceValues(event) {
         //!TOFIX
         if (settings.broadcastAll === false) {
             Array.from(io.sockets.sockets.values()).forEach((socket) => {
-                const tags = Object.values(event.values).filter((tag) => {
-                    return socket.tagsClientSubscriptions.includes(tag.id);
-                });
-                socket.emit(Events.IoEventTypes.DEVICE_VALUES, {
-                    id: event.id,
-                    values: tagsToSend(tags)
-                });
+                // One malformed subscription must not stop the broadcast for
+                // all the other connected clients.
+                try {
+                    const subscriptions = Array.isArray(socket.tagsClientSubscriptions)
+                        ? socket.tagsClientSubscriptions
+                        : [];
+                    const tags = Object.values(event.values).filter((tag) => {
+                        return subscriptions.includes(tag.id);
+                    });
+                    socket.emit(Events.IoEventTypes.DEVICE_VALUES, {
+                        id: event.id,
+                        values: tagsToSend(tags)
+                    });
+                } catch (err) {
+                    logger.error(`${Events.IoEventTypes.DEVICE_VALUES}: ${err.message}`);
+                }
             });
         } else {
             io.emit(Events.IoEventTypes.DEVICE_VALUES, {
@@ -837,5 +873,6 @@ var runtime = module.exports = {
     checkPermission: checkPermission,
     get socketPool() { return socketPool },
     get socketMutex() {return socketMutex },
-    get apiKeys() { return apiKeys }
+    get apiKeys() { return apiKeys },
+    localization: localization
 }

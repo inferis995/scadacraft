@@ -42,7 +42,8 @@ module.exports = {
     },
     app: function () {
         var backupApp = express();
-        backupApp.use(function (req, res, next) {
+        // only the backup routes: this app is mounted on the whole API
+        backupApp.use('/api/backup', function (req, res, next) {
             if (!runtime.backup) {
                 res.status(404).end();
             } else {

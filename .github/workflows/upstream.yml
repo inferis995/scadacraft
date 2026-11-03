@@ -1,0 +1,46 @@
+name: FUXA upstream check
+
+# Weekly: compare frangoteam/FUXA master with the commit ScadaCraft is aligned with
+# (.github/fuxa-upstream) and keep one open issue listing the new upstream commits.
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.repository.private }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare with upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BASE=$(grep -v '^#' .github/fuxa-upstream | head -1 | tr -d '[:space:]')
+          git fetch --quiet --filter=blob:none https://github.com/frangoteam/FUXA.git master
+          HEAD_SHA=$(git rev-parse FETCH_HEAD)
+          COUNT=$(git rev-list --count "$BASE..FETCH_HEAD")
+          echo "aligned with $BASE, upstream at $HEAD_SHA, $COUNT new commit(s)"
+          TITLE="FUXA upstream: new commits to align"
+          EXISTING=$(gh issue list --state open --search "$TITLE in:title" --json number --jq '.[0].number // empty')
+          if [ "$COUNT" = "0" ]; then
+            [ -n "$EXISTING" ] && gh issue close "$EXISTING" --comment "Aligned with FUXA ${HEAD_SHA:0:7}."
+            exit 0
+          fi
+          {
+            echo "FUXA master has **$COUNT** commit(s) after the aligned commit \`${BASE:0:7}\` (now at \`${HEAD_SHA:0:7}\`)."
+            echo
+            git log --format='- %h %ad %s' --date=short "$BASE..FETCH_HEAD" | head -150
+            echo
+            echo "Align them, then update \`.github/fuxa-upstream\`."
+          } > body.md
+          if [ -n "$EXISTING" ]; then
+            gh issue edit "$EXISTING" --body-file body.md
+          else
+            gh issue create --title "$TITLE" --body-file body.md
+          fi
