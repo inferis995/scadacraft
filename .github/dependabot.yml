@@ -32,6 +32,9 @@ updates:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
+      # pdfmake 0.3 changes the API used by the PDF reports: update by hand
+      - dependency-name: "pdfmake"
+        versions: [">=0.3.0"]
       - dependency-name: "jsonata"
       - dependency-name: "electron-builder"
       - dependency-name: "electron"
@@ -66,6 +69,9 @@ updates:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
+      # pdfmake 0.3 changes the API used by the PDF reports: update by hand
+      - dependency-name: "pdfmake"
+        versions: [">=0.3.0"]
       - dependency-name: "@angular/*"
       - dependency-name: "@angular-devkit/*"
       - dependency-name: "@angular/cli"
