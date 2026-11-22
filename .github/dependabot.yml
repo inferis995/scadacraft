@@ -10,7 +10,7 @@ updates:
     schedule:
       interval: "weekly"
 
-    rebase-strategy: disabled
+    rebase-strategy: auto
 
     open-pull-requests-limit: 5
 
@@ -28,6 +28,10 @@ updates:
           - "*"
 
     ignore:
+      # major versions need code changes: updated by hand, not by grouped PRs
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
       - dependency-name: "jsonata"
       - dependency-name: "electron-builder"
       - dependency-name: "electron"
@@ -43,7 +47,7 @@ updates:
     schedule:
       interval: "weekly"
 
-    rebase-strategy: disabled
+    rebase-strategy: auto
 
     open-pull-requests-limit: 5
 
@@ -58,6 +62,10 @@ updates:
           - "*"
 
     ignore:
+      # major versions need code changes: updated by hand, not by grouped PRs
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
       - dependency-name: "@angular/*"
       - dependency-name: "@angular-devkit/*"
       - dependency-name: "@angular/cli"
@@ -77,7 +85,7 @@ updates:
     schedule:
       interval: "monthly"
 
-    rebase-strategy: disabled
+    rebase-strategy: auto
 
     open-pull-requests-limit: 2
 
@@ -85,6 +93,10 @@ updates:
       - "electron"
 
     ignore:
+      # major versions need code changes: updated by hand, not by grouped PRs
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
       - dependency-name: "electron-builder"
       - dependency-name: "electron"
         update-types:
