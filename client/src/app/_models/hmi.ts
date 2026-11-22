@@ -419,6 +419,7 @@ export class GaugeStatus {
 
 export class GaugeActionStatus {
     type: string;
+    animationType?: string;
     timer?: any = null;
     animr?: any = null;
     spool?: any;

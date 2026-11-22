@@ -99,6 +99,18 @@ export function buildWidgetItem(input: WidgetInstanceInput): { id: string; item:
     Array.from(el.childNodes).forEach((c) => { if (c.nodeType === 1) walk(c as unknown as XElement); });
   };
   walk(svg as unknown as XElement);
+  // keep internal references (gradients, clip paths, <use>) pointing at the renamed ids, as the editor does
+  const fixRefs = (el: XElement) => {
+    for (const attr of Array.from(el.attributes ?? [])) {
+      let value = attr.value;
+      const direct = /^#(.+)$/.exec(value);
+      if ((attr.localName === 'href' || attr.name === 'xlink:href') && direct && idMap[direct[1]]) value = `#${idMap[direct[1]]}`;
+      value = value.replace(/url\(\s*(['"]?)#([^\s)'"]+)\1\s*\)/g, (ref, q, ref_id) => (idMap[ref_id] ? `url(${q}#${idMap[ref_id]}${q})` : ref));
+      if (value !== attr.value) el.setAttribute(attr.name, value);
+    }
+    Array.from(el.childNodes).forEach((c) => { if (c.nodeType === 1) fixRefs(c as unknown as XElement); });
+  };
+  fixRefs(svg as unknown as XElement);
 
   const moduleId = `wModule_${svgGuid}`;
   let processed: { content: string; vars: WidgetPropertyVariable[] } | undefined;
