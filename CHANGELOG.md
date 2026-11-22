@@ -5,6 +5,15 @@ All notable changes to ScadaCraft. Versions of the MCP server are in brackets.
 ## Unreleased
 
 ### Changed
+- Aligned with FUXA 1.3.6 release (master of 2026-11-20, 71 commits): security fixes (DAQ query
+  ranges, MQTT payload size, Node-RED WebSocket admin auth, TLS credentials kept out of settings,
+  recipe and scheduler permissions, runSysFunction access), S7 optional pure-JS driver (nodes7) and
+  write completion, BACnet / Modbus / MQTT / Redis / EtherNet/IP / GPIO / WebAPI fixes, concurrent
+  shape animations, counter-clockwise rotation, widget internal references kept after id renaming,
+  every variable bound to a shared tag updated, QuestDB tag names.
+- MCP widget placement keeps internal references (gradients, clip paths, `<use>`) like the editor.
+
+### Changed
 - Aligned with FUXA master of 2026-11-01 (1.3.6-3007, 90 commits after 1.3.5): S7 reconnection and
   rack/slot checks, alarm acknowledgement authorization, DAQ/SQLite/InfluxDB fixes, session-scoped
   history responses, SNMP driver, generic EtherNet/IP, MELSEC 1E/3E frames, HTML button actions,

@@ -7,6 +7,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import assert from 'node:assert/strict';
 import { processWidget } from '../dist/fuxa/widget-script.js';
+import { buildWidgetItem } from '../dist/fuxa/view.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = join(HERE, '..', '..');
@@ -34,6 +35,24 @@ for (const file of files) {
   assert.equal(ours.content, ref.content, `${file}: script differs`);
   assert.deepEqual(ours.vars, ref.vars, `${file}: variables differ`);
   n++;
+}
+// internal references follow the renamed ids (SvgUtils.renameIdsInSvg since FUXA 1.3.6-3098)
+{
+  const svgSource = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="10" height="10">
+<defs><linearGradient id="g1"/><clipPath id="c1"/><path id="p1" d="M0 0"/></defs>
+<rect id="r" fill="url(#g1)" style="clip-path: url('#c1')" stroke="url(#missing)"/><use xlink:href="#p1"/><use href="#p1"/>
+<script><![CDATA[//!export-start
+let _pn_x = 0;
+//!export-end
+function putValue(id, value) {}
+]]></script></svg>`;
+  const { item } = buildWidgetItem({ widget: { widget: 't', varsToBind: [] }, svgSource, address: '_widgets/t.svg', x: 0, y: 0, width: 10, height: 10 });
+  const out = item.property.svgContent;
+  const sfx = /id="g1_([^"]+)"/.exec(out)[1];
+  assert.match(out, new RegExp(`fill="url\\(#g1_${sfx}\\)"`), 'url() reference renamed');
+  assert.match(out, new RegExp(`clip-path: url\\('#c1_${sfx}'\\)`), 'quoted url() reference renamed');
+  assert.match(out, /stroke="url\(#missing\)"/, 'unknown reference kept');
+  assert.equal((out.match(new RegExp(`href="#p1_${sfx}"`, 'g')) || []).length, 2, 'href and xlink:href renamed');
 }
 rmSync(tmp, { recursive: true, force: true });
 console.log(`parity OK: ${n} widgets match the editor's processing`);
